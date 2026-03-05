@@ -1,0 +1,8 @@
+/out
+bin/
+build/
+/.vs
+.idea/
+Makefile
+
+CMakeSettings.json
