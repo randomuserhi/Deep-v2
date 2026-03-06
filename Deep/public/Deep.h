@@ -144,7 +144,7 @@
  * Deep Utilities
  */
 
-#include <Deep/Types.h>
+#include "Deep/Types.h" // IWYU pragma: export
 
 // TODO(randomuserhi):
 // - Detect architecture (64bit / 32bit), currently only 64 bit is supported

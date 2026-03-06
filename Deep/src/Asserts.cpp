@@ -2,7 +2,7 @@
  * Asserts.cpp
  */
 
-#include <Deep.h>
+#include "Deep.h" // IWYU pragma: keep
 
 #ifdef DEEP_USE_ASSERTS
 
