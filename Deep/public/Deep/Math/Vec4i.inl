@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Deep/Math/Vec4i.h"
+#include "Deep/Math/Vec4.h"
+
 DEEP_NAMESPACE_BEGIN
 
 #ifdef DEEP_USE_SSE4_1
 Vec4i::Vec4i(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
-    sse_m128i(in_x, in_y, in_z, in_w) {}
+    xmmi(in_x, in_y, in_z, in_w) {}
 #else
 Vec4i::Vec4i(int32 roX, int32 in_y, int32 in_z, int32 in_w) {
     x = in_x;
@@ -14,12 +17,12 @@ Vec4i::Vec4i(int32 roX, int32 in_y, int32 in_z, int32 in_w) {
 }
 #endif
 
-Vec4i::Vec4i(SSE_m128i in_sse_m128i) :
-    sse_m128i(in_sse_m128i) {}
+Vec4i::Vec4i(Xmmi in_xmmi) :
+    xmmi(in_xmmi) {}
 
 Vec4i::Vec4i(Vec3iArg in_xyz, int32 in_w) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128i = _mm_blend_epi32(in_xyz.sse_m128i, _mm_set1_epi32(in_w), 8);
+    xmmi = _mm_blend_epi32(in_xyz.xmmi, _mm_set1_epi32(in_w), 8);
 #else
     x = in_xyz.x;
     y = in_xyz.y;
@@ -40,7 +43,7 @@ int32 Vec4i::manhattanDistance() const {
 #ifdef DEEP_USE_SSE4_1
     // NOTE(randomuserhi): Not even sure if SIMD horizontal sum here is worth. Might be better off without
     //                     Profiling required.
-    SSE_m128i sum = _mm_add_epi32(sse_m128i, _mm_shuffle_epi32(sse_m128i, _MM_SHUFFLE(2, 3, 0, 1)));
+    Xmmi sum = _mm_add_epi32(xmmi, _mm_shuffle_epi32(xmmi, _MM_SHUFFLE(2, 3, 0, 1)));
     sum = _mm_add_epi32(sum, _mm_shuffle_epi32(sum, _MM_SHUFFLE(1, 0, 3, 2)));
     return _mm_cvtsi128_si32(sum);
 #else
@@ -50,7 +53,7 @@ int32 Vec4i::manhattanDistance() const {
 
 int32 Vec4i::Dot(Vec4iArg in_a, Vec4iArg in_b) {
 #ifdef DEEP_USE_SSE4_1
-    SSE_m128i sum = _mm_mullo_epi32(in_a.sse_m128i, in_b.sse_m128i);
+    Xmmi sum = _mm_mullo_epi32(in_a.xmmi, in_b.xmmi);
 
     // NOTE(randomuserhi): Not even sure if SIMD horizontal sum here is worth. Might be better off without
     //                     Profiling required.
@@ -63,95 +66,95 @@ int32 Vec4i::Dot(Vec4iArg in_a, Vec4iArg in_b) {
 }
 
 Vec4i::operator Vec4() const {
-    return Vec4{ _mm_cvtepi32_ps(sse_m128i) };
+    return Vec4{ _mm_cvtepi32_ps(xmmi) };
 }
 
 Deep_Inline bool operator!=(Vec4iArg in_a, Vec4iArg in_b) {
-    return in_a.sse_m128i != in_b.sse_m128i;
+    return in_a.xmmi != in_b.xmmi;
 }
 Deep_Inline bool operator==(Vec4iArg in_a, Vec4iArg in_b) {
     return !(in_a != in_b);
 }
 
 Vec4i& Vec4i::operator+=(Vec4iArg in_other) {
-    sse_m128i += in_other.sse_m128i;
+    xmmi += in_other.xmmi;
     return *this;
 }
 
 Vec4i operator+(Vec4iArg in_a, Vec4iArg in_b) {
     Vec4i result;
-    result.sse_m128i = in_a.sse_m128i + in_b.sse_m128i;
+    result.xmmi = in_a.xmmi + in_b.xmmi;
     return result;
 }
 
 Vec4i& Vec4i::operator-=(Vec4iArg in_other) {
-    sse_m128i -= in_other.sse_m128i;
+    xmmi -= in_other.xmmi;
     return *this;
 }
 
 Vec4i operator-(Vec4iArg in_a, Vec4iArg in_b) {
     Vec4i result;
-    result.sse_m128i = in_a.sse_m128i - in_b.sse_m128i;
+    result.xmmi = in_a.xmmi - in_b.xmmi;
     return result;
 }
 
 Vec4i operator-(Vec4iArg in_a) {
     Vec4i result;
-    result.sse_m128i = -in_a.sse_m128i;
+    result.xmmi = -in_a.xmmi;
     return result;
 }
 
 Vec4i& Vec4i::operator*=(Vec4iArg in_other) {
-    sse_m128i *= in_other.sse_m128i;
+    xmmi *= in_other.xmmi;
     return *this;
 }
 Vec4i operator*(Vec4iArg in_a, Vec4iArg in_b) {
     Vec4i result;
-    result.sse_m128i = in_a.sse_m128i * in_b.sse_m128i;
+    result.xmmi = in_a.xmmi * in_b.xmmi;
     return result;
 }
 
 Vec4i& Vec4i::operator*=(int32 in_other) {
-    sse_m128i *= in_other;
+    xmmi *= in_other;
     return *this;
 }
 
 Vec4i operator*(Vec4iArg in_vec, int32 in_val) {
     Vec4i result;
-    result.sse_m128i = in_vec.sse_m128i * in_val;
+    result.xmmi = in_vec.xmmi * in_val;
     return result;
 }
 
 Vec4i operator*(int32 in_val, Vec4iArg in_vec) {
     Vec4i result;
-    result.sse_m128i = in_val * in_vec.sse_m128i;
+    result.xmmi = in_val * in_vec.xmmi;
     return result;
 }
 
 Vec4i& Vec4i::operator/=(Vec4iArg in_other) {
-    sse_m128i /= in_other.sse_m128i;
+    xmmi /= in_other.xmmi;
     return *this;
 }
 Vec4i operator/(Vec4iArg in_a, Vec4iArg in_b) {
     Vec4i result;
-    result.sse_m128i = in_a.sse_m128i / in_b.sse_m128i;
+    result.xmmi = in_a.xmmi / in_b.xmmi;
     return result;
 }
 
 Vec4i& Vec4i::operator/=(int32 in_other) {
-    sse_m128i /= in_other;
+    xmmi /= in_other;
     return *this;
 }
 
 Vec4i operator/(Vec4iArg in_vec, int32 in_val) {
     Vec4i result;
-    result.sse_m128i = in_vec.sse_m128i / in_val;
+    result.xmmi = in_vec.xmmi / in_val;
     return result;
 }
 
 Vec4i operator/(int32 in_val, Vec4iArg in_vec) {
     Vec4i result;
-    result.sse_m128i = in_val / in_vec.sse_m128i;
+    result.xmmi = in_val / in_vec.xmmi;
     return result;
 }
 

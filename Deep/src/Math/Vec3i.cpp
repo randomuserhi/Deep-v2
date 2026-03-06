@@ -1,4 +1,4 @@
-#include <Deep/Math.h>
+#include "Deep/Math/Vec3i.h"
 
 DEEP_NAMESPACE_BEGIN
 

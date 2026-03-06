@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <Deep.h>
-#include <Deep/Math.h>
-#include <Deep/Bit.h>
+#include "Deep.h"
+#include "Deep/Math.h"
 
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #include <vector>
@@ -56,4 +55,4 @@ private:
 
 DEEP_NAMESPACE_END
 
-#include "PacketWriter.inl"
+#include "PacketWriter.inl" // IWYU pragma: export

@@ -1,7 +1,6 @@
-#include <Tests.h>
+#include "Tests.h"
 
-#include <Deep.h>
-#include <Deep/Math.h>
+#include "Deep/Math/Mat4.h"
 
 TEST(Mat4, Equality) {
     const Deep::Mat4 a{

@@ -1,10 +1,15 @@
 #pragma once
 
+#include "Deep/Math/Ops.h"
+#include "Deep/Math/Vec3.h"
+#include "Deep/Math/Vec3i.h"
+#include "Deep/Math/Vec4.h"
+
 DEEP_NAMESPACE_BEGIN
 
 #ifdef DEEP_USE_SSE4_1
 Vec3::Vec3(float32 in_x, float32 in_y, float32 in_z) :
-    sse_m128(in_x, in_y, in_z, in_z) {}
+    xmm(in_x, in_y, in_z, in_z) {}
 #else
 Vec3::Vec3(float32 in_x, float32 in_y, float32 in_z) {
     x = in_x;
@@ -15,7 +20,7 @@ Vec3::Vec3(float32 in_x, float32 in_y, float32 in_z) {
 
 #ifdef DEEP_USE_SSE4_1
 Vec3::Vec3(Vec4Arg in_vec) :
-    sse_m128(in_vec.sse_m128) {}
+    xmm(in_vec.xmm) {}
 #else
 Vec3::Vec3(Vec4Arg in_vec) {
     x = in_vec.x;
@@ -25,20 +30,20 @@ Vec3::Vec3(Vec4Arg in_vec) {
 #endif
 
 #ifdef DEEP_USE_SSE4_1
-Vec3::Vec3(SSE_m128 in_sse_m128) :
-    sse_m128(in_sse_m128) {}
+Vec3::Vec3(Xmm in_xmm) :
+    xmm(in_xmm) {}
 #else
-Vec3::Vec3(SSE_m128 in_sse_m128) {
-    x = in_sse_m128.x;
-    y = in_sse_m128.y;
-    z = in_sse_m128.z;
+Vec3::Vec3(Xmm in_xmm) {
+    x = in_xmm.x;
+    y = in_xmm.y;
+    z = in_xmm.z;
 }
 #endif
 
 Vec3& Vec3::Normalize() {
 #ifdef DEEP_USE_SSE4_1
-    SSE_m128 magnitudeSqrd = _mm_dp_ps(sse_m128, sse_m128, 0x7f);
-    if (_mm_cvtss_f32(magnitudeSqrd) != 0.0f) sse_m128 = _mm_div_ps(sse_m128, _mm_sqrt_ps(magnitudeSqrd));
+    Xmm magnitudeSqrd = _mm_dp_ps(xmm, xmm, 0x7f);
+    if (_mm_cvtss_f32(magnitudeSqrd) != 0.0f) xmm = _mm_div_ps(xmm, _mm_sqrt_ps(magnitudeSqrd));
     return *this;
 #else
     float32 magnitudeSqrd = sqrdMagnitude();
@@ -56,7 +61,7 @@ bool Vec3::IsNormalized(float tolerance) const {
 
 float32 Vec3::sqrdMagnitude() const {
 #ifdef DEEP_USE_SSE4_1
-    return _mm_cvtss_f32(_mm_dp_ps(sse_m128, sse_m128, 0x7f));
+    return _mm_cvtss_f32(_mm_dp_ps(xmm, xmm, 0x7f));
     ;
 #else
     return x * x + y * y + z * z;
@@ -64,7 +69,7 @@ float32 Vec3::sqrdMagnitude() const {
 }
 float32 Vec3::magnitude() const {
 #ifdef DEEP_USE_SSE4_1
-    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(sse_m128, sse_m128, 0x7f)));
+    return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(xmm, xmm, 0x7f)));
 #else
     return Deep::Sqrt(sqrdMagnitude());
 #endif
@@ -72,7 +77,7 @@ float32 Vec3::magnitude() const {
 
 float32 Vec3::Dot(Vec3Arg in_a, Vec3Arg in_b) {
 #ifdef DEEP_USE_SSE4_1
-    return _mm_cvtss_f32(_mm_dp_ps(in_a.sse_m128, in_b.sse_m128, 0x7f));
+    return _mm_cvtss_f32(_mm_dp_ps(in_a.xmm, in_b.xmm, 0x7f));
 #else
     return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z;
 #endif
@@ -80,11 +85,11 @@ float32 Vec3::Dot(Vec3Arg in_a, Vec3Arg in_b) {
 
 Vec3 Vec3::Cross(Vec3Arg in_a, Vec3Arg in_b) {
 #if defined(DEEP_USE_SSE)
-    SSE_m128 t1 = _mm_shuffle_ps(in_b.sse_m128, in_b.sse_m128, _MM_SHUFFLE(0, 0, 2, 1)); // Assure Z and W are the same
-    t1 = _mm_mul_ps(t1, in_a.sse_m128);
-    SSE_m128 t2 = _mm_shuffle_ps(in_a.sse_m128, in_a.sse_m128, _MM_SHUFFLE(0, 0, 2, 1)); // Assure Z and W are the same
-    t2 = _mm_mul_ps(t2, in_b.sse_m128);
-    SSE_m128 t3 = _mm_sub_ps(t1, t2);
+    Xmm t1 = _mm_shuffle_ps(in_b.xmm, in_b.xmm, _MM_SHUFFLE(0, 0, 2, 1)); // Assure Z and W are the same
+    t1 = _mm_mul_ps(t1, in_a.xmm);
+    Xmm t2 = _mm_shuffle_ps(in_a.xmm, in_a.xmm, _MM_SHUFFLE(0, 0, 2, 1)); // Assure Z and W are the same
+    t2 = _mm_mul_ps(t2, in_b.xmm);
+    Xmm t3 = _mm_sub_ps(t1, t2);
     return Deep::Vec3{ _mm_shuffle_ps(t3, t3, _MM_SHUFFLE(0, 0, 2, 1)) }; // Assure Z and W are the same
 #else
     return Deep::Vec3{ in_a.m_values[1] * in_b.m_values[2] - in_a.m_values[2] * in_b.m_values[1],
@@ -94,12 +99,12 @@ Vec3 Vec3::Cross(Vec3Arg in_a, Vec3Arg in_b) {
 }
 
 Vec3::operator Vec3i() const {
-    return Vec3i{ _mm_cvtps_epi32(sse_m128) };
+    return Vec3i{ _mm_cvtps_epi32(xmm) };
 }
 
 Deep_Inline bool operator!=(Vec3Arg in_a, Vec3Arg in_b) {
 #ifdef DEEP_USE_SSE4_1
-    return (SSE_m128::Equals(in_a.sse_m128, in_b.sse_m128).ToBooleanBitMask() & 0b111) != 0b111;
+    return (Xmm::Equals(in_a.xmm, in_b.xmm).ToBooleanBitMask() & 0b111) != 0b111;
 #else
     return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z;
 #endif
@@ -110,7 +115,7 @@ Deep_Inline bool operator==(Vec3Arg a, Vec3Arg b) {
 
 Vec3& Vec3::operator+=(Vec3Arg in_other) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128 += in_other.sse_m128;
+    xmm += in_other.xmm;
 #else
     x += in_other.x;
     y += in_other.y;
@@ -122,7 +127,7 @@ Vec3& Vec3::operator+=(Vec3Arg in_other) {
 Vec3 operator+(Vec3Arg in_a, Vec3Arg in_b) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_a.sse_m128 + in_b.sse_m128;
+    result.xmm = in_a.xmm + in_b.xmm;
     return result;
 #else
     return Vec3{ in_a.x + in_b.x, in_a.y + in_b.y, in_a.z + in_b.z };
@@ -131,7 +136,7 @@ Vec3 operator+(Vec3Arg in_a, Vec3Arg in_b) {
 
 Vec3& Vec3::operator-=(Vec3Arg in_other) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128 -= in_other.sse_m128;
+    xmm -= in_other.xmm;
 #else
     x -= in_other.x;
     y -= in_other.y;
@@ -143,7 +148,7 @@ Vec3& Vec3::operator-=(Vec3Arg in_other) {
 Vec3 operator-(Vec3Arg in_a, Vec3Arg in_b) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_a.sse_m128 - in_b.sse_m128;
+    result.xmm = in_a.xmm - in_b.xmm;
     return result;
 #else
     return Vec3{ in_a.x - in_b.x, in_a.y - in_b.y, in_a.z - in_b.z };
@@ -153,7 +158,7 @@ Vec3 operator-(Vec3Arg in_a, Vec3Arg in_b) {
 Vec3 operator-(Vec3Arg in_a) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = -in_a.sse_m128;
+    result.xmm = -in_a.xmm;
     return result;
 #else
     // NOTE(randomuserhi): 0.0f - x to stay consistent with vectorised version
@@ -163,7 +168,7 @@ Vec3 operator-(Vec3Arg in_a) {
 
 Vec3& Vec3::operator*=(Vec3Arg in_other) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128 *= in_other.sse_m128;
+    xmm *= in_other.xmm;
 #else
     x *= in_other.x;
     y *= in_other.y;
@@ -174,7 +179,7 @@ Vec3& Vec3::operator*=(Vec3Arg in_other) {
 Vec3 operator*(Vec3Arg in_a, Vec3Arg in_b) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_a.sse_m128 * in_b.sse_m128;
+    result.xmm = in_a.xmm * in_b.xmm;
     return result;
 #else
     return Vec3{ in_a.x * in_b.x, in_a.y * in_b.y, in_a.z * in_b.z };
@@ -183,7 +188,7 @@ Vec3 operator*(Vec3Arg in_a, Vec3Arg in_b) {
 
 Vec3& Vec3::operator*=(float32 in_other) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128 *= in_other;
+    xmm *= in_other;
 #else
     x *= in_other;
     y *= in_other;
@@ -195,7 +200,7 @@ Vec3& Vec3::operator*=(float32 in_other) {
 Vec3 operator*(Vec3Arg in_vec, float32 in_val) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_vec.sse_m128 * in_val;
+    result.xmm = in_vec.xmm * in_val;
     return result;
 #else
     return Vec3{ in_vec.x * in_val, in_vec.y * in_val, in_vec.z * in_val };
@@ -205,7 +210,7 @@ Vec3 operator*(Vec3Arg in_vec, float32 in_val) {
 Vec3 operator*(float32 in_val, Vec3Arg in_vec) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_val * in_vec.sse_m128;
+    result.xmm = in_val * in_vec.xmm;
     return result;
 #else
     return Vec3{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z };
@@ -214,7 +219,7 @@ Vec3 operator*(float32 in_val, Vec3Arg in_vec) {
 
 Vec3& Vec3::operator/=(Vec3Arg in_other) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128 /= in_other.sse_m128;
+    xmm /= in_other.xmm;
 #else
     x /= in_other.x;
     y /= in_other.y;
@@ -225,7 +230,7 @@ Vec3& Vec3::operator/=(Vec3Arg in_other) {
 Vec3 operator/(Vec3Arg in_a, Vec3Arg in_b) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_a.sse_m128 / in_b.sse_m128;
+    result.xmm = in_a.xmm / in_b.xmm;
     return result;
 #else
     return Vec3{ in_a.x / in_b.x, in_a.y / in_b.y, in_a.z / in_b.z };
@@ -234,7 +239,7 @@ Vec3 operator/(Vec3Arg in_a, Vec3Arg in_b) {
 
 Vec3& Vec3::operator/=(float32 in_other) {
 #ifdef DEEP_USE_SSE4_1
-    sse_m128 /= in_other;
+    xmm /= in_other;
 #else
     x /= in_other;
     y /= in_other;
@@ -246,7 +251,7 @@ Vec3& Vec3::operator/=(float32 in_other) {
 Vec3 operator/(Vec3Arg in_vec, float32 in_val) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_vec.sse_m128 / in_val;
+    result.xmm = in_vec.xmm / in_val;
     return result;
 #else
     return Vec3{ in_vec.x / in_val, in_vec.y / in_val, in_vec.z / in_val };
@@ -256,7 +261,7 @@ Vec3 operator/(Vec3Arg in_vec, float32 in_val) {
 Vec3 operator/(float32 in_val, Vec3Arg in_vec) {
 #ifdef DEEP_USE_SSE4_1
     Vec3 result;
-    result.sse_m128 = in_val / in_vec.sse_m128;
+    result.xmm = in_val / in_vec.xmm;
     return result;
 #else
     return Vec3{ in_val / in_vec.x, in_val / in_vec.y, in_val / in_vec.z };

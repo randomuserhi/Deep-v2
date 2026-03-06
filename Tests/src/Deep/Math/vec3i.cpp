@@ -1,7 +1,6 @@
-#include <Tests.h>
+#include "Tests.h"
 
-#include <Deep.h>
-#include <Deep/Math.h>
+#include "Deep/Math/Vec3i.h"
 
 TEST(Vec3i, Equality) {
     Deep::Vec3i a{ 1, 2, 3 };

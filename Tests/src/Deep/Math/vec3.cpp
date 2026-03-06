@@ -1,7 +1,6 @@
-#include <Tests.h>
+#include "Tests.h"
 
-#include <Deep.h>
-#include <Deep/Math.h>
+#include "Deep/Math/Vec3.h"
 
 TEST(Vec3, Equality) {
     const Deep::Vec3 a{ 1, 2, 3 };

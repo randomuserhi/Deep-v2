@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Deep/Net/PacketReader.h"
+#include "Deep/Bit.h"
+
 DEEP_NAMESPACE_BEGIN
 
 PacketReader::PacketReader(const uint8* in_data) :

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "_MathTypes.h"
-#include "_SSE_m128.h"
-#include "_Vec4.h"
+#include "Deep.h"
+#include "Deep/Math/VecArgs.h"
+#include "Deep/Math/Xmm.h"
+#include "Deep/Math/Vec4.h"
+#include "Deep/Math/XmmArgs.h"
 
 #include <type_traits>
 
@@ -12,20 +14,20 @@ DEEP_NAMESPACE_BEGIN
 // Notation is column followed by row, so m10 is column 1, row 0.
 //
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Mat4 {
+struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
     //
 
     Mat4() = default;
     Mat4(const Mat4&) = default;
     Mat4& operator=(const Mat4&) = default;
-    Deep_Inline Mat4(SSE_m128 in_col0, SSE_m128 in_col1, SSE_m128 in_col2, SSE_m128 in_col3);
+    Deep_Inline Mat4(const XmmArg in_col0, const XmmArg in_col1, const XmmArg in_col2, const XmmArg in_col3);
     Deep_Inline Mat4(                                                   //
         float32 in_m00, float32 in_m01, float32 in_m02, float32 in_m03, //
         float32 in_m10, float32 in_m11, float32 in_m12, float32 in_m13, //
         float32 in_m20, float32 in_m21, float32 in_m22, float32 in_m23, //
         float32 in_m30, float32 in_m31, float32 in_m32, float32 in_m33  //
     );                                                                  //
-    Deep_Inline Mat4(Vec4 in_col0, Vec4 in_col1, Vec4 in_col2, Vec4 in_col3);
+    Deep_Inline Mat4(const Vec4Arg in_col0, const Vec4Arg in_col1, const Vec4Arg in_col2, const Vec4Arg in_col3);
 
     //
 
@@ -70,7 +72,7 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Mat4 {
      * (30, 31, 32, 33)
      */
     union {
-        SSE_m128 m_cols[4];
+        Xmm m_cols[4];
         Vec4 m_vcols[4];
         float32 m_values[16];
         // NOTE(randomuserhi): order of values matter for specific memory access patterns
@@ -102,3 +104,5 @@ static_assert(std::is_trivial<Mat4>(), "Is supposed to be a trivial type!");
 static_assert(std::is_standard_layout<Mat4>(), "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
+
+#include "Deep/Math/Mat4.inl" // IWYU pragma: export

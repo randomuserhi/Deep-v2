@@ -1,7 +1,6 @@
-#include <Tests.h>
+#include "Tests.h"
 
-#include <Deep.h>
-#include <Deep/Math.h>
+#include "Deep/Math/Vec4.h"
 
 TEST(Vec4, Equality) {
     Deep::Vec4 a{ 1, 2, 3, 4 };

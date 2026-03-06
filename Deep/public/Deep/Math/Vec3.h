@@ -1,19 +1,22 @@
 #pragma once
 
-#include "_MathTypes.h"
+#include "Deep.h"
+#include "Deep/Math/VecArgs.h"
+#include "Deep/Math/Xmm.h"
+
 #include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Vec3 {
+struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec3 {
     //
 
     Vec3() = default;
     Vec3(const Vec3&) = default;
     Vec3& operator=(const Vec3&) = default;
     Deep_Inline Vec3(float32 in_x, float32 in_y, float32 in_z);
-    explicit Deep_Inline Vec3(SSE_m128 in_sse_m128);
+    explicit Deep_Inline Vec3(Xmm in_xmm);
     explicit Deep_Inline Vec3(Vec4Arg in_vec);
 
     //
@@ -75,8 +78,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Vec3 {
 
     // NOTE(randomuserhi): The underlying type is a Vec4 for vectorisation
     union {
-        SSE_m128 sse_m128;
-        SSE_m128i sse_m128i;
+        Xmm xmm;
+        Xmmi xmmi;
         float32 m_values[4];
         struct {
             float32 x;
@@ -101,3 +104,5 @@ static_assert(std::is_trivial<Vec3>(), "Is supposed to be a trivial type!");
 static_assert(std::is_standard_layout<Vec3>(), "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
+
+#include "Deep/Math/Vec3.inl" // IWYU pragma: export

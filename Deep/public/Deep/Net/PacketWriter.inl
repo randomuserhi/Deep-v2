@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Deep/Net/PacketWriter.h"
+#include "Deep/Bit.h"
+
 DEEP_NAMESPACE_BEGIN
 
 PacketWriter::PacketWriter() {}

@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <Deep.h>
-#include <Deep/Math.h>
-#include <Deep/Bit.h>
+#include "Deep.h"
+#include "Deep/Math.h"
 
 DEEP_NAMESPACE_BEGIN
 
