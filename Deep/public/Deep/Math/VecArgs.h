@@ -4,6 +4,12 @@
 
 DEEP_NAMESPACE_BEGIN
 
+struct Vec2i;
+using Vec2iArg = const Vec2i;
+
+struct Vec2;
+using Vec2Arg = const Vec2;
+
 struct Vec3i;
 using Vec3iArg = const Vec3i;
 

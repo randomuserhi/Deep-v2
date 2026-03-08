@@ -10,33 +10,24 @@ DEEP_NAMESPACE_BEGIN
 Vec3i::Vec3i(int32 in_x, int32 in_y, int32 in_z) :
     xmmi(in_x, in_y, in_z, in_z) {}
 #else
-Vec3i::Vec3i(int32 in_x, int32 in_y, int32 in_z) {
-    x = in_x;
-    y = in_y;
-    z = in_z;
-}
+Vec3i::Vec3i(int32 in_x, int32 in_y, int32 in_z) :
+    x(in_x), y(in_y), z(in_z) {}
 #endif
 
 #ifdef DEEP_USE_SSE4_1
 Vec3i::Vec3i(Vec4iArg in_vec) :
     xmmi(in_vec.xmmi) {}
 #else
-Vec3i::Vec3i(Vec4iArg in_vec) {
-    x = in_vec.x;
-    y = in_vec.y;
-    z = in_vec.z;
-}
+Vec3i::Vec3i(Vec4iArg in_vec) :
+    x(in_vec.x), y(in_vec.y), z(in_vec.z) {}
 #endif
 
 #ifdef DEEP_USE_SSE4_1
-Vec3i::Vec3i(Xmmi in_Xmmi) :
-    xmmi(in_Xmmi) {}
+Vec3i::Vec3i(Xmmi in_xmmi) :
+    xmmi(in_xmmi) {}
 #else
-Vec3i::Vec3i(Xmmi in_Xmmi) {
-    x = in_Xmmi.x;
-    y = in_Xmmi.y;
-    z = in_Xmmi.z;
-}
+Vec3i::Vec3i(Xmmi in_xmmi) :
+    x(in_xmmi.x), y(in_xmmi.y), z(in_xmmi.z) {}
 #endif
 
 float32 Vec3i::sqrdMagnitude() const {
@@ -123,8 +114,8 @@ Vec3i operator-(Vec3iArg in_a) {
     result.xmmi = -in_a.xmmi;
     return result;
 #else
-    // NOTE(randomuserhi): 0.0f - x to stay consistent with vectorised version
-    return Vec3i{ 0.0f - in_a.x, 0.0f - in_a.y, 0.0f - in_a.z };
+    // NOTE(randomuserhi): 0 - x to stay consistent with vectorised version
+    return Vec3i{ 0 - in_a.x, 0 - in_a.y, 0 - in_a.z };
 #endif
 }
 

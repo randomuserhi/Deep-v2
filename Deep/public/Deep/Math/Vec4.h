@@ -34,6 +34,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec4 {
 
     [[nodiscard]] static Deep_Inline float32 Dot(Vec4Arg in_a, Vec4Arg in_b);
 
+    [[nodiscard]] static Deep_Inline Vec4 Lerp(Vec4Arg in_a, Vec4Arg in_b, float32 in_t);
+
     //
 
     // Equality

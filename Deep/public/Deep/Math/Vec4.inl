@@ -11,27 +11,20 @@ DEEP_NAMESPACE_BEGIN
 Vec4::Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
     xmm(in_x, in_y, in_z, in_w) {}
 #else
-Vec4::Vec4(float32 roX, float32 in_y, float32 in_z, float32 in_w) {
-    x = in_x;
-    y = in_y;
-    z = in_z;
-    w = in_w;
-}
+Vec4::Vec4(float32 roX, float32 in_y, float32 in_z, float32 in_w) :
+    x(in_x), y(in_y), z(in_z), w(in_w) {}
 #endif
 
 Vec4::Vec4(Xmm in_xmm) :
     xmm(in_xmm) {}
 
-Vec4::Vec4(Vec3Arg in_xyz, float32 in_w) {
 #ifdef DEEP_USE_SSE4_1
-    xmm = _mm_blend_ps(in_xyz.xmm, _mm_set1_ps(in_w), 8);
+Vec4::Vec4(Vec3Arg in_xyz, float32 in_w) :
+    xmm(_mm_blend_ps(in_xyz.xmm, _mm_set1_ps(in_w), 8)) {}
 #else
-    x = in_xyz.x;
-    y = in_xyz.y;
-    z = in_xyz.z;
-    w = in_w;
+Vec4::Vec4(Vec3Arg in_xyz, float32 in_w) :
+    x(in_xyz.x), y(in_xyz.y), z(in_xyz.z), w(in_w) {}
 #endif
-}
 
 Vec4& Vec4::Normalize() {
 #ifdef DEEP_USE_SSE4_1
@@ -74,6 +67,10 @@ float32 Vec4::Dot(Vec4Arg in_a, Vec4Arg in_b) {
 #else
     return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z + in_a.w * in_b.w;
 #endif
+}
+
+Vec4 Vec4::Lerp(Vec4Arg in_a, Vec4Arg in_b, float32 in_t) {
+    return (in_b - in_a) * in_t + in_a;
 }
 
 Vec4::operator Vec4i() const {

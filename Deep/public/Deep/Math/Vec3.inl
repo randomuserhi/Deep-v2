@@ -11,33 +11,24 @@ DEEP_NAMESPACE_BEGIN
 Vec3::Vec3(float32 in_x, float32 in_y, float32 in_z) :
     xmm(in_x, in_y, in_z, in_z) {}
 #else
-Vec3::Vec3(float32 in_x, float32 in_y, float32 in_z) {
-    x = in_x;
-    y = in_y;
-    z = in_z;
-}
+Vec3::Vec3(float32 in_x, float32 in_y, float32 in_z) :
+    x(in_x), y(in_y), z(in_z) {}
 #endif
 
 #ifdef DEEP_USE_SSE4_1
 Vec3::Vec3(Vec4Arg in_vec) :
     xmm(in_vec.xmm) {}
 #else
-Vec3::Vec3(Vec4Arg in_vec) {
-    x = in_vec.x;
-    y = in_vec.y;
-    z = in_vec.z;
-}
+Vec3::Vec3(Vec4Arg in_vec) :
+    x(in_vec.x), y(in_vec.y), z(in_vec.z) {}
 #endif
 
 #ifdef DEEP_USE_SSE4_1
 Vec3::Vec3(Xmm in_xmm) :
     xmm(in_xmm) {}
 #else
-Vec3::Vec3(Xmm in_xmm) {
-    x = in_xmm.x;
-    y = in_xmm.y;
-    z = in_xmm.z;
-}
+Vec3::Vec3(Xmm in_xmm) :
+    x(in_xmm.x), y(in_xmm.y), z(in_xmm.z) {}
 #endif
 
 Vec3& Vec3::Normalize() {
@@ -96,6 +87,10 @@ Vec3 Vec3::Cross(Vec3Arg in_a, Vec3Arg in_b) {
                        in_a.m_values[2] * in_b.m_values[0] - in_a.m_values[0] * in_b.m_values[2],
                        in_a.m_values[0] * in_b.m_values[1] - in_a.m_values[1] * in_b.m_values[0] };
 #endif
+}
+
+Vec3 Vec3::Lerp(Vec3Arg in_a, Vec3Arg in_b, float32 in_t) {
+    return (in_b - in_a) * in_t + in_a;
 }
 
 Vec3::operator Vec3i() const {
