@@ -1,0 +1,61 @@
+#include "Deep.h"
+#include "Deep/Physics3D/Aabb.h"
+
+DEEP_NAMESPACE_BEGIN
+
+bool IsOverlapping(Vec3 in_point, Aabb3DArg in_a) {
+    Vec3 minA = in_a.m_min + in_a.m_offset;
+    Vec3 maxA = in_a.m_max + in_a.m_offset;
+    return in_point.x > minA.x && in_point.x < maxA.x && //
+           in_point.y > minA.y && in_point.y < maxA.y && //
+           in_point.z > minA.z && in_point.z < maxA.z;
+}
+
+bool IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b) {
+    Vec3 minA = in_a.m_min + in_a.m_offset;
+    Vec3 maxA = in_a.m_max + in_a.m_offset;
+    Vec3 minB = in_b.m_min + in_b.m_offset;
+    Vec3 maxB = in_b.m_max + in_b.m_offset;
+    return minA.x < maxB.x && maxA.x > minB.x && //
+           minA.y < maxB.y && maxA.y > minB.y && //
+           minA.z < maxB.z && maxA.z > minB.z;
+}
+
+bool IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b, ContactInfo* out_contactInfo) {
+    ContactInfo contactInfo;
+
+    Vec3 minA = in_a.m_min + in_a.m_offset;
+    Vec3 maxA = in_a.m_max + in_a.m_offset;
+    Vec3 minB = in_b.m_min + in_b.m_offset;
+    Vec3 maxB = in_b.m_max + in_b.m_offset;
+
+    float32 dx1 = maxB.x - minA.x;
+    float32 dx2 = maxA.x - minB.x;
+    contactInfo.m_penetrationDistance = Deep::Min(dx1, dx2);
+    contactInfo.m_normal = { dx1 < dx2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+
+    if (contactInfo.m_penetrationDistance <= 0) return false;
+
+    float32 dy1 = maxB.y - minA.y;
+    float32 dy2 = maxA.y - minB.y;
+    float32 py = Deep::Min(dy1, dy2);
+    if (py <= 0) return false;
+    if (py < contactInfo.m_penetrationDistance) {
+        contactInfo.m_penetrationDistance = py;
+        contactInfo.m_normal = { dy1 < dy2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+    }
+
+    float32 dz1 = maxB.z - minA.z;
+    float32 dz2 = maxA.z - minB.z;
+    float32 pz = Deep::Min(dz1, dz2);
+    if (pz <= 0) return false;
+    if (pz < contactInfo.m_penetrationDistance) {
+        contactInfo.m_penetrationDistance = pz;
+        contactInfo.m_normal = { dz1 < dz2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+    }
+
+    *out_contactInfo = contactInfo;
+    return true;
+}
+
+DEEP_NAMESPACE_END
