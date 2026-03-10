@@ -150,14 +150,14 @@ TEST_SUPPRESS_WARNINGS
     do {                                                                                                                    \
         if (!(condition)) {                                                                                                 \
             Test::internal::g_testFailed = true;                                                                            \
-            std::cout << "\n\tCondition '" << #condition << "' was not true.";                                              \
+            std::cout << "\n\tCondition '" << #condition << "' was false, but expected true.";                              \
         }                                                                                                                   \
     } while (0)
 #define EXPECT_FALSE(condition)                                                                                             \
     do {                                                                                                                    \
         if ((condition)) {                                                                                                  \
             Test::internal::g_testFailed = true;                                                                            \
-            std::cout << "\n\tCondition '" << #condition << "' was false.";                                                 \
+            std::cout << "\n\tCondition '" << #condition << "' was true, but expected false.";                              \
         }                                                                                                                   \
     } while (0)
 

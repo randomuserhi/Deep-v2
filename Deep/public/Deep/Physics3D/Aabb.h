@@ -5,9 +5,8 @@
 DEEP_NAMESPACE_BEGIN
 
 struct DEEP_EXPORT Aabb3D {
-    Vec3 m_min;
-    Vec3 m_max;
-    Vec3 m_offset;
+    Vec3 m_center;
+    Vec3 m_extents;
 };
 
 using Aabb3DArg = const Aabb3D&;
