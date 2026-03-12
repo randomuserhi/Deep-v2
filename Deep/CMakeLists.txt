@@ -178,6 +178,7 @@ elseif (CLANG)
 	endif()
 
 	# Enable/Disable exceptions
+	message(STATUS "CPP_EXCEPTIONS_ENABLED: ${CPP_EXCEPTIONS_ENABLED}")
 	if (NOT CPP_EXCEPTIONS_ENABLED)
 		target_compile_options(Deep PRIVATE -fno-exceptions)
 	else()

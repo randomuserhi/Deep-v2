@@ -148,8 +148,12 @@ elseif (CLANG)
 		target_compile_options(Tests PRIVATE -g)
 	endif()
 
-	# Enable exceptions
-	target_compile_options(Tests PRIVATE -fexceptions)
+	# Enable/Disable exceptions
+	if (NOT CPP_EXCEPTIONS_ENABLED)
+		target_compile_options(Tests PRIVATE -fno-exceptions)
+	else()
+		target_compile_options(Tests PRIVATE -fexceptions)
+	endif()
 else()
 	message(FATAL_ERROR "Unsupported compiler")
 endif()

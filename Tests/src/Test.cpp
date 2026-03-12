@@ -5,6 +5,7 @@ TEST_SUPPRESS_WARNINGS_STD_BEGIN
 #include <unordered_map>
 #include <vector>
 #include <chrono>
+#include <cstring>
 TEST_SUPPRESS_WARNINGS_STD_END
 
 namespace Test {
@@ -15,7 +16,7 @@ struct CStrHash {
 };
 
 TEST_SUPPRESS_WARNING_PUSH
-TEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage-in-libc-call")
+TEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage")
 struct CStrEqual {
     bool operator()(const char* a, const char* b) const {
         return std::strcmp(a, b) == 0;
