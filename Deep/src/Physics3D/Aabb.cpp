@@ -67,4 +67,17 @@ int IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b, ContactInfo* out_contactInfo) 
     return 1;
 }
 
+bool Raycast(Ray3D in_ray, RayHit3D* out_hit) {
+    // TODO(randomuserhi): Implementation
+    //                     API for if ray should hit starting collider (if ray originates from inside of it)
+    return false;
+}
+
+int RaycastAll(Ray3D in_ray, RayHit3D* out_hits) {
+    // TODO(randomuserhi): Implementation returning all hits (entry + exit)
+    //                     API for if ray should hit starting collider (if ray originates from inside of it)
+    //                     - In that case, should just return exit hit
+    return 0;
+}
+
 DEEP_NAMESPACE_END
