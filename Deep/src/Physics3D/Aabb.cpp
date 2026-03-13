@@ -26,7 +26,7 @@ bool IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b) {
            minA.z < maxB.z && maxA.z > minB.z;
 }
 
-bool IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b, ContactInfo* out_contactInfo) {
+int IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b, ContactInfo* out_contactInfo) {
     Deep_Assert(in_a.m_extents.x > 0 && in_a.m_extents.y > 0 && in_a.m_extents.z > 0, "Extents of box must be > 0.");
     Deep_Assert(in_b.m_extents.x > 0 && in_b.m_extents.y > 0 && in_b.m_extents.z > 0, "Extents of box must be > 0.");
     Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
@@ -43,12 +43,12 @@ bool IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b, ContactInfo* out_contactInfo)
     contactInfo.m_penetrationDistance = Deep::Min(dx1, dx2);
     contactInfo.m_normal = { dx1 < dx2 ? -1.0f : 1.0f, 0.0f, 0.0f };
 
-    if (contactInfo.m_penetrationDistance <= 0) return false;
+    if (contactInfo.m_penetrationDistance <= 0) return 0;
 
     float32 dy1 = maxB.y - minA.y;
     float32 dy2 = maxA.y - minB.y;
     float32 py = Deep::Min(dy1, dy2);
-    if (py <= 0) return false;
+    if (py <= 0) return 0;
     if (py < contactInfo.m_penetrationDistance) {
         contactInfo.m_penetrationDistance = py;
         contactInfo.m_normal = { dy1 < dy2 ? -1.0f : 1.0f, 0.0f, 0.0f };
@@ -57,14 +57,14 @@ bool IsOverlapping(Aabb3DArg in_a, Aabb3DArg in_b, ContactInfo* out_contactInfo)
     float32 dz1 = maxB.z - minA.z;
     float32 dz2 = maxA.z - minB.z;
     float32 pz = Deep::Min(dz1, dz2);
-    if (pz <= 0) return false;
+    if (pz <= 0) return 0;
     if (pz < contactInfo.m_penetrationDistance) {
         contactInfo.m_penetrationDistance = pz;
         contactInfo.m_normal = { dz1 < dz2 ? -1.0f : 1.0f, 0.0f, 0.0f };
     }
 
     *out_contactInfo = contactInfo;
-    return true;
+    return 1;
 }
 
 DEEP_NAMESPACE_END
