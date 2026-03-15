@@ -4,6 +4,6 @@
 // #define Deep_Break ((void)0)
 
 int main() {
-    Test::RunAllTests();
-    return 0;
+	Test::RunAllTests();
+	return 0;
 }
