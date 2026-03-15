@@ -87,7 +87,7 @@ Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
 
     // Note: Using x + x instead of 2.0f * x to to stay consistent with vectorised version
     float32 tx = x + x;
-    float2 ty = y + y;
+    float32 ty = y + y;
     float32 tz = z + z;
 
     float32 xx = tx * x;
@@ -239,20 +239,22 @@ Mat4 Mat4::inversed() const {
     result.m_cols[1] /= det;
     result.m_cols[2] /= det;
     result.m_cols[3] /= det;
+
+    return result;
 #endif
 }
 
-Deep_Inline bool operator!=(Mat4Arg in_a, Mat4Arg in_b) {
+Deep_Inline bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
     return Xmmi::And(Xmmi::And(Xmm::Equals(in_a.m_cols[0], in_b.m_cols[0]), Xmm::Equals(in_a.m_cols[1], in_b.m_cols[1])),
                      Xmmi::And(Xmm::Equals(in_a.m_cols[2], in_b.m_cols[2]), Xmm::Equals(in_a.m_cols[3], in_b.m_cols[3])))
                .ToBooleanBitMask()
            != 0b1111;
 }
-Deep_Inline bool operator==(Mat4Arg in_a, Mat4Arg in_b) {
+Deep_Inline bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b) {
     return !(in_a != in_b);
 }
 
-Mat4 operator*(Mat4Arg in_a, Mat4Arg in_b) {
+Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b) {
     Mat4 c;
 
 #ifdef DEEP_USE_SSE
@@ -312,7 +314,7 @@ Mat4 operator*(Mat4Arg in_a, Mat4Arg in_b) {
     return c;
 }
 
-Vec3 operator*(Mat4Arg in_mat, Vec3Arg in_vec) {
+Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
     Vec3 _v;
 #ifdef DEEP_USE_SSE4_1
     _v.xmm = _mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(0, 0, 0, 0)));
@@ -330,7 +332,7 @@ Vec3 operator*(Mat4Arg in_mat, Vec3Arg in_vec) {
     return _v;
 }
 
-Vec4 operator*(Mat4Arg in_mat, Vec4Arg in_vec) {
+Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec) {
     Vec4 _v;
 #ifdef DEEP_USE_SSE4_1
     _v.xmm = _mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(0, 0, 0, 0)));
@@ -357,7 +359,7 @@ Mat4& Mat4::operator*=(float32 in_other) {
     return *this;
 }
 
-Mat4 operator*(Mat4Arg in_vec, float32 in_val) {
+Mat4 operator*(Arg_Mat4 in_vec, float32 in_val) {
     Mat4 result;
     result.m_cols[0] = in_vec.m_cols[0] * in_val;
     result.m_cols[1] = in_vec.m_cols[1] * in_val;
@@ -366,7 +368,7 @@ Mat4 operator*(Mat4Arg in_vec, float32 in_val) {
     return result;
 }
 
-Mat4 operator*(float32 in_val, Mat4Arg in_vec) {
+Mat4 operator*(float32 in_val, Arg_Mat4 in_vec) {
     Mat4 result;
     result.m_cols[0] = in_val * in_vec.m_cols[0];
     result.m_cols[1] = in_val * in_vec.m_cols[1];
@@ -383,7 +385,7 @@ Mat4& Mat4::operator/=(float32 in_other) {
     return *this;
 }
 
-Mat4 operator/(Mat4Arg in_vec, float32 in_val) {
+Mat4 operator/(Arg_Mat4 in_vec, float32 in_val) {
     Mat4 result;
     result.m_cols[0] = in_vec.m_cols[0] / in_val;
     result.m_cols[1] = in_vec.m_cols[1] / in_val;
@@ -392,7 +394,7 @@ Mat4 operator/(Mat4Arg in_vec, float32 in_val) {
     return result;
 }
 
-Mat4 operator/(float32 in_val, Mat4Arg in_vec) {
+Mat4 operator/(float32 in_val, Arg_Mat4 in_vec) {
     Mat4 result;
     result.m_cols[0] = in_val / in_vec.m_cols[0];
     result.m_cols[1] = in_val / in_vec.m_cols[1];

@@ -3,7 +3,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // TODO(randomuserhi): SIMD implementations + consider inlining?
-Mat4& Mat4::Compose(Vec3Arg in_position, QuatArg in_rotation, Vec3Arg in_scale) {
+Mat4& Mat4::Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale) {
     float32 x = in_rotation.x;
     float32 y = in_rotation.y;
     float32 z = in_rotation.z;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Deep.h"
+
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #include <cstdlib>
 #include <cstring>
@@ -38,8 +40,12 @@ void* AlignedMalloc(size_t in_size, size_t in_alignment) {
     return _aligned_malloc(in_size, in_alignment);
 #else
     void* block = nullptr;
-    // NOTE(randomuserhi): Suppress -Wunused-result
+
+    DEEP_SUPPRESS_WARNING_PUSH
+    DEEP_CLANG_SUPPRESS_WARNING("-Wunused-result")
     posix_memalign(&block, in_alignment, in_size);
+    DEEP_SUPPRESS_WARNING_POP
+
     return block;
 #endif
 }

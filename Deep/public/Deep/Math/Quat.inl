@@ -12,7 +12,7 @@ Quat::Quat(Xmm in_xmm) :
 Quat::Quat(Vec4 in_vec) :
     vec(in_vec) {};
 
-Quat Quat::FromMat4(Mat4Arg in_mat) {
+Quat Quat::FromMat4(Arg_Mat4 in_mat) {
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
     float trace = in_mat.m00 + in_mat.m11 + in_mat.m22;
@@ -94,28 +94,28 @@ Quat::Quat(Vec3 in_axis, float32 in_angle) {
     xmm = Xmm::Select(in_axis.xmm * s, c, Xmmi{ 0, 0, 0, (int32)0xffffffff });
 }
 
-Deep_Inline bool operator!=(QuatArg in_a, QuatArg in_b) {
+Deep_Inline bool operator!=(Arg_Quat in_a, Arg_Quat in_b) {
     return in_a.vec != in_b.vec;
 }
-Deep_Inline bool operator==(QuatArg in_a, QuatArg in_b) {
+Deep_Inline bool operator==(Arg_Quat in_a, Arg_Quat in_b) {
     return !(in_a != in_b);
 }
 
-Quat& Quat::operator+=(QuatArg in_other) {
+Quat& Quat::operator+=(Arg_Quat in_other) {
     vec += in_other.vec;
     return *this;
 }
 
-Quat operator+(QuatArg in_a, QuatArg in_b) {
+Quat operator+(Arg_Quat in_a, Arg_Quat in_b) {
     return in_a.vec + in_b.vec;
 }
 
-Quat& Quat::operator-=(QuatArg in_other) {
+Quat& Quat::operator-=(Arg_Quat in_other) {
     vec -= in_other.vec;
     return *this;
 }
 
-Quat operator-(QuatArg in_a, QuatArg in_b) {
+Quat operator-(Arg_Quat in_a, Arg_Quat in_b) {
     return in_a.vec - in_b.vec;
 }
 
@@ -129,23 +129,23 @@ Quat& Quat::operator/=(float32 in_other) {
     return *this;
 }
 
-Quat operator*(QuatArg in_quat, float32 in_val) {
+Quat operator*(Arg_Quat in_quat, float32 in_val) {
     return in_quat.vec * in_val;
 }
 
-Quat operator*(float32 in_val, QuatArg in_quat) {
+Quat operator*(float32 in_val, Arg_Quat in_quat) {
     return in_val * in_quat.vec;
 }
 
-Quat operator/(QuatArg in_quat, float32 in_val) {
+Quat operator/(Arg_Quat in_quat, float32 in_val) {
     return in_quat.vec / in_val;
 }
 
-Quat operator/(float32 in_val, QuatArg in_quat) {
+Quat operator/(float32 in_val, Arg_Quat in_quat) {
     return in_val / in_quat.vec;
 }
 
-Quat& Quat::operator*=(QuatArg in_other) {
+Quat& Quat::operator*=(Arg_Quat in_other) {
 #ifdef DEEP_USE_SSE4_1
     // Taken from: http://momchil-velikov.blogspot.nl/2013/10/fast-sse-quternion-multiplication.html
     __m128 abcd = xmm;
@@ -210,18 +210,18 @@ Quat& Quat::operator*=(QuatArg in_other) {
     return *this;
 }
 
-Quat operator*(Quat in_a, QuatArg in_b) {
+Quat operator*(Quat in_a, Arg_Quat in_b) {
     return in_a *= in_b;
 }
 
-Vec3 operator*(QuatArg in_quat, Vec3Arg in_vec) {
+Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_vec) {
     Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
     // Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)
     return Vec3{ (in_quat * Vec4(in_vec, 0.0f) * in_quat.conjugated()).xmm };
 }
 
-Vec3 Quat::InverseRotate(QuatArg in_quat, Vec3Arg in_vec) {
+Vec3 Quat::InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_vec) {
     Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
     // Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)

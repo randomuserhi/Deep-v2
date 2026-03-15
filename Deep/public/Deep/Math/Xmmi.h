@@ -138,6 +138,6 @@ static_assert(std::is_standard_layout<Xmmi>(), "Is supposed to be standard layou
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Xmmi.inl" // IWYU pragma: export
-
 #undef DEEP_VEC_ALIGNMENT
+
+#include "Deep/Math/Xmmi.inl" // IWYU pragma: export

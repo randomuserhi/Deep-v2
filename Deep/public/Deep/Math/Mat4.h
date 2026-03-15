@@ -27,7 +27,7 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
         float32 in_m20, float32 in_m21, float32 in_m22, float32 in_m23, //
         float32 in_m30, float32 in_m31, float32 in_m32, float32 in_m33  //
     );                                                                  //
-    Deep_Inline Mat4(const Vec4Arg in_col0, const Vec4Arg in_col1, const Vec4Arg in_col2, const Vec4Arg in_col3);
+    Deep_Inline Mat4(const Arg_Vec4 in_col0, const Arg_Vec4 in_col1, const Arg_Vec4 in_col2, const Arg_Vec4 in_col3);
 
     //
 
@@ -37,29 +37,29 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
     Deep_Inline Mat4& Inverse();
     [[nodiscard]] Deep_Inline Mat4 inversed() const;
 
-    Mat4& Compose(Vec3Arg in_position, QuatArg in_rotation, Vec3Arg in_scale);
+    Mat4& Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale);
 
     //
 
     // Equality
-    friend bool operator!=(Mat4Arg in_a, Mat4Arg in_b);
-    friend bool operator==(Mat4Arg in_a, Mat4Arg in_b);
+    friend bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b);
+    friend bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b);
 
     // Mul Matrix4x4s
-    friend Deep_Inline Mat4 operator*(Mat4Arg in_a, Mat4Arg in_b);
+    friend Deep_Inline Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b);
 
     // Mul Matrix4x4s and float
     Deep_Inline Mat4& operator*=(float32 in_other);
-    friend Deep_Inline Mat4 operator*(Mat4Arg in_mat, float32 in_val);
-    friend Deep_Inline Mat4 operator*(float32 in_val, Mat4Arg in_mat);
+    friend Deep_Inline Mat4 operator*(Arg_Mat4 in_mat, float32 in_val);
+    friend Deep_Inline Mat4 operator*(float32 in_val, Arg_Mat4 in_mat);
 
     Deep_Inline Mat4& operator/=(float32 in_other);
-    friend Deep_Inline Mat4 operator/(Mat4Arg in_mat, float32 in_val);
-    friend Deep_Inline Mat4 operator/(float32 in_val, Mat4Arg in_mat);
+    friend Deep_Inline Mat4 operator/(Arg_Mat4 in_mat, float32 in_val);
+    friend Deep_Inline Mat4 operator/(float32 in_val, Arg_Mat4 in_mat);
 
     // Multiply Matrix4x4 and Vectors
-    friend Deep_Inline Vec3 operator*(Mat4Arg in_mat, Vec3Arg in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
-    friend Deep_Inline Vec4 operator*(Mat4Arg in_mat, Vec4Arg in_vec);
+    friend Deep_Inline Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
+    friend Deep_Inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
 
     [[nodiscard]] static Deep_Inline Mat4 FromQuaternion(const Quat& in_quat);
 

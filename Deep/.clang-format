@@ -40,3 +40,5 @@ SpaceAfterTemplateKeyword: false
 Cpp11BracedListStyle: false
 
 AllowShortLambdasOnASingleLine: Empty
+
+IndentPPDirectives: None

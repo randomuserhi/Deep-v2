@@ -17,10 +17,10 @@ Vec4i::Vec4i(Xmmi in_xmmi) :
     xmmi(in_xmmi) {}
 
 #ifdef DEEP_USE_SSE4_1
-Vec4i::Vec4i(Vec3iArg in_xyz, int32 in_w) :
+Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
     xmmi(_mm_blend_epi32(in_xyz.xmmi, _mm_set1_epi32(in_w), 8)) {}
 #else
-Vec4i::Vec4i(Vec3iArg in_xyz, int32 in_w) :
+Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
     x(in_xyz.x), y(in_xyz.y), z(in_xyz.z), w(in_w) {}
 #endif
 
@@ -44,7 +44,7 @@ int32 Vec4i::manhattanDistance() const {
 #endif
 }
 
-int32 Vec4i::Dot(Vec4iArg in_a, Vec4iArg in_b) {
+int32 Vec4i::Dot(Arg_Vec4i in_a, Arg_Vec4i in_b) {
 #ifdef DEEP_USE_SSE4_1
     Xmmi sum = _mm_mullo_epi32(in_a.xmmi, in_b.xmmi);
 
@@ -59,49 +59,53 @@ int32 Vec4i::Dot(Vec4iArg in_a, Vec4iArg in_b) {
 }
 
 Vec4i::operator Vec4() const {
+#ifdef DEEP_USE_SSE
     return Vec4{ _mm_cvtepi32_ps(xmmi) };
+#else
+    return Vec4{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z), static_cast<float32>(w) };
+#endif
 }
 
-Deep_Inline bool operator!=(Vec4iArg in_a, Vec4iArg in_b) {
+Deep_Inline bool operator!=(Arg_Vec4i in_a, Arg_Vec4i in_b) {
     return in_a.xmmi != in_b.xmmi;
 }
-Deep_Inline bool operator==(Vec4iArg in_a, Vec4iArg in_b) {
+Deep_Inline bool operator==(Arg_Vec4i in_a, Arg_Vec4i in_b) {
     return !(in_a != in_b);
 }
 
-Vec4i& Vec4i::operator+=(Vec4iArg in_other) {
+Vec4i& Vec4i::operator+=(Arg_Vec4i in_other) {
     xmmi += in_other.xmmi;
     return *this;
 }
 
-Vec4i operator+(Vec4iArg in_a, Vec4iArg in_b) {
+Vec4i operator+(Arg_Vec4i in_a, Arg_Vec4i in_b) {
     Vec4i result;
     result.xmmi = in_a.xmmi + in_b.xmmi;
     return result;
 }
 
-Vec4i& Vec4i::operator-=(Vec4iArg in_other) {
+Vec4i& Vec4i::operator-=(Arg_Vec4i in_other) {
     xmmi -= in_other.xmmi;
     return *this;
 }
 
-Vec4i operator-(Vec4iArg in_a, Vec4iArg in_b) {
+Vec4i operator-(Arg_Vec4i in_a, Arg_Vec4i in_b) {
     Vec4i result;
     result.xmmi = in_a.xmmi - in_b.xmmi;
     return result;
 }
 
-Vec4i operator-(Vec4iArg in_a) {
+Vec4i operator-(Arg_Vec4i in_a) {
     Vec4i result;
     result.xmmi = -in_a.xmmi;
     return result;
 }
 
-Vec4i& Vec4i::operator*=(Vec4iArg in_other) {
+Vec4i& Vec4i::operator*=(Arg_Vec4i in_other) {
     xmmi *= in_other.xmmi;
     return *this;
 }
-Vec4i operator*(Vec4iArg in_a, Vec4iArg in_b) {
+Vec4i operator*(Arg_Vec4i in_a, Arg_Vec4i in_b) {
     Vec4i result;
     result.xmmi = in_a.xmmi * in_b.xmmi;
     return result;
@@ -112,23 +116,23 @@ Vec4i& Vec4i::operator*=(int32 in_other) {
     return *this;
 }
 
-Vec4i operator*(Vec4iArg in_vec, int32 in_val) {
+Vec4i operator*(Arg_Vec4i in_vec, int32 in_val) {
     Vec4i result;
     result.xmmi = in_vec.xmmi * in_val;
     return result;
 }
 
-Vec4i operator*(int32 in_val, Vec4iArg in_vec) {
+Vec4i operator*(int32 in_val, Arg_Vec4i in_vec) {
     Vec4i result;
     result.xmmi = in_val * in_vec.xmmi;
     return result;
 }
 
-Vec4i& Vec4i::operator/=(Vec4iArg in_other) {
+Vec4i& Vec4i::operator/=(Arg_Vec4i in_other) {
     xmmi /= in_other.xmmi;
     return *this;
 }
-Vec4i operator/(Vec4iArg in_a, Vec4iArg in_b) {
+Vec4i operator/(Arg_Vec4i in_a, Arg_Vec4i in_b) {
     Vec4i result;
     result.xmmi = in_a.xmmi / in_b.xmmi;
     return result;
@@ -139,13 +143,13 @@ Vec4i& Vec4i::operator/=(int32 in_other) {
     return *this;
 }
 
-Vec4i operator/(Vec4iArg in_vec, int32 in_val) {
+Vec4i operator/(Arg_Vec4i in_vec, int32 in_val) {
     Vec4i result;
     result.xmmi = in_vec.xmmi / in_val;
     return result;
 }
 
-Vec4i operator/(int32 in_val, Vec4iArg in_vec) {
+Vec4i operator/(int32 in_val, Arg_Vec4i in_vec) {
     Vec4i result;
     result.xmmi = in_val / in_vec.xmmi;
     return result;

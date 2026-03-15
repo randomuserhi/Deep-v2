@@ -3,6 +3,10 @@
 #include "Deep/Math/Xmmi.h"
 #include "Deep/Math/Xmm.h"
 
+#if !defined(DEEP_USE_SSE)
+#include "Deep/Bit.h"
+#endif
+
 DEEP_NAMESPACE_BEGIN
 
 Xmmi::Xmmi(int32 in_x, int32 in_y, int32 in_z, int32 in_w) {

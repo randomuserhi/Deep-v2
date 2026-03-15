@@ -123,6 +123,6 @@ static_assert(std::is_standard_layout<Xmm>(), "Is supposed to be standard layout
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Xmm.inl" // IWYU pragma: export
-
 #undef DEEP_VEC_ALIGNMENT
+
+#include "Deep/Math/Xmm.inl" // IWYU pragma: export

@@ -11,7 +11,7 @@ DEEP_NAMESPACE_BEGIN
 Vec4::Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
     xmm(in_x, in_y, in_z, in_w) {}
 #else
-Vec4::Vec4(float32 roX, float32 in_y, float32 in_z, float32 in_w) :
+Vec4::Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
     x(in_x), y(in_y), z(in_z), w(in_w) {}
 #endif
 
@@ -19,10 +19,10 @@ Vec4::Vec4(Xmm in_xmm) :
     xmm(in_xmm) {}
 
 #ifdef DEEP_USE_SSE4_1
-Vec4::Vec4(Vec3Arg in_xyz, float32 in_w) :
+Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
     xmm(_mm_blend_ps(in_xyz.xmm, _mm_set1_ps(in_w), 8)) {}
 #else
-Vec4::Vec4(Vec3Arg in_xyz, float32 in_w) :
+Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
     x(in_xyz.x), y(in_xyz.y), z(in_xyz.z), w(in_w) {}
 #endif
 
@@ -61,7 +61,7 @@ float32 Vec4::magnitude() const {
 #endif
 }
 
-float32 Vec4::Dot(Vec4Arg in_a, Vec4Arg in_b) {
+float32 Vec4::Dot(Arg_Vec4 in_a, Arg_Vec4 in_b) {
 #ifdef DEEP_USE_SSE4_1
     return _mm_cvtss_f32(_mm_dp_ps(in_a.xmm, in_b.xmm, 0xff));
 #else
@@ -69,54 +69,58 @@ float32 Vec4::Dot(Vec4Arg in_a, Vec4Arg in_b) {
 #endif
 }
 
-Vec4 Vec4::Lerp(Vec4Arg in_a, Vec4Arg in_b, float32 in_t) {
+Vec4 Vec4::Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t) {
     return (in_b - in_a) * in_t + in_a;
 }
 
 Vec4::operator Vec4i() const {
+#ifdef DEEP_USE_SSE
     return Vec4i{ _mm_cvtps_epi32(xmm) };
+#else
+    return Vec4i{ static_cast<int32>(x), static_cast<int32>(y), static_cast<int32>(z), static_cast<int32>(w) };
+#endif
 }
 
-Deep_Inline bool operator!=(Vec4Arg in_a, Vec4Arg in_b) {
+Deep_Inline bool operator!=(Arg_Vec4 in_a, Arg_Vec4 in_b) {
     return in_a.xmm != in_b.xmm;
 }
-Deep_Inline bool operator==(Vec4Arg in_a, Vec4Arg in_b) {
+Deep_Inline bool operator==(Arg_Vec4 in_a, Arg_Vec4 in_b) {
     return !(in_a != in_b);
 }
 
-Vec4& Vec4::operator+=(Vec4Arg in_other) {
+Vec4& Vec4::operator+=(Arg_Vec4 in_other) {
     xmm += in_other.xmm;
     return *this;
 }
 
-Vec4 operator+(Vec4Arg in_a, Vec4Arg in_b) {
+Vec4 operator+(Arg_Vec4 in_a, Arg_Vec4 in_b) {
     Vec4 result;
     result.xmm = in_a.xmm + in_b.xmm;
     return result;
 }
 
-Vec4& Vec4::operator-=(Vec4Arg in_other) {
+Vec4& Vec4::operator-=(Arg_Vec4 in_other) {
     xmm -= in_other.xmm;
     return *this;
 }
 
-Vec4 operator-(Vec4Arg in_a, Vec4Arg in_b) {
+Vec4 operator-(Arg_Vec4 in_a, Arg_Vec4 in_b) {
     Vec4 result;
     result.xmm = in_a.xmm - in_b.xmm;
     return result;
 }
 
-Vec4 operator-(Vec4Arg in_a) {
+Vec4 operator-(Arg_Vec4 in_a) {
     Vec4 result;
     result.xmm = -in_a.xmm;
     return result;
 }
 
-Vec4& Vec4::operator*=(Vec4Arg in_other) {
+Vec4& Vec4::operator*=(Arg_Vec4 in_other) {
     xmm *= in_other.xmm;
     return *this;
 }
-Vec4 operator*(Vec4Arg in_a, Vec4Arg in_b) {
+Vec4 operator*(Arg_Vec4 in_a, Arg_Vec4 in_b) {
     Vec4 result;
     result.xmm = in_a.xmm * in_b.xmm;
     return result;
@@ -127,23 +131,23 @@ Vec4& Vec4::operator*=(float32 in_other) {
     return *this;
 }
 
-Vec4 operator*(Vec4Arg in_vec, float32 in_val) {
+Vec4 operator*(Arg_Vec4 in_vec, float32 in_val) {
     Vec4 result;
     result.xmm = in_vec.xmm * in_val;
     return result;
 }
 
-Vec4 operator*(float32 in_val, Vec4Arg in_vec) {
+Vec4 operator*(float32 in_val, Arg_Vec4 in_vec) {
     Vec4 result;
     result.xmm = in_val * in_vec.xmm;
     return result;
 }
 
-Vec4& Vec4::operator/=(Vec4Arg in_other) {
+Vec4& Vec4::operator/=(Arg_Vec4 in_other) {
     xmm /= in_other.xmm;
     return *this;
 }
-Vec4 operator/(Vec4Arg in_a, Vec4Arg in_b) {
+Vec4 operator/(Arg_Vec4 in_a, Arg_Vec4 in_b) {
     Vec4 result;
     result.xmm = in_a.xmm / in_b.xmm;
     return result;
@@ -154,13 +158,13 @@ Vec4& Vec4::operator/=(float32 in_other) {
     return *this;
 }
 
-Vec4 operator/(Vec4Arg in_vec, float32 in_val) {
+Vec4 operator/(Arg_Vec4 in_vec, float32 in_val) {
     Vec4 result;
     result.xmm = in_vec.xmm / in_val;
     return result;
 }
 
-Vec4 operator/(float32 in_val, Vec4Arg in_vec) {
+Vec4 operator/(float32 in_val, Arg_Vec4 in_vec) {
     Vec4 result;
     result.xmm = in_val / in_vec.xmm;
     return result;

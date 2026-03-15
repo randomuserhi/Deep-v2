@@ -1,8 +1,8 @@
-/out
 bin/
 build/
 /.vs
 .idea/
+.cache/
 Makefile
 
 CMakeSettings.json

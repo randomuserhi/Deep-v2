@@ -148,6 +148,7 @@
 
 // TODO(randomuserhi):
 // - Detect architecture (64bit / 32bit), currently only 64 bit is supported
+// - Support NEON SIMD
 // - Proper detection of SIMD (current is botched)
 // - Support for ARM / WASM compilation
 
@@ -223,14 +224,9 @@
  */
 
 #if !defined(DEEP_DONT_USE_SIMD_INTRINSICS)
-
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-
 #define DEEP_CPU_X86
-
 #define DEEP_USE_SSE
-
-// Detect enabled instruction sets
 #if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && !defined(DEEP_USE_AVX512)
 #define DEEP_USE_AVX512
 #endif
@@ -255,20 +251,25 @@
 #if (defined(__BMI__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_TZCNT)
 #define DEEP_USE_TZCNT
 #endif
-
 #else
-
 #error Unsupported CPU architecture
-
 #endif
-
 #endif
 
 /*
  * Asserts
  */
 #ifndef Deep_Break
+#ifdef DEEP_PLATFORM_WINDOWS
 #define Deep_Break __debugbreak()
+#else
+#include <signal.h>
+#ifdef SIGTRAP
+#define Deep_Break raise(SIGTRAP)
+#else
+#define Deep_Break raise(SIGABRT)
+#endif
+#endif
 #endif
 
 #ifdef DEEP_USE_ASSERTS
