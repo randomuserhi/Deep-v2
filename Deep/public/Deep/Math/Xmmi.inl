@@ -2,6 +2,7 @@
 
 #include "Deep/Math/Xmmi.h"
 #include "Deep/Math/Xmm.h"
+#include "Deep/Bit.h"
 
 #if !defined(DEEP_USE_SSE)
 #include "Deep/Bit.h"
@@ -19,8 +20,17 @@ Xmmi::Xmmi(int32 in_x, int32 in_y, int32 in_z, int32 in_w) {
 	this->w = in_w;
 #endif
 }
-Xmmi::Xmmi(Type in_internal) :
+constexpr Xmmi::Xmmi(Type in_internal) :
 	_internal(in_internal) {}
+
+constexpr Xmmi Xmmi::Constexpr(int32 in_x, int32 in_y, int32 in_z, int32 in_w) {
+	Xmmi xmmi;
+	xmmi.x = in_x;
+	xmmi.y = in_y;
+	xmmi.z = in_z;
+	xmmi.w = in_w;
+	return xmmi;
+}
 
 Xmmi::operator Type() const {
 	return _internal;
@@ -33,12 +43,24 @@ Xmm Xmmi::ToFloat() const {
 	return Xmm{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z), static_cast<float32>(w) };
 #endif
 }
+constexpr Xmm Xmmi::Constexpr_ToFloat() const {
+	Xmm xmm;
+	xmm.x = static_cast<float32>(x);
+	xmm.y = static_cast<float32>(y);
+	xmm.z = static_cast<float32>(z);
+	xmm.w = static_cast<float32>(w);
+	return xmm;
+}
+
 Xmm Xmmi::ReinterpretAsFloat() const {
 #ifdef DEEP_USE_SSE
 	return _mm_castsi128_ps(_internal);
 #else
 	return Deep::BitCast<Xmm>(*this);
 #endif
+}
+constexpr Xmm Xmmi::Constexpr_ReinterpretAsFloat() const {
+	return Deep::BitCast<Xmm>(*this);
 }
 
 Xmmi Xmmi::Replicate(int in_value) {
@@ -68,6 +90,9 @@ Xmmi Xmmi::Xor(const XmmiArg in_a, const XmmiArg in_b) {
 	return Xmmi{ in_a.x ^ in_b.x, in_a.y ^ in_b.y, in_a.z ^ in_b.z, in_a.w ^ in_b.w };
 #endif
 }
+constexpr Xmmi Xmmi::Constexpr_Xor(const XmmiArg in_a, const XmmiArg in_b) {
+	return Xmmi::Constexpr(in_a.x ^ in_b.x, in_a.y ^ in_b.y, in_a.z ^ in_b.z, in_a.w ^ in_b.w);
+}
 
 Xmmi Xmmi::And(const XmmiArg in_a, const XmmiArg in_b) {
 #ifdef DEEP_USE_SSE
@@ -75,6 +100,9 @@ Xmmi Xmmi::And(const XmmiArg in_a, const XmmiArg in_b) {
 #else
 	return Xmmi{ in_a.x & in_b.x, in_a.y & in_b.y, in_a.z & in_b.z, in_a.w & in_b.w };
 #endif
+}
+constexpr Xmmi Xmmi::Constexpr_And(const XmmiArg in_a, const XmmiArg in_b) {
+	return Xmmi::Constexpr(in_a.x & in_b.x, in_a.y & in_b.y, in_a.z & in_b.z, in_a.w & in_b.w);
 }
 
 Xmmi Xmmi::Equals(const XmmiArg in_a, const XmmiArg in_b) {
@@ -86,6 +114,12 @@ Xmmi Xmmi::Equals(const XmmiArg in_a, const XmmiArg in_b) {
 		         in_a.z == in_b.z ? static_cast<int32>(0xffffffff) : 0,
 		         in_a.w == in_b.w ? static_cast<int32>(0xffffffff) : 0 };
 #endif
+}
+constexpr Xmmi Xmmi::Constexpr_Equals(const XmmiArg in_a, const XmmiArg in_b) {
+	return Xmmi::Constexpr(in_a.x == in_b.x ? static_cast<int32>(0xffffffff) : 0, //
+	                       in_a.y == in_b.y ? static_cast<int32>(0xffffffff) : 0, //
+	                       in_a.z == in_b.z ? static_cast<int32>(0xffffffff) : 0, //
+	                       in_a.w == in_b.w ? static_cast<int32>(0xffffffff) : 0);
 }
 
 template<const uint32 Count>

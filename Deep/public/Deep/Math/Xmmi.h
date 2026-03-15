@@ -35,11 +35,13 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 
 	//
 
-	Xmmi() = default;
-	Xmmi(const Xmmi&) = default;
-	Xmmi& operator=(const Xmmi&) = default;
+	constexpr Xmmi() = default;
+	constexpr Xmmi(const Xmmi&) = default;
+	constexpr Xmmi& operator=(const Xmmi&) = default;
 	Deep_Inline Xmmi(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
-	Deep_Inline Xmmi(Type in_internal);
+	constexpr Deep_Inline Xmmi(Type in_internal);
+
+	constexpr static Deep_Inline Xmmi Constexpr(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
 
 	//
 
@@ -50,9 +52,11 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 
 	// Convert into __m128, converting each component to a float
 	Deep_Inline Xmm ToFloat() const;
+	constexpr Deep_Inline Xmm Constexpr_ToFloat() const;
 
 	// Reinterpret bytes as a __m128
 	Deep_Inline Xmm ReinterpretAsFloat() const;
+	constexpr Deep_Inline Xmm Constexpr_ReinterpretAsFloat() const;
 
 	// Treats the 4 components as booleans where true is when the most significant bit is set
 	// and returns it as a bit mask.
@@ -65,15 +69,18 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 
 	// Component wise logical AND
 	static Deep_Inline Xmmi And(const XmmiArg in_a, const XmmiArg in_b);
+	constexpr static Deep_Inline Xmmi Constexpr_And(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Component wise logical XOR
 	static Deep_Inline Xmmi Xor(const XmmiArg in_a, const XmmiArg in_b);
+	constexpr static Deep_Inline Xmmi Constexpr_Xor(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
 	static Deep_Inline Xmmi Equals(const XmmiArg in_a, const XmmiArg in_b);
+	constexpr static Deep_Inline Xmmi Constexpr_Equals(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Shift all components by `Count` bits to the left
 	template<const uint32 Count>

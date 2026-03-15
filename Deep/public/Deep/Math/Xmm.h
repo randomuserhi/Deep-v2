@@ -30,39 +30,46 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmm {
 
 	//
 
-	Xmm() = default;
-	Xmm(const Xmm&) = default;
-	Xmm& operator=(const Xmm&) = default;
+	constexpr Xmm() = default;
+	constexpr Xmm(const Xmm&) = default;
+	constexpr Xmm& operator=(const Xmm&) = default;
 	Deep_Inline Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
-	Deep_Inline Xmm(Type in_internal);
+	constexpr Deep_Inline Xmm(Type in_internal);
+
+	constexpr static Deep_Inline Xmm Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
 
 	//
 
 	// Implicit conversion
-	Deep_Inline operator Type() const;
+	constexpr Deep_Inline operator Type() const;
 
 	//
 
 	// Convert into __m128i, converting each component to an integer
 	Deep_Inline Xmmi ToInt() const;
+	constexpr Deep_Inline Xmmi Constexpr_ToInt() const;
 
 	// Reinterpret bytes as a __m128i
 	Deep_Inline Xmmi ReinterpretAsInt() const;
+	constexpr Deep_Inline Xmmi Constexpr_ReinterpretAsInt() const;
 
 	// Replicate the given value across all components
 	static Deep_Inline Xmm Replicate(float32 in_value);
 
 	// Component wise logical AND
 	static Deep_Inline Xmm And(const XmmArg in_a, const XmmArg in_b);
+	constexpr static Deep_Inline Xmm Constexpr_And(const XmmArg in_a, const XmmArg in_b);
 
 	// Component wise logical XOR
 	static Deep_Inline Xmm Xor(const XmmArg in_a, const XmmArg in_b);
+	constexpr static Deep_Inline Xmm Constexpr_Xor(const XmmArg in_a, const XmmArg in_b);
 
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
 	static Deep_Inline Xmmi Equals(const XmmArg in_a, const XmmArg in_b);
+	constexpr static Deep_Inline Xmmi Constexpr_Equals(const XmmArg in_a, const XmmArg in_b);
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
 	static Deep_Inline Xmm Select(const XmmArg in_a, const XmmArg in_b, const XmmiArg in_control);
@@ -102,7 +109,7 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmm {
 
 	// Calculate the sin and cosin for each component and store the result
 	// in `sin` and `cos` respectively
-	inline void SinCos(Xmm& wo_sin, Xmm& wo_cos);
+	inline void SinCos(Xmm& out_sin, Xmm& out_cos);
 
 	//
 

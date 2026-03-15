@@ -2,10 +2,7 @@
 
 #include "Deep/Math/Xmm.h"
 #include "Deep/Math/Xmmi.h"
-
-#if !defined(DEEP_USE_SSE)
 #include "Deep/Bit.h"
-#endif
 
 DEEP_NAMESPACE_BEGIN
 
@@ -19,10 +16,19 @@ Xmm::Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {
 	w = in_w;
 #endif
 }
-Xmm::Xmm(Type in_internal) :
-    _internal(in_internal) {}
+constexpr Xmm::Xmm(Type in_internal) :
+	_internal(in_internal) {}
 
-Xmm::operator Type() const {
+constexpr Xmm Xmm::Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {
+	Xmm xmm;
+	xmm.x = in_x;
+	xmm.y = in_y;
+	xmm.z = in_z;
+	xmm.w = in_w;
+	return xmm;
+}
+
+constexpr Xmm::operator Type() const {
 	return _internal;
 }
 
@@ -33,12 +39,19 @@ Xmmi Xmm::ToInt() const {
 	return Xmmi{ static_cast<int32>(x), static_cast<int32>(y), static_cast<int32>(z), static_cast<int32>(w) };
 #endif
 }
+constexpr Xmmi Xmm::Constexpr_ToInt() const {
+	return Xmmi::Constexpr(static_cast<int32>(x), static_cast<int32>(y), static_cast<int32>(z), static_cast<int32>(w));
+}
+
 Xmmi Xmm::ReinterpretAsInt() const {
 #ifdef DEEP_USE_SSE
 	return _mm_castps_si128(_internal);
 #else
 	return Deep::BitCast<Xmmi>(*this);
 #endif
+}
+constexpr Xmmi Xmm::Constexpr_ReinterpretAsInt() const {
+	return Deep::BitCast<Xmmi>(*this);
 }
 
 Xmm Xmm::Replicate(float32 in_value) {
@@ -48,6 +61,7 @@ Xmm Xmm::Replicate(float32 in_value) {
 	return Xmm{ in_value, in_value, in_value, in_value };
 #endif
 }
+
 Xmm Xmm::And(const XmmArg in_a, const XmmArg in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_and_ps(in_a, in_b);
@@ -55,6 +69,11 @@ Xmm Xmm::And(const XmmArg in_a, const XmmArg in_b) {
 	return Xmmi::And(in_a.ReinterpretAsInt(), in_b.ReinterpretAsInt()).ReinterpretAsFloat();
 #endif
 }
+constexpr Xmm Xmm::Constexpr_And(const XmmArg in_a, const XmmArg in_b) {
+	return Xmmi::Constexpr_And(in_a.Constexpr_ReinterpretAsInt(), in_b.Constexpr_ReinterpretAsInt())
+	    .Constexpr_ReinterpretAsFloat();
+}
+
 Xmm Xmm::Xor(const XmmArg in_a, const XmmArg in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_xor_ps(in_a, in_b);
@@ -62,13 +81,26 @@ Xmm Xmm::Xor(const XmmArg in_a, const XmmArg in_b) {
 	return Xmmi::Xor(in_a.ReinterpretAsInt(), in_b.ReinterpretAsInt()).ReinterpretAsFloat();
 #endif
 }
+constexpr Xmm Xmm::Constexpr_Xor(const XmmArg in_a, const XmmArg in_b) {
+	return Xmmi::Constexpr_Xor(in_a.Constexpr_ReinterpretAsInt(), in_b.Constexpr_ReinterpretAsInt())
+	    .Constexpr_ReinterpretAsFloat();
+}
+
 Xmmi Xmm::Equals(const XmmArg in_a, const XmmArg in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_castps_si128(_mm_cmpeq_ps(in_a, in_b));
 #else
-	return Xmmi{ in_a.x == in_b.x ? (int32)0xffffffff : 0, in_a.y == in_b.y ? (int32)0xffffffff : 0,
-		         in_a.z == in_b.z ? (int32)0xffffffff : 0, in_a.w == in_b.w ? (int32)0xffffffff : 0 };
+	return Xmmi{ in_a.x == in_b.x ? (int32)0xffffffff : 0, //
+		         in_a.y == in_b.y ? (int32)0xffffffff : 0, //
+		         in_a.z == in_b.z ? (int32)0xffffffff : 0, //
+		         in_a.w == in_b.w ? (int32)0xffffffff : 0 };
 #endif
+}
+constexpr Xmmi Xmm::Constexpr_Equals(const XmmArg in_a, const XmmArg in_b) {
+	return Xmmi::Constexpr(in_a.x == in_b.x ? (int32)0xffffffff : 0, //
+	                       in_a.y == in_b.y ? (int32)0xffffffff : 0, //
+	                       in_a.z == in_b.z ? (int32)0xffffffff : 0, //
+	                       in_a.w == in_b.w ? (int32)0xffffffff : 0);
 }
 
 Deep_Inline bool operator!=(const XmmArg in_a, const XmmArg in_b) {
@@ -210,7 +242,7 @@ Xmm Xmm::Select(const XmmArg in_a, const XmmArg in_b, XmmiArg in_control) {
 #endif
 }
 
-void Xmm::SinCos(Xmm& wo_sin, Xmm& wo_cos) {
+void Xmm::SinCos(Xmm& out_sin, Xmm& out_cos) {
 	// Implementation based on sinf.c from the cephes library, combines sinf and cosf in a single function, changes
 	// octants to quadrants and vectorizes it Original implementation by Stephen L. Moshier (See:
 	// http://www.moshier.net/)
@@ -244,12 +276,12 @@ void Xmm::SinCos(Xmm& wo_sin, Xmm& wo_cos) {
 	// Taylor expansion:
 	// Cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! + x^8/8! + ... = (((x2/8!- 1/6!) * x2 + 1/4!) * x2 - 1/2!) * x2 + 1
 	Xmm taylorCos =
-	    ((2.443315711809948e-5f * x2 - Xmm::Replicate(1.388731625493765e-3f)) * x2 + Xmm::Replicate(4.166664568298827e-2f))
-	        * x2 * x2
-	    - 0.5f * x2 + Xmm::Replicate(1.0f);
+		((2.443315711809948e-5f * x2 - Xmm::Replicate(1.388731625493765e-3f)) * x2 + Xmm::Replicate(4.166664568298827e-2f))
+			* x2 * x2
+		- 0.5f * x2 + Xmm::Replicate(1.0f);
 	// Sin(x) = x - x^3/3! + x^5/5! - x^7/7! + ... = ((-x2/7! + 1/5!) * x2 - 1/3!) * x2 * x + x
 	Xmm taylorSin =
-	    ((-1.9515295891e-4f * x2 + Xmm::Replicate(8.3321608736e-3f)) * x2 - Xmm::Replicate(1.6666654611e-1f)) * x2 * _x + _x;
+		((-1.9515295891e-4f * x2 + Xmm::Replicate(8.3321608736e-3f)) * x2 - Xmm::Replicate(1.6666654611e-1f)) * x2 * _x + _x;
 
 	// The lowest 2 bits of quadrant indicate the quadrant that we are in.
 	// Let x be the original input value and x' our value that has been mapped to the range [-PI / 4, PI / 4].
@@ -275,8 +307,8 @@ void Xmm::SinCos(Xmm& wo_sin, Xmm& wo_cos) {
 	Xmmi cos_sign = Xmmi::Xor(bit1, bit2);
 
 	// Correct the signs
-	wo_sin = Xmm::Xor(s, sinSign.ReinterpretAsFloat());
-	wo_cos = Xmm::Xor(c, cos_sign.ReinterpretAsFloat());
+	out_sin = Xmm::Xor(s, sinSign.ReinterpretAsFloat());
+	out_cos = Xmm::Xor(c, cos_sign.ReinterpretAsFloat());
 }
 
 DEEP_NAMESPACE_END
