@@ -4,6 +4,10 @@
 #include "Deep/Math/Xmmi.h"
 #include "Deep/Bit.h"
 
+#if !defined(DEEP_USE_SSE)
+#include "Deep/Math/Ops.h"
+#endif
+
 DEEP_NAMESPACE_BEGIN
 
 Xmm::Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {
@@ -84,6 +88,32 @@ Xmm Xmm::Xor(const XmmArg in_a, const XmmArg in_b) {
 constexpr Xmm Xmm::Constexpr_Xor(const XmmArg in_a, const XmmArg in_b) {
 	return Xmmi::Constexpr_Xor(in_a.Constexpr_ReinterpretAsInt(), in_b.Constexpr_ReinterpretAsInt())
 	    .Constexpr_ReinterpretAsFloat();
+}
+
+Xmm Xmm::Min(const XmmArg in_a, const XmmArg in_b) {
+#ifdef DEEP_USE_SSE
+	return _mm_min_ps(in_a, in_b);
+#else
+	return Xmm{
+		Deep::Min(in_a.x, in_b.x), //
+		Deep::Min(in_a.y, in_b.y), //
+		Deep::Min(in_a.z, in_b.z), //
+		Deep::Min(in_a.w, in_b.w)  //
+	};
+#endif
+}
+
+Xmm Xmm::Max(const XmmArg in_a, const XmmArg in_b) {
+#ifdef DEEP_USE_SSE
+	return _mm_max_ps(in_a, in_b);
+#else
+	return Xmm{
+		Deep::Max(in_a.x, in_b.x), //
+		Deep::Max(in_a.y, in_b.y), //
+		Deep::Max(in_a.z, in_b.z), //
+		Deep::Max(in_a.w, in_b.w)  //
+	};
+#endif
 }
 
 Xmmi Xmm::Equals(const XmmArg in_a, const XmmArg in_b) {

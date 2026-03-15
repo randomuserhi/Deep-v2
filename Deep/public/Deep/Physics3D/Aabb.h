@@ -17,7 +17,8 @@ DEEP_EXPORT bool IsOverlapping(Vec3 in_point, Arg_Aabb3D in_a);
 DEEP_EXPORT bool IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b);
 DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo);
 
-DEEP_EXPORT bool Raycast(Ray3D in_ray, RayHit3D* out_hit);
-int RaycastAll(Ray3D in_ray, RayHit3D* out_hits);
+DEEP_EXPORT bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box);
+DEEP_EXPORT bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit);
+DEEP_EXPORT int RaycastAll(Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits);
 
 DEEP_NAMESPACE_END

@@ -64,6 +64,10 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmm {
 	static Deep_Inline Xmm Xor(const XmmArg in_a, const XmmArg in_b);
 	constexpr static Deep_Inline Xmm Constexpr_Xor(const XmmArg in_a, const XmmArg in_b);
 
+	// Component wise min/max
+	static Deep_Inline Xmm Min(const XmmArg in_a, const XmmArg in_b);
+	static Deep_Inline Xmm Max(const XmmArg in_a, const XmmArg in_b);
+
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//

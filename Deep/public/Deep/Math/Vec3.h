@@ -100,6 +100,9 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec3 {
 	static const Vec3 k_right;
 	static const Vec3 k_forwards;
 	static const Vec3 k_backwards;
+
+	static constexpr int k_numAxis = 3;
+	static const Vec3 k_axis[k_numAxis];
 };
 
 static_assert(std::is_trivial<Vec3>(), "Is supposed to be a trivial type!");
