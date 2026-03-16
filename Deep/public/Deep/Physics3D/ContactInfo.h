@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Deep.h"
 #include "Deep/Math/Vec3.h"
 

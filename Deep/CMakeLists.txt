@@ -100,7 +100,7 @@ function(SET_INTERPROCEDURAL_OPTIMIZATION)
 		check_ipo_supported(RESULT IS_IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
 
 		if (IS_IPO_SUPPORTED)
-			message("Interprocedural optimizations are turned on")
+			message(STATUS "Interprocedural optimizations are turned on")
 			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON PARENT_SCOPE)
 			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION ON PARENT_SCOPE)
 		else()

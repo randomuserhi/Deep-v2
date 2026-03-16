@@ -9,6 +9,7 @@ cmake --build build
 
 `m_camelCase` for members
 `k_camelCase` for constants
+`e_camelCase` for enum values
 `s_camelCase` for static
 `CamelCase` for functions
 `CamelCase` for types
