@@ -98,16 +98,6 @@ template bool Raycast<RaycastType::e_startsOutside>(Ray3D, Arg_Aabb3D);
 
 template<RaycastType in_queryType>
 bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
-	// TODO(randomuserhi): API for if ray should hit starting collider (if ray originates from inside of it)
-	//
-	//                     API can be written using template overrides - Raycast<e_startInCollider>(...) and
-	//                     Raycast<e_startOutCollider>(...) This allows branching to be constexpr and these methods remain
-	//                     fast.
-	//
-	//                     if tEnter < 0, then ray starting within the bounding box
-	//                     - If ray starting inside collider is allowed, then out_hit should be the exit contact
-	//                     - Otherwise return no hit
-
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
 	Deep_Assert(out_hit != nullptr, "Out param must not be nullptr.");

@@ -110,6 +110,27 @@ Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
 #endif
 }
 
+float32 Mat4::determinant() const {
+#ifdef DEEP_USE_SSE
+	// TODO(randomuserhi):
+	return 0;
+#else
+	// TODO(randomuserhi): verify the below
+
+	float32 m00 = this->m00, m01 = this->m01, m02 = this->m02, m03 = this->m03;
+	float32 m10 = this->m10, m11 = this->m11, m12 = this->m12, m13 = this->m13;
+	float32 m20 = this->m20, m21 = this->m21, m22 = this->m22, m23 = this->m23;
+	float32 m30 = this->m30, m31 = this->m31, m32 = this->m32, m33 = this->m33;
+
+	float det = m00 * (m11 * (m22 * m33 - m23 * m32) - m12 * (m21 * m33 - m23 * m31) + m13 * (m21 * m32 - m22 * m31))
+	            - m01 * (m10 * (m22 * m33 - m23 * m32) - m12 * (m20 * m33 - m23 * m30) + m13 * (m20 * m32 - m22 * m30))
+	            + m02 * (m10 * (m21 * m33 - m23 * m31) - m11 * (m20 * m33 - m23 * m30) + m13 * (m20 * m31 - m21 * m30))
+	            - m03 * (m10 * (m21 * m32 - m22 * m31) - m11 * (m20 * m32 - m22 * m30) + m12 * (m20 * m31 - m21 * m30));
+
+	return det;
+#endif
+}
+
 Mat4& Mat4::Inverse() {
 	*this = inversed();
 	return *this;

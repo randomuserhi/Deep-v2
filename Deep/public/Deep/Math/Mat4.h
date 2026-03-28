@@ -31,6 +31,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
 
 	//
 
+	[[nodiscard]] Deep_Inline float32 determinant() const;
+
 	Deep_Inline Mat4& Transpose();
 	[[nodiscard]] Deep_Inline Mat4 transposed() const;
 
