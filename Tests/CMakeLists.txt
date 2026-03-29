@@ -142,9 +142,20 @@ if (MSVC)
 elseif (CLANG)
 	# Enable warnings
 	target_compile_options(Tests PRIVATE 
-		-Wall 
+		-Wall
+		-Wextra
 		-Werror
 		)	
+
+	# Extra useful warnings
+	target_compile_options(Tests PRIVATE
+		-Wpessimizing-move
+		-Wredundant-move
+		-Wmove
+		-Wreturn-std-move
+		-Wdefaulted-function-deleted
+		-Wself-move
+		)
 
 	# Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)

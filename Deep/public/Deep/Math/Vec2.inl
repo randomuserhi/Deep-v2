@@ -20,7 +20,7 @@ Vec2::Vec2(Arg_Vec4 in_vec) :
 
 Vec2& Vec2::Normalize() {
 	float32 magnitudeSqrd = sqrdMagnitude();
-	if (magnitudeSqrd != 0.0) *this /= Deep::Sqrt(magnitudeSqrd);
+	if (magnitudeSqrd != 0.0f) *this /= Deep::Sqrt(magnitudeSqrd);
 	return *this;
 }
 Vec2 Vec2::normalized() const {

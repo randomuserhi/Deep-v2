@@ -120,17 +120,17 @@ Xmmi Xmm::Equals(const XmmArg in_a, const XmmArg in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_castps_si128(_mm_cmpeq_ps(in_a, in_b));
 #else
-	return Xmmi{ in_a.x == in_b.x ? (int32)0xffffffff : 0, //
-		         in_a.y == in_b.y ? (int32)0xffffffff : 0, //
-		         in_a.z == in_b.z ? (int32)0xffffffff : 0, //
-		         in_a.w == in_b.w ? (int32)0xffffffff : 0 };
+	return Xmmi{ in_a.x == in_b.x ? int32(0xffffffff) : 0, //
+		         in_a.y == in_b.y ? int32(0xffffffff) : 0, //
+		         in_a.z == in_b.z ? int32(0xffffffff) : 0, //
+		         in_a.w == in_b.w ? int32(0xffffffff) : 0 };
 #endif
 }
 constexpr Xmmi Xmm::Constexpr_Equals(const XmmArg in_a, const XmmArg in_b) {
-	return Xmmi::Constexpr(in_a.x == in_b.x ? (int32)0xffffffff : 0, //
-	                       in_a.y == in_b.y ? (int32)0xffffffff : 0, //
-	                       in_a.z == in_b.z ? (int32)0xffffffff : 0, //
-	                       in_a.w == in_b.w ? (int32)0xffffffff : 0);
+	return Xmmi::Constexpr(in_a.x == in_b.x ? int32(0xffffffff) : 0, //
+	                       in_a.y == in_b.y ? int32(0xffffffff) : 0, //
+	                       in_a.z == in_b.z ? int32(0xffffffff) : 0, //
+	                       in_a.w == in_b.w ? int32(0xffffffff) : 0);
 }
 
 inline bool operator!=(const XmmArg in_a, const XmmArg in_b) {
@@ -279,7 +279,7 @@ void Xmm::SinCos(Xmm& out_sin, Xmm& out_cos) {
 
 	// Make argument positive and remember sign for sin only since cos is symmetric around x (highest bit of a float is
 	// the sign bit)
-	Xmmi sinSign = Xmmi::And(ReinterpretAsInt(), Xmmi::Replicate(0x80000000U));
+	Xmmi sinSign = Xmmi::And(ReinterpretAsInt(), Xmmi::Replicate(int32(0x80000000)));
 	Xmm _x = Xmm::Xor(*this, sinSign.ReinterpretAsFloat());
 
 	// x / (PI / 2) rounded to nearest int gives us the quadrant closest to x
@@ -326,7 +326,7 @@ void Xmm::SinCos(Xmm& out_sin, Xmm& out_cos) {
 	//
 	// So: sin_sign = bit2, cos_sign = bit1 ^ bit2, bit1 determines if we use sin or cos Taylor expansion
 	Xmmi bit1 = quadrant.LogicalShiftLeft<31>();
-	Xmmi bit2 = Xmmi::And(quadrant.LogicalShiftLeft<30>(), Xmmi::Replicate(0x80000000U));
+	Xmmi bit2 = Xmmi::And(quadrant.LogicalShiftLeft<30>(), Xmmi::Replicate(int32(0x80000000)));
 
 	// Select which one of the results is sin and which one is cos
 	Xmm s = Xmm::Select(taylorSin, taylorCos, bit1);

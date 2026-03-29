@@ -38,7 +38,7 @@ Vec3& Vec3::Normalize() {
 	return *this;
 #else
 	float32 magnitudeSqrd = sqrdMagnitude();
-	if (magnitudeSqrd != 0.0) *this /= Deep::Sqrt(magnitudeSqrd);
+	if (magnitudeSqrd != 0.0f) *this /= Deep::Sqrt(magnitudeSqrd);
 	return *this;
 #endif
 }
@@ -53,7 +53,6 @@ bool Vec3::IsNormalized(float tolerance) const {
 float32 Vec3::sqrdMagnitude() const {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cvtss_f32(_mm_dp_ps(xmm, xmm, 0x7f));
-	;
 #else
 	return x * x + y * y + z * z;
 #endif

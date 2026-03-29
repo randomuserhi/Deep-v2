@@ -28,19 +28,19 @@ Quat Quat::FromMat4(Arg_Mat4 in_mat) {
 		if (in_mat.m22 > in_mat.m_cols[i].values[i]) i = 2;
 
 		if (i == 0) {
-			float s = sqrt(in_mat.m00 - (in_mat.m11 + in_mat.m22) + 1);
+			float s = Deep::Sqrt(in_mat.m00 - (in_mat.m11 + in_mat.m22) + 1.0f);
 			float is = 0.5f / s;
 			return Quat(0.5f * s, (in_mat.m10 + in_mat.m01) * is, (in_mat.m02 + in_mat.m20) * is,
 			            (in_mat.m12 - in_mat.m21) * is);
 		} else if (i == 1) {
-			float s = sqrt(in_mat.m11 - (in_mat.m22 + in_mat.m00) + 1);
+			float s = Deep::Sqrt(in_mat.m11 - (in_mat.m22 + in_mat.m00) + 1.0f);
 			float is = 0.5f / s;
 			return Quat((in_mat.m10 + in_mat.m01) * is, 0.5f * s, (in_mat.m21 + in_mat.m12) * is,
 			            (in_mat.m20 - in_mat.m02) * is);
 		} else {
 			Deep_Assert(i == 2, "Index should be 2.");
 
-			float s = sqrt(in_mat.m22 - (in_mat.m00 + in_mat.m11) + 1);
+			float s = Deep::Sqrt(in_mat.m22 - (in_mat.m00 + in_mat.m11) + 1.0f);
 			float is = 0.5f / s;
 			return Quat((in_mat.m02 + in_mat.m20) * is, (in_mat.m21 + in_mat.m12) * is, 0.5f * s,
 			            (in_mat.m01 - in_mat.m10) * is);
@@ -67,7 +67,7 @@ Mat4 Quat::ToMat4() const {
 
 Quat& Quat::Conjugate() {
 	// https://stackoverflow.com/questions/56992811/is-there-a-way-to-flip-the-sign-bit-of-32-bit-float-with-xor
-	xmm = Xmm::Xor(xmm, Xmmi{ (int32)0x80000000, (int32)0x80000000, (int32)0x80000000, 0 }.ReinterpretAsFloat());
+	xmm = Xmm::Xor(xmm, Xmmi{ int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat());
 	return *this;
 }
 Quat Quat::conjugated() const {
@@ -91,7 +91,7 @@ Quat::Quat(Vec3 in_axis, float32 in_angle) {
 
 	Xmm s, c;
 	Xmm::Replicate(0.5f * in_angle).SinCos(s, c);
-	xmm = Xmm::Select(in_axis.xmm * s, c, Xmmi{ 0, 0, 0, (int32)0xffffffff });
+	xmm = Xmm::Select(in_axis.xmm * s, c, Xmmi{ 0, 0, 0, int32(0xffffffff) });
 }
 
 inline bool operator!=(Arg_Quat in_a, Arg_Quat in_b) {

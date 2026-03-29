@@ -136,17 +136,15 @@ Xmmi Xmmi::Equals(const XmmiArg in_a, const XmmiArg in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_cmpeq_epi32(in_a, in_b);
 #else
-	return Xmmi{ in_a.x == in_b.x ? static_cast<int32>(0xffffffff) : 0,
-		         in_a.y == in_b.y ? static_cast<int32>(0xffffffff) : 0,
-		         in_a.z == in_b.z ? static_cast<int32>(0xffffffff) : 0,
-		         in_a.w == in_b.w ? static_cast<int32>(0xffffffff) : 0 };
+	return Xmmi{ in_a.x == in_b.x ? int32(0xffffffff) : 0, in_a.y == in_b.y ? int32(0xffffffff) : 0,
+		         in_a.z == in_b.z ? int32(0xffffffff) : 0, in_a.w == in_b.w ? int32(0xffffffff) : 0 };
 #endif
 }
 constexpr Xmmi Xmmi::Constexpr_Equals(const XmmiArg in_a, const XmmiArg in_b) {
-	return Xmmi::Constexpr(in_a.x == in_b.x ? static_cast<int32>(0xffffffff) : 0, //
-	                       in_a.y == in_b.y ? static_cast<int32>(0xffffffff) : 0, //
-	                       in_a.z == in_b.z ? static_cast<int32>(0xffffffff) : 0, //
-	                       in_a.w == in_b.w ? static_cast<int32>(0xffffffff) : 0);
+	return Xmmi::Constexpr(in_a.x == in_b.x ? int32(0xffffffff) : 0, //
+	                       in_a.y == in_b.y ? int32(0xffffffff) : 0, //
+	                       in_a.z == in_b.z ? int32(0xffffffff) : 0, //
+	                       in_a.w == in_b.w ? int32(0xffffffff) : 0);
 }
 
 template<const uint32 Count>

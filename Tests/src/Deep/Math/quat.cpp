@@ -40,7 +40,7 @@ TEST(Quat, RotateVector) {
 }
 
 TEST(Quat, InverseRotateVector) {
-	Deep::Quat q{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, 0.5 * Deep::Pi };
+	Deep::Quat q{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, 0.5f * Deep::Pi };
 	const Deep::Vec3 v{ 1.0f, 0.0f, 0.0f };
 	const Deep::Vec3 result = Deep::Quat::InverseRotate(q, v);
 

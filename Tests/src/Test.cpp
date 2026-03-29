@@ -9,6 +9,9 @@ TEST_SUPPRESS_WARNINGS_STD_BEGIN
 TEST_SUPPRESS_WARNINGS_STD_END
 
 namespace Test {
+
+TestBase::~TestBase() = default;
+
 struct CStrHash {
 	size_t operator()(const char* s) const {
 		return std::hash<std::string_view>{}(s);

@@ -24,3 +24,5 @@ cmake --build build
 
 The library provides `Arg_` types which give you the fastest way to pass a type as a function argument.
 This typically follows the rule, if the type is < 32 bytes pass by value (`const T`) otherwise pass by reference (`const T&`).
+
+Optimized for clang version >= 20.x.x

@@ -33,7 +33,7 @@ Vec4& Vec4::Normalize() {
 	return *this;
 #else
 	float32 magnitudeSqrd = sqrdMagnitude();
-	if (magnitudeSqrd != 0.0) *this /= Deep::Sqrt(magnitudeSqrd);
+	if (magnitudeSqrd != 0.0f) *this /= Deep::Sqrt(magnitudeSqrd);
 	return *this;
 #endif
 }

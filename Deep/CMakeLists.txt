@@ -176,7 +176,17 @@ elseif (CLANG)
 	target_compile_options(Deep PRIVATE -fno-trapping-math)
 
 	# Enable warnings
-	target_compile_options(Deep PRIVATE -Wall -Werror)
+	target_compile_options(Deep PRIVATE -Wall -Wextra -Werror)
+
+	# Extra useful warnings
+	target_compile_options(Deep PRIVATE
+		-Wpessimizing-move
+		-Wredundant-move
+		-Wmove
+		-Wreturn-std-move
+		-Wdefaulted-function-deleted
+		-Wself-move
+		)
 
 	# Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)

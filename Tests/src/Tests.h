@@ -167,7 +167,7 @@ TEST_SUPPRESS_WARNING_PUSH
 TEST_CLANG_SUPPRESS_WARNING("-Wpadded")
 class TestBase {
 protected:
-	inline virtual ~TestBase() {}
+	virtual ~TestBase();
 
 public:
 	virtual void TestBody() const = 0;
