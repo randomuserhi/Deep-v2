@@ -10,4 +10,6 @@ struct ContactInfo {
 	float32 m_penetrationDistance;
 };
 
+using Arg_ContactInfo = const ContactInfo&;
+
 DEEP_NAMESPACE_END

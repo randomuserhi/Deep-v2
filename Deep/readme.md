@@ -19,3 +19,8 @@ cmake --build build
 `in_camelCase` for in arguments
 `out_camelCase` for out arguments
 `io_camelCase` for in-out arguments
+
+# Notes
+
+The library provides `Arg_` types which give you the fastest way to pass a type as a function argument.
+This typically follows the rule, if the type is < 32 bytes pass by value (`const T`) otherwise pass by reference (`const T&`).

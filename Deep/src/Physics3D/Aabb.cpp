@@ -5,29 +5,6 @@
 
 DEEP_NAMESPACE_BEGIN
 
-bool IsOverlapping(Vec3 in_point, Arg_Aabb3D in_a) {
-	Deep_Assert(in_a.m_extents.x > 0 && in_a.m_extents.y > 0 && in_a.m_extents.z > 0, "Extents of box must be > 0.");
-	Vec3 minA = in_a.m_center - in_a.m_extents;
-	Vec3 maxA = in_a.m_center + in_a.m_extents;
-	return in_point.x > minA.x && in_point.x < maxA.x && //
-	       in_point.y > minA.y && in_point.y < maxA.y && //
-	       in_point.z > minA.z && in_point.z < maxA.z;
-}
-
-bool IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b) {
-	Deep_Assert(in_a.m_extents.x > 0 && in_a.m_extents.y > 0 && in_a.m_extents.z > 0, "Extents of box must be > 0.");
-	Deep_Assert(in_b.m_extents.x > 0 && in_b.m_extents.y > 0 && in_b.m_extents.z > 0, "Extents of box must be > 0.");
-
-	Vec3 minA = in_a.m_center - in_a.m_extents;
-	Vec3 maxA = in_a.m_center + in_a.m_extents;
-	Vec3 minB = in_b.m_center - in_b.m_extents;
-	Vec3 maxB = in_b.m_center + in_b.m_extents;
-
-	return minA.x < maxB.x && maxA.x > minB.x && //
-	       minA.y < maxB.y && maxA.y > minB.y && //
-	       minA.z < maxB.z && maxA.z > minB.z;
-}
-
 int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo) {
 	Deep_Assert(in_a.m_extents.x > 0 && in_a.m_extents.y > 0 && in_a.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_b.m_extents.x > 0 && in_b.m_extents.y > 0 && in_b.m_extents.z > 0, "Extents of box must be > 0.");
@@ -70,7 +47,7 @@ int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo
 }
 
 template<RaycastType in_queryType>
-bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box) {
+bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
 
@@ -93,11 +70,11 @@ bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box) {
 	}
 	return tEnter <= tExit && tExit > 0.0f;
 }
-template bool Raycast<RaycastType::e_startsInside>(Ray3D, Arg_Aabb3D);
-template bool Raycast<RaycastType::e_startsOutside>(Ray3D, Arg_Aabb3D);
+template bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D);
+template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D);
 
 template<RaycastType in_queryType>
-bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
+bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
 	Deep_Assert(out_hit != nullptr, "Out param must not be nullptr.");
@@ -113,50 +90,102 @@ bool Raycast(Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 	Xmm tmin = Xmm::Min(t1.xmm, t2.xmm);
 	Xmm tmax = Xmm::Max(t1.xmm, t2.xmm);
 
-	int32 axis = (tmin.y > tmin.x) ? 1 : 0;
+	int32 enterAxis = (tmin.y > tmin.x) ? 1 : 0;
 	float32 tEnter = (tmin.y > tmin.x) ? tmin.y : tmin.x;
-	axis = (tmin.z > tEnter) ? 2 : axis;
+	enterAxis = (tmin.z > tEnter) ? 2 : enterAxis;
 	tEnter = (tmin.z > tEnter) ? tmin.z : tEnter;
 
-	float32 tExit = Deep::Min(Deep::Min(tmax.x, tmax.y), tmax.z);
+	int32 exitAxis = (tmax.y < tmax.x) ? 1 : 0;
+	float32 tExit = (tmax.y < tmax.x) ? tmax.y : tmax.x;
+	exitAxis = (tmax.z < tExit) ? 2 : exitAxis;
+	tExit = (tmax.z < tExit) ? tmax.z : tExit;
 
 	bool outside = tEnter >= 0;
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
 		if (!outside || tEnter > tExit || tExit < 0.0f) return false;
 
-		out_hit->m_distance = tEnter;
-		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * out_hit->m_distance;
+		const int32 axis = enterAxis;
+		const float32 distance = tEnter;
+		const float32 multiplier = -1.0f;
+		out_hit->m_distance = distance;
+		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * distance;
 		out_hit->m_normal = Vec3::k_zero;
-		out_hit->m_normal.m_values[axis] = Deep::Sign(in_ray.m_direction.m_values[axis]) * -1.0f;
+		out_hit->m_normal.m_values[axis] = Deep::Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 	} else {
 		if (tEnter > tExit || tExit < 0.0f) return false;
 
-		out_hit->m_distance = outside ? tEnter : tExit;
-		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * out_hit->m_distance;
+		const int32 axis = outside ? enterAxis : exitAxis;
+		const float32 distance = outside ? tEnter : tExit;
+		const float32 multiplier = outside ? -1.0f : 1.0f;
+		out_hit->m_distance = distance;
+		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * distance;
 		out_hit->m_normal = Vec3::k_zero;
-		out_hit->m_normal.m_values[axis] = Deep::Sign(in_ray.m_direction.m_values[axis]);
-		if (outside) out_hit->m_normal.m_values[axis] *= -1.0f;
+		out_hit->m_normal.m_values[axis] = Deep::Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 	}
 
 	return true;
 }
-template bool Raycast<RaycastType::e_startsInside>(Ray3D, Arg_Aabb3D, RayHit3D*);
-template bool Raycast<RaycastType::e_startsOutside>(Ray3D, Arg_Aabb3D, RayHit3D*);
+template bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
 
 template<RaycastType in_queryType>
-int RaycastAll(Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
-	// TODO(randomuserhi): API for if ray should hit starting collider (if ray originates from inside of it)
-	//
-	//                     API can be written using template overrides - Raycast<e_startInCollider>(...) and
-	//                     Raycast<e_startOutCollider>(...) This allows branching to be constexpr and these methods remain
-	//                     fast.
-	//
-	//                     if tEnter < 0, then ray starting within the bounding box
-	//                     - If ray starting inside collider is allowed, then only 1 hit is returned which is the exit hit
-	//                     - Otherwise return no hits
-	return 0;
+int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
+	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
+	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
+	Deep_Assert(out_hits != nullptr, "Out param must not be nullptr.");
+
+	Vec3 min = in_box.m_center - in_box.m_extents;
+	Vec3 max = in_box.m_center + in_box.m_extents;
+
+	Vec3 invDir = 1.0f / in_ray.m_direction;
+
+	Vec3 t1 = (min - in_ray.m_origin) * invDir;
+	Vec3 t2 = (max - in_ray.m_origin) * invDir;
+
+	Xmm tmin = Xmm::Min(t1.xmm, t2.xmm);
+	Xmm tmax = Xmm::Max(t1.xmm, t2.xmm);
+
+	int32 enterAxis = (tmin.y > tmin.x) ? 1 : 0;
+	float32 tEnter = (tmin.y > tmin.x) ? tmin.y : tmin.x;
+	enterAxis = (tmin.z > tEnter) ? 2 : enterAxis;
+	tEnter = (tmin.z > tEnter) ? tmin.z : tEnter;
+
+	int32 exitAxis = (tmax.y < tmax.x) ? 1 : 0;
+	float32 tExit = (tmax.y < tmax.x) ? tmax.y : tmax.x;
+	exitAxis = (tmax.z < tExit) ? 2 : exitAxis;
+	tExit = (tmax.z < tExit) ? tmax.z : tExit;
+
+	if (tEnter > tExit || tExit < 0.0f) return 0;
+
+	int32 hitCount = 0;
+
+	// Handle entry hit
+	if (tEnter >= 0.0f) {
+		float32 distance = tEnter;
+		out_hits[hitCount].m_distance = distance;
+		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
+		out_hits[hitCount].m_normal = Vec3::k_zero;
+		out_hits[hitCount].m_normal.m_values[enterAxis] = Deep::Sign(in_ray.m_direction.m_values[enterAxis]) * -1.0f;
+		++hitCount;
+	}
+
+	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+		if (tEnter < 0.0f) return 0;
+	}
+
+	// Handle exit hit
+	{
+		float32 distance = tExit;
+		out_hits[hitCount].m_distance = distance;
+		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
+		out_hits[hitCount].m_normal = Vec3::k_zero;
+		out_hits[hitCount].m_normal.m_values[exitAxis] = Deep::Sign(in_ray.m_direction.m_values[exitAxis]);
+		++hitCount;
+	}
+
+	return hitCount;
 }
-template int RaycastAll<RaycastType::e_startsInside>(Ray3D, Arg_Aabb3D, RayHit3D*);
-template int RaycastAll<RaycastType::e_startsOutside>(Ray3D, Arg_Aabb3D, RayHit3D*);
+template int32 RaycastAll<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+template int32 RaycastAll<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
 
 DEEP_NAMESPACE_END

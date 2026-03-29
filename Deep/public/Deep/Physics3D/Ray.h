@@ -14,11 +14,15 @@ struct Ray3D {
 	Vec3 m_direction;
 };
 
+using Arg_Ray3D = const Ray3D&;
+
 struct RayHit3D {
 	Vec3 m_point;
 	Vec3 m_normal;
 	float32 m_distance;
 };
+
+using Arg_RayHit3D = const RayHit3D&;
 
 enum class RaycastType {
 	e_startsInside,  // Rays will collide with colliders they start inside of
