@@ -157,12 +157,19 @@ elseif (CLANG)
 		-Wself-move
 		)
 
+	# Disable RTTI
+	message(STATUS "${MESSAGE_PREFIX} USE_RTTI: ${USE_RTTI}")
+	if (NOT USE_RTTI)
+		target_compile_options(Tests PRIVATE -fno-rtti)
+	endif()
+
 	# Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)
 		target_compile_options(Tests PRIVATE -g)
 	endif()
 
 	# Enable/Disable exceptions
+	message(STATUS "${MESSAGE_PREFIX} CPP_EXCEPTIONS_ENABLED: ${CPP_EXCEPTIONS_ENABLED}")
 	if (NOT CPP_EXCEPTIONS_ENABLED)
 		target_compile_options(Tests PRIVATE -fno-exceptions)
 	else()

@@ -42,6 +42,9 @@ option(NO_SIMD_INTRINSICS "Disable SIMD intrinsics" OFF)
 # memcpy or bitcast to avoid strict aliasing issues.
 option(USE_STRICT_ALIASING "Abide by strict aliasing rules" OFF)
 
+# When turned on, the library will be compiled with RTTI
+option(USE_RTTI "Enable RTTI" OFF)
+
 # Select X86 processor features to use (if everything is off it will be SSE2 compatible)
 option(USE_SSE4_1 "Enable SSE4.1" ON)
 option(USE_SSE4_2 "Enable SSE4.2" ON)
@@ -191,6 +194,12 @@ elseif (CLANG)
 	# Optionally generate debug symbols
 	if (GENERATE_DEBUG_SYMBOLS)
 		target_compile_options(Deep PRIVATE -g)
+	endif()
+
+	# Disable RTTI
+	message(STATUS "${MESSAGE_PREFIX} USE_RTTI: ${USE_RTTI}")
+	if (NOT USE_RTTI)
+		target_compile_options(Deep PRIVATE -fno-rtti)
 	endif()
 
 	# Enable/Disable exceptions
