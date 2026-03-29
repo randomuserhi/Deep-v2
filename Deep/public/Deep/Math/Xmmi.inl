@@ -180,14 +180,14 @@ Xmmi Xmmi::Select(const XmmiArg in_a, const XmmiArg in_b, const XmmiArg in_contr
 #endif
 }
 
-Deep_Inline bool operator!=(const XmmiArg in_a, const XmmiArg in_b) {
+inline bool operator!=(const XmmiArg in_a, const XmmiArg in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return Xmmi::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
 #endif
 }
-Deep_Inline bool operator==(const XmmiArg in_a, const XmmiArg in_b) {
+inline bool operator==(const XmmiArg in_a, const XmmiArg in_b) {
 	return !(in_a != in_b);
 }
 

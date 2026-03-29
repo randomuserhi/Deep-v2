@@ -20,24 +20,24 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
 	Mat4() = default;
 	Mat4(const Mat4&) = default;
 	Mat4& operator=(const Mat4&) = default;
-	Deep_Inline Mat4(const XmmArg in_col0, const XmmArg in_col1, const XmmArg in_col2, const XmmArg in_col3);
-	Deep_Inline Mat4(                                                   //
+	inline Mat4(const XmmArg in_col0, const XmmArg in_col1, const XmmArg in_col2, const XmmArg in_col3);
+	inline Mat4(                                                        //
 		float32 in_m00, float32 in_m01, float32 in_m02, float32 in_m03, //
 		float32 in_m10, float32 in_m11, float32 in_m12, float32 in_m13, //
 		float32 in_m20, float32 in_m21, float32 in_m22, float32 in_m23, //
 		float32 in_m30, float32 in_m31, float32 in_m32, float32 in_m33  //
 	);                                                                  //
-	Deep_Inline Mat4(const Arg_Vec4 in_col0, const Arg_Vec4 in_col1, const Arg_Vec4 in_col2, const Arg_Vec4 in_col3);
+	inline Mat4(const Arg_Vec4 in_col0, const Arg_Vec4 in_col1, const Arg_Vec4 in_col2, const Arg_Vec4 in_col3);
 
 	//
 
-	[[nodiscard]] Deep_Inline float32 determinant() const;
+	[[nodiscard]] inline float32 determinant() const;
 
-	Deep_Inline Mat4& Transpose();
-	[[nodiscard]] Deep_Inline Mat4 transposed() const;
+	inline Mat4& Transpose();
+	[[nodiscard]] inline Mat4 transposed() const;
 
-	Deep_Inline Mat4& Inverse();
-	[[nodiscard]] Deep_Inline Mat4 inversed() const;
+	inline Mat4& Inverse();
+	[[nodiscard]] inline Mat4 inversed() const;
 
 	Mat4& Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale);
 
@@ -48,22 +48,22 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
 	friend bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b);
 
 	// Mul Matrix4x4s
-	friend Deep_Inline Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b);
+	friend inline Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b);
 
 	// Mul Matrix4x4s and float
-	Deep_Inline Mat4& operator*=(float32 in_other);
-	friend Deep_Inline Mat4 operator*(Arg_Mat4 in_mat, float32 in_val);
-	friend Deep_Inline Mat4 operator*(float32 in_val, Arg_Mat4 in_mat);
+	inline Mat4& operator*=(float32 in_other);
+	friend inline Mat4 operator*(Arg_Mat4 in_mat, float32 in_val);
+	friend inline Mat4 operator*(float32 in_val, Arg_Mat4 in_mat);
 
-	Deep_Inline Mat4& operator/=(float32 in_other);
-	friend Deep_Inline Mat4 operator/(Arg_Mat4 in_mat, float32 in_val);
-	friend Deep_Inline Mat4 operator/(float32 in_val, Arg_Mat4 in_mat);
+	inline Mat4& operator/=(float32 in_other);
+	friend inline Mat4 operator/(Arg_Mat4 in_mat, float32 in_val);
+	friend inline Mat4 operator/(float32 in_val, Arg_Mat4 in_mat);
 
 	// Multiply Matrix4x4 and Vectors
-	friend Deep_Inline Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
-	friend Deep_Inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
+	friend inline Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
+	friend inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
 
-	[[nodiscard]] static Deep_Inline Mat4 FromQuaternion(const Quat& in_quat);
+	[[nodiscard]] static inline Mat4 FromQuaternion(const Quat& in_quat);
 
 	//
 

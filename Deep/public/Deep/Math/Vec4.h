@@ -15,26 +15,26 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec4 {
 	Vec4() = default;
 	Vec4(const Vec4&) = default;
 	Vec4& operator=(const Vec4&) = default;
-	Deep_Inline Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
-	explicit Deep_Inline Vec4(Xmm in_xmm);
-	explicit Deep_Inline Vec4(Arg_Vec3 in_xyz, float32 in_w);
+	inline Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
+	explicit inline Vec4(Xmm in_xmm);
+	explicit inline Vec4(Arg_Vec3 in_xyz, float32 in_w);
 
 	//
 
-	explicit Deep_Inline operator Vec4i() const;
+	explicit inline operator Vec4i() const;
 
 	//
 
-	Deep_Inline Vec4& Normalize();
-	[[nodiscard]] Deep_Inline Vec4 normalized() const;
-	[[nodiscard]] Deep_Inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
+	inline Vec4& Normalize();
+	[[nodiscard]] inline Vec4 normalized() const;
+	[[nodiscard]] inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
 
-	[[nodiscard]] Deep_Inline float32 sqrdMagnitude() const;
-	[[nodiscard]] Deep_Inline float32 magnitude() const;
+	[[nodiscard]] inline float32 sqrdMagnitude() const;
+	[[nodiscard]] inline float32 magnitude() const;
 
-	[[nodiscard]] static Deep_Inline float32 Dot(Arg_Vec4 in_a, Arg_Vec4 in_b);
+	[[nodiscard]] static inline float32 Dot(Arg_Vec4 in_a, Arg_Vec4 in_b);
 
-	[[nodiscard]] static Deep_Inline Vec4 Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t);
+	[[nodiscard]] static inline Vec4 Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t);
 
 	//
 
@@ -43,34 +43,34 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec4 {
 	friend bool operator==(Arg_Vec4 in_a, Arg_Vec4 in_b);
 
 	// Add vectors
-	Deep_Inline Vec4& operator+=(Arg_Vec4 in_other);
-	friend Deep_Inline Vec4 operator+(Arg_Vec4 in_a, Arg_Vec4 in_b);
+	inline Vec4& operator+=(Arg_Vec4 in_other);
+	friend inline Vec4 operator+(Arg_Vec4 in_a, Arg_Vec4 in_b);
 
 	// Sub vectors
-	Deep_Inline Vec4& operator-=(Arg_Vec4 in_other);
-	friend Deep_Inline Vec4 operator-(Arg_Vec4 in_a, Arg_Vec4 in_b);
-	friend Deep_Inline Vec4 operator-(Arg_Vec4 in_a);
+	inline Vec4& operator-=(Arg_Vec4 in_other);
+	friend inline Vec4 operator-(Arg_Vec4 in_a, Arg_Vec4 in_b);
+	friend inline Vec4 operator-(Arg_Vec4 in_a);
 
 	// Mul vectors
-	Deep_Inline Vec4& operator*=(Arg_Vec4 in_other);
-	friend Deep_Inline Vec4 operator*(Arg_Vec4 in_a, Arg_Vec4 in_b);
+	inline Vec4& operator*=(Arg_Vec4 in_other);
+	friend inline Vec4 operator*(Arg_Vec4 in_a, Arg_Vec4 in_b);
 
 	// Div vectors
-	Deep_Inline Vec4& operator/=(Arg_Vec4 in_other);
-	friend Deep_Inline Vec4 operator/(Arg_Vec4 in_a, Arg_Vec4 in_b);
+	inline Vec4& operator/=(Arg_Vec4 in_other);
+	friend inline Vec4 operator/(Arg_Vec4 in_a, Arg_Vec4 in_b);
 
 	// Mul vector and float
-	Deep_Inline Vec4& operator*=(float32 in_other);
-	friend Deep_Inline Vec4 operator*(Arg_Vec4 in_vec, float32 in_val);
-	friend Deep_Inline Vec4 operator*(float32 in_val, Arg_Vec4 in_vec);
+	inline Vec4& operator*=(float32 in_other);
+	friend inline Vec4 operator*(Arg_Vec4 in_vec, float32 in_val);
+	friend inline Vec4 operator*(float32 in_val, Arg_Vec4 in_vec);
 
 	// Div vector and float
-	Deep_Inline Vec4& operator/=(float32 in_other);
-	friend Deep_Inline Vec4 operator/(Arg_Vec4 in_vec, float32 in_val);
-	friend Deep_Inline Vec4 operator/(float32 in_val, Arg_Vec4 in_vec);
+	inline Vec4& operator/=(float32 in_other);
+	friend inline Vec4 operator/(Arg_Vec4 in_vec, float32 in_val);
+	friend inline Vec4 operator/(float32 in_val, Arg_Vec4 in_vec);
 
 	// Multiply a Matrix4x4 and Vector
-	friend Deep_Inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
+	friend inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
 
 	//
 

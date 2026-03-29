@@ -14,30 +14,30 @@ struct DEEP_EXPORT [[nodiscard]] alignas(int64) Vec2 {
 	Vec2() = default;
 	Vec2(const Vec2&) = default;
 	Vec2& operator=(const Vec2&) = default;
-	Deep_Inline Vec2(float32 in_x, float32 in_y);
-	explicit Deep_Inline Vec2(Arg_Vec3 in_vec);
-	explicit Deep_Inline Vec2(Arg_Vec4 in_vec);
+	inline Vec2(float32 in_x, float32 in_y);
+	explicit inline Vec2(Arg_Vec3 in_vec);
+	explicit inline Vec2(Arg_Vec4 in_vec);
 
 	//
 
-	explicit Deep_Inline operator Vec2i() const;
+	explicit inline operator Vec2i() const;
 
 	//
 
-	Deep_Inline Vec2& Normalize();
-	[[nodiscard]] Deep_Inline Vec2 normalized() const;
-	[[nodiscard]] Deep_Inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
+	inline Vec2& Normalize();
+	[[nodiscard]] inline Vec2 normalized() const;
+	[[nodiscard]] inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
 
-	[[nodiscard]] Deep_Inline float32 sqrdMagnitude() const;
-	[[nodiscard]] Deep_Inline float32 magnitude() const;
+	[[nodiscard]] inline float32 sqrdMagnitude() const;
+	[[nodiscard]] inline float32 magnitude() const;
 
-	[[nodiscard]] static Deep_Inline float32 Dot(Arg_Vec2 in_a, Arg_Vec2 in_b);
-	[[nodiscard]] static Deep_Inline float32 Cross(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	[[nodiscard]] static inline float32 Dot(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	[[nodiscard]] static inline float32 Cross(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
-	[[nodiscard]] static Deep_Inline Vec2 Rotate(Arg_Vec2 in_a, float in_radians);
-	[[nodiscard]] static Deep_Inline float32 Angle(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	[[nodiscard]] static inline Vec2 Rotate(Arg_Vec2 in_a, float in_radians);
+	[[nodiscard]] static inline float32 Angle(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
-	[[nodiscard]] static Deep_Inline Vec2 Lerp(Arg_Vec2 in_a, Arg_Vec2 in_b, float32 in_t);
+	[[nodiscard]] static inline Vec2 Lerp(Arg_Vec2 in_a, Arg_Vec2 in_b, float32 in_t);
 
 	//
 
@@ -46,34 +46,34 @@ struct DEEP_EXPORT [[nodiscard]] alignas(int64) Vec2 {
 	friend bool operator==(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
 	// Add vectors
-	Deep_Inline Vec2& operator+=(Arg_Vec2 in_other);
-	friend Deep_Inline Vec2 operator+(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	inline Vec2& operator+=(Arg_Vec2 in_other);
+	friend inline Vec2 operator+(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
 	// Sub vectors
-	Deep_Inline Vec2& operator-=(Arg_Vec2 in_other);
-	friend Deep_Inline Vec2 operator-(Arg_Vec2 in_a, Arg_Vec2 in_b);
-	friend Deep_Inline Vec2 operator-(Arg_Vec2 in_a);
+	inline Vec2& operator-=(Arg_Vec2 in_other);
+	friend inline Vec2 operator-(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	friend inline Vec2 operator-(Arg_Vec2 in_a);
 
 	// Mul vectors
-	Deep_Inline Vec2& operator*=(Arg_Vec2 in_other);
-	friend Deep_Inline Vec2 operator*(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	inline Vec2& operator*=(Arg_Vec2 in_other);
+	friend inline Vec2 operator*(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
 	// Div vectors
-	Deep_Inline Vec2& operator/=(Arg_Vec2 in_other);
-	friend Deep_Inline Vec2 operator/(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	inline Vec2& operator/=(Arg_Vec2 in_other);
+	friend inline Vec2 operator/(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
 	// Mul vector and float
-	Deep_Inline Vec2& operator*=(float32 in_other);
-	friend Deep_Inline Vec2 operator*(Arg_Vec2 in_vec, float32 in_val);
-	friend Deep_Inline Vec2 operator*(float32 in_val, Arg_Vec2 in_vec);
+	inline Vec2& operator*=(float32 in_other);
+	friend inline Vec2 operator*(Arg_Vec2 in_vec, float32 in_val);
+	friend inline Vec2 operator*(float32 in_val, Arg_Vec2 in_vec);
 
 	// Div vector and float
-	Deep_Inline Vec2& operator/=(float32 other);
-	friend Deep_Inline Vec2 operator/(Arg_Vec2 in_vec, float32 in_val);
-	friend Deep_Inline Vec2 operator/(float32 in_val, Arg_Vec2 in_vec);
+	inline Vec2& operator/=(float32 other);
+	friend inline Vec2 operator/(Arg_Vec2 in_vec, float32 in_val);
+	friend inline Vec2 operator/(float32 in_val, Arg_Vec2 in_vec);
 
 	// Apply a quaternion to a vector
-	friend Deep_Inline Vec2 operator*(Arg_Quat in_quat, Arg_Vec2 in_vec);
+	friend inline Vec2 operator*(Arg_Quat in_quat, Arg_Vec2 in_vec);
 
 	//
 

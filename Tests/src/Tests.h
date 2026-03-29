@@ -13,7 +13,7 @@
 #endif
 
 #if defined(TEST_COMPILER_CLANG)
-#define Test_Inline inline
+#define Test_Inline inline __attribute__((always_inline))
 #define Test_AlignOf(type) __alignof__(type)
 
 #define Test_PushPack

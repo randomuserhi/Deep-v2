@@ -20,25 +20,25 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Quat {
 	Quat() = default;
 	Quat(const Quat&) = default;
 	Quat& operator=(const Quat&) = default;
-	Deep_Inline Quat(Vec4 in_vec);
-	explicit Deep_Inline Quat(Xmm in_Xmm);
-	explicit Deep_Inline Quat(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
-	explicit Deep_Inline Quat(Vec3 in_axis, float32 in_angle);
+	inline Quat(Vec4 in_vec);
+	explicit inline Quat(Xmm in_Xmm);
+	explicit inline Quat(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
+	explicit inline Quat(Vec3 in_axis, float32 in_angle);
 
 	//
 
-	Deep_Inline Quat& Normalize();
-	[[nodiscard]] Deep_Inline Quat normalized() const;
-	[[nodiscard]] Deep_Inline bool IsNormalized(float roTolerance = 1.0e-6f) const;
+	inline Quat& Normalize();
+	[[nodiscard]] inline Quat normalized() const;
+	[[nodiscard]] inline bool IsNormalized(float roTolerance = 1.0e-6f) const;
 
-	Deep_Inline Quat& Conjugate();
-	[[nodiscard]] Deep_Inline Quat conjugated() const;
+	inline Quat& Conjugate();
+	[[nodiscard]] inline Quat conjugated() const;
 
-	Deep_Inline Quat& Inverse();
-	[[nodiscard]] Deep_Inline Quat inversed() const;
+	inline Quat& Inverse();
+	[[nodiscard]] inline Quat inversed() const;
 
-	Deep_Inline Mat4 ToMat4() const;
-	static Deep_Inline Quat FromMat4(Arg_Mat4 in_mat);
+	inline Mat4 ToMat4() const;
+	static inline Quat FromMat4(Arg_Mat4 in_mat);
 
 	//
 
@@ -47,32 +47,32 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Quat {
 	friend bool operator==(Arg_Quat in_a, Arg_Quat in_b);
 
 	// Add quaternions
-	Deep_Inline Quat& operator+=(Arg_Quat in_other);
-	friend Deep_Inline Quat operator+(Arg_Quat in_a, Arg_Quat in_b);
+	inline Quat& operator+=(Arg_Quat in_other);
+	friend inline Quat operator+(Arg_Quat in_a, Arg_Quat in_b);
 
 	// Sub quaternions
-	Deep_Inline Quat& operator-=(Arg_Quat in_other);
-	friend Deep_Inline Quat operator-(Arg_Quat in_a, Arg_Quat in_b);
+	inline Quat& operator-=(Arg_Quat in_other);
+	friend inline Quat operator-(Arg_Quat in_a, Arg_Quat in_b);
 
 	// Mul quaternions
-	Deep_Inline Quat& operator*=(Arg_Quat in_other);
-	friend Deep_Inline Quat operator*(Quat in_a, Arg_Quat in_b);
+	inline Quat& operator*=(Arg_Quat in_other);
+	friend inline Quat operator*(Quat in_a, Arg_Quat in_b);
 
 	// Mul quaternion and float
-	Deep_Inline Quat& operator*=(float32 in_other);
-	friend Deep_Inline Quat operator*(Arg_Quat in_quat, float32 in_val);
-	friend Deep_Inline Quat operator*(float32 in_val, Arg_Quat in_quat);
+	inline Quat& operator*=(float32 in_other);
+	friend inline Quat operator*(Arg_Quat in_quat, float32 in_val);
+	friend inline Quat operator*(float32 in_val, Arg_Quat in_quat);
 
 	// Div quaternion and float
-	Deep_Inline Quat& operator/=(float32 in_other);
-	friend Deep_Inline Quat operator/(Arg_Quat in_quat, float32 in_val);
-	friend Deep_Inline Quat operator/(float32 in_val, Arg_Quat in_quat);
+	inline Quat& operator/=(float32 in_other);
+	friend inline Quat operator/(Arg_Quat in_quat, float32 in_val);
+	friend inline Quat operator/(float32 in_val, Arg_Quat in_quat);
 
 	// Rotate a vector by a quaternion
-	friend Deep_Inline Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_val);
+	friend inline Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_val);
 
 	// Rotate a vector by the inverse of this quaternion
-	static Deep_Inline Vec3 InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_val);
+	static inline Vec3 InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_val);
 
 	//
 

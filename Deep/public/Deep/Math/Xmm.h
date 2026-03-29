@@ -33,50 +33,50 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmm {
 	constexpr Xmm() = default;
 	constexpr Xmm(const Xmm&) = default;
 	constexpr Xmm& operator=(const Xmm&) = default;
-	Deep_Inline Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
-	constexpr Deep_Inline Xmm(Type in_internal);
+	inline Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
+	constexpr inline Xmm(Type in_internal);
 
-	constexpr static Deep_Inline Xmm Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
+	constexpr static inline Xmm Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
 
 	//
 
 	// Implicit conversion
-	constexpr Deep_Inline operator Type() const;
+	constexpr inline operator Type() const;
 
 	//
 
 	// Convert into __m128i, converting each component to an integer
-	Deep_Inline Xmmi ToInt() const;
-	constexpr Deep_Inline Xmmi Constexpr_ToInt() const;
+	inline Xmmi ToInt() const;
+	constexpr inline Xmmi Constexpr_ToInt() const;
 
 	// Reinterpret bytes as a __m128i
-	Deep_Inline Xmmi ReinterpretAsInt() const;
-	constexpr Deep_Inline Xmmi Constexpr_ReinterpretAsInt() const;
+	inline Xmmi ReinterpretAsInt() const;
+	constexpr inline Xmmi Constexpr_ReinterpretAsInt() const;
 
 	// Replicate the given value across all components
-	static Deep_Inline Xmm Replicate(float32 in_value);
+	static inline Xmm Replicate(float32 in_value);
 
 	// Component wise logical AND
-	static Deep_Inline Xmm And(const XmmArg in_a, const XmmArg in_b);
-	constexpr static Deep_Inline Xmm Constexpr_And(const XmmArg in_a, const XmmArg in_b);
+	static inline Xmm And(const XmmArg in_a, const XmmArg in_b);
+	constexpr static inline Xmm Constexpr_And(const XmmArg in_a, const XmmArg in_b);
 
 	// Component wise logical XOR
-	static Deep_Inline Xmm Xor(const XmmArg in_a, const XmmArg in_b);
-	constexpr static Deep_Inline Xmm Constexpr_Xor(const XmmArg in_a, const XmmArg in_b);
+	static inline Xmm Xor(const XmmArg in_a, const XmmArg in_b);
+	constexpr static inline Xmm Constexpr_Xor(const XmmArg in_a, const XmmArg in_b);
 
 	// Component wise min/max
-	static Deep_Inline Xmm Min(const XmmArg in_a, const XmmArg in_b);
-	static Deep_Inline Xmm Max(const XmmArg in_a, const XmmArg in_b);
+	static inline Xmm Min(const XmmArg in_a, const XmmArg in_b);
+	static inline Xmm Max(const XmmArg in_a, const XmmArg in_b);
 
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static Deep_Inline Xmmi Equals(const XmmArg in_a, const XmmArg in_b);
-	constexpr static Deep_Inline Xmmi Constexpr_Equals(const XmmArg in_a, const XmmArg in_b);
+	static inline Xmmi Equals(const XmmArg in_a, const XmmArg in_b);
+	constexpr static inline Xmmi Constexpr_Equals(const XmmArg in_a, const XmmArg in_b);
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
-	static Deep_Inline Xmm Select(const XmmArg in_a, const XmmArg in_b, const XmmiArg in_control);
+	static inline Xmm Select(const XmmArg in_a, const XmmArg in_b, const XmmiArg in_control);
 
 	//
 
@@ -85,31 +85,31 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmm {
 	friend bool operator==(const XmmArg in_a, const XmmArg in_b);
 
 	// Component wise Add
-	Deep_Inline Xmm& operator+=(const XmmArg roOther);
-	friend Deep_Inline Xmm operator+(Xmm in_a, const XmmArg in_b);
+	inline Xmm& operator+=(const XmmArg roOther);
+	friend inline Xmm operator+(Xmm in_a, const XmmArg in_b);
 
 	// Component wise Sub
-	Deep_Inline Xmm& operator-=(const XmmArg in_other);
-	friend Deep_Inline Xmm operator-(Xmm in_a, const XmmArg in_b);
-	friend Deep_Inline Xmm operator-(const XmmArg in_other);
+	inline Xmm& operator-=(const XmmArg in_other);
+	friend inline Xmm operator-(Xmm in_a, const XmmArg in_b);
+	friend inline Xmm operator-(const XmmArg in_other);
 
 	// Component wise Mul
-	Deep_Inline Xmm& operator*=(const XmmArg in_other);
-	friend Deep_Inline Xmm operator*(Xmm in_a, const XmmArg in_b);
+	inline Xmm& operator*=(const XmmArg in_other);
+	friend inline Xmm operator*(Xmm in_a, const XmmArg in_b);
 
 	// Component wise Div
-	Deep_Inline Xmm& operator/=(const XmmArg in_other);
-	friend Deep_Inline Xmm operator/(Xmm in_a, const XmmArg in_b);
+	inline Xmm& operator/=(const XmmArg in_other);
+	friend inline Xmm operator/(Xmm in_a, const XmmArg in_b);
 
 	// Mul components with float
-	Deep_Inline Xmm& operator*=(float32 in_other);
-	friend Deep_Inline Xmm operator*(Xmm in_vec, float32 in_val);
-	friend Deep_Inline Xmm operator*(float32 in_val, const XmmArg in_vec);
+	inline Xmm& operator*=(float32 in_other);
+	friend inline Xmm operator*(Xmm in_vec, float32 in_val);
+	friend inline Xmm operator*(float32 in_val, const XmmArg in_vec);
 
 	// Div components with float
-	Deep_Inline Xmm& operator/=(float32 in_other);
-	friend Deep_Inline Xmm operator/(Xmm in_vec, float32 in_val);
-	friend Deep_Inline Xmm operator/(float32 in_val, const XmmArg in_vec);
+	inline Xmm& operator/=(float32 in_other);
+	friend inline Xmm operator/(Xmm in_vec, float32 in_val);
+	friend inline Xmm operator/(float32 in_val, const XmmArg in_vec);
 
 	// Calculate the sin and cosin for each component and store the result
 	// in `sin` and `cos` respectively

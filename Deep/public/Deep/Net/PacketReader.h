@@ -14,27 +14,27 @@ DEEP_NAMESPACE_BEGIN
 struct DEEP_EXPORT PacketReader {
 	//
 
-	Deep_Inline PacketReader(const uint8* in_data);
+	inline PacketReader(const uint8* in_data);
 
 	//
 
-	Deep_Inline uint8 ReadUInt8();
+	inline uint8 ReadUInt8();
 
-	Deep_Inline uint16 ReadUInt16();
-	Deep_Inline uint32 ReadUInt32();
-	Deep_Inline uint64 ReadUInt64();
+	inline uint16 ReadUInt16();
+	inline uint32 ReadUInt32();
+	inline uint64 ReadUInt64();
 
-	Deep_Inline int16 ReadInt16();
-	Deep_Inline int32 ReadInt32();
-	Deep_Inline int64 ReadInt64();
+	inline int16 ReadInt16();
+	inline int32 ReadInt32();
+	inline int64 ReadInt64();
 
-	Deep_Inline float32 ReadFloat16();
-	Deep_Inline float32 ReadFloat32();
+	inline float32 ReadFloat16();
+	inline float32 ReadFloat32();
 
-	Deep_Inline Vec3 ReadVec3();
+	inline Vec3 ReadVec3();
 	Quat ReadQuaternion();
 
-	Deep_Inline Vec3 ReadHalfVec3();
+	inline Vec3 ReadHalfVec3();
 	Quat ReadHalfQuaternion();
 
 	//

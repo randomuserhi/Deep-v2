@@ -153,7 +153,7 @@
 // - Support for ARM / WASM compilation
 
 #if defined(DEEP_COMPILER_CLANG)
-#define Deep_Inline inline __attribute__((always_inline))
+#define Deep_ForceInline inline __attribute__((always_inline))
 #define Deep_NoInline __attribute__((noinline))
 #define Deep_AlignOf(type) __alignof__(type)
 
@@ -169,7 +169,7 @@
 #define Deep_Restrict __restrict__
 
 #elif defined(DEEP_COMPILER_GCC)
-#define Deep_Inline inline __attribute__((always_inline))
+#define Deep_ForceInline inline __attribute__((always_inline))
 #define Deep_NoInline __attribute__((noinline))
 #define Deep_AlignOf(type) __alignof__(type)
 
@@ -185,7 +185,7 @@
 #define Deep_Restrict __restrict__
 
 #elif defined(DEEP_COMPILER_MSVC)
-#define Deep_Inline inline __forceinline
+#define Deep_ForceInline inline __forceinline
 #define Deep_NoInline __declspec(noinline)
 #define Deep_AlignOf(type) alignof(type)
 
@@ -279,7 +279,7 @@ DEEP_NAMESPACE_BEGIN
 DEEP_EXPORT bool OnAssertFailImpl(const char* in_expression, const char* in_file, int32 in_line, const char* in_message);
 DEEP_EXPORT extern bool (*g_onAssertFail)(const char* in_expression, const char* in_file, int32 in_line,
                                           const char* in_message);
-Deep_Inline bool AssertFailed(const char* in_expression, const char* in_file, int32 in_line, const char* in_message) {
+inline bool AssertFailed(const char* in_expression, const char* in_file, int32 in_line, const char* in_message) {
 	if (g_onAssertFail == nullptr) {
 		return true;
 	} else {

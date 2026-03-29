@@ -38,64 +38,64 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 	constexpr Xmmi() = default;
 	constexpr Xmmi(const Xmmi&) = default;
 	constexpr Xmmi& operator=(const Xmmi&) = default;
-	Deep_Inline Xmmi(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
-	constexpr Deep_Inline Xmmi(Type in_internal);
+	inline Xmmi(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
+	constexpr inline Xmmi(Type in_internal);
 
-	constexpr static Deep_Inline Xmmi Constexpr(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
+	constexpr static inline Xmmi Constexpr(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
 
 	//
 
 	// Implicit conversion
-	Deep_Inline operator Type() const;
+	inline operator Type() const;
 
 	//
 
 	// Convert into __m128, converting each component to a float
-	Deep_Inline Xmm ToFloat() const;
-	constexpr Deep_Inline Xmm Constexpr_ToFloat() const;
+	inline Xmm ToFloat() const;
+	constexpr inline Xmm Constexpr_ToFloat() const;
 
 	// Reinterpret bytes as a __m128
-	Deep_Inline Xmm ReinterpretAsFloat() const;
-	constexpr Deep_Inline Xmm Constexpr_ReinterpretAsFloat() const;
+	inline Xmm ReinterpretAsFloat() const;
+	constexpr inline Xmm Constexpr_ReinterpretAsFloat() const;
 
 	// Treats the 4 components as booleans where true is when the most significant bit is set
 	// and returns it as a bit mask.
 	//
 	// Bit 0 is set if X is true, Bit 1 is set if Y is true, Bit 2 is set if Z is true and Bit 3 is set if W is true.
-	Deep_Inline int32 ToBooleanBitMask() const;
+	inline int32 ToBooleanBitMask() const;
 
 	// Replicate the given value across all components
-	static Deep_Inline Xmmi Replicate(int in_value);
+	static inline Xmmi Replicate(int in_value);
 
 	// Component wise logical AND
-	static Deep_Inline Xmmi And(const XmmiArg in_a, const XmmiArg in_b);
-	constexpr static Deep_Inline Xmmi Constexpr_And(const XmmiArg in_a, const XmmiArg in_b);
+	static inline Xmmi And(const XmmiArg in_a, const XmmiArg in_b);
+	constexpr static inline Xmmi Constexpr_And(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Component wise logical XOR
-	static Deep_Inline Xmmi Xor(const XmmiArg in_a, const XmmiArg in_b);
-	constexpr static Deep_Inline Xmmi Constexpr_Xor(const XmmiArg in_a, const XmmiArg in_b);
+	static inline Xmmi Xor(const XmmiArg in_a, const XmmiArg in_b);
+	constexpr static inline Xmmi Constexpr_Xor(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Component wise min/max
-	static Deep_Inline Xmmi Min(const XmmiArg in_a, const XmmiArg in_b);
-	static Deep_Inline Xmmi Max(const XmmiArg in_a, const XmmiArg in_b);
+	static inline Xmmi Min(const XmmiArg in_a, const XmmiArg in_b);
+	static inline Xmmi Max(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static Deep_Inline Xmmi Equals(const XmmiArg in_a, const XmmiArg in_b);
-	constexpr static Deep_Inline Xmmi Constexpr_Equals(const XmmiArg in_a, const XmmiArg in_b);
+	static inline Xmmi Equals(const XmmiArg in_a, const XmmiArg in_b);
+	constexpr static inline Xmmi Constexpr_Equals(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Shift all components by `Count` bits to the left
 	template<const uint32 Count>
-	Deep_Inline Xmmi LogicalShiftLeft() const;
+	inline Xmmi LogicalShiftLeft() const;
 
 	// Shift all components by `Count` bits to the right
 	template<const uint32 Count>
-	Deep_Inline Xmmi LogicalShiftRight() const;
+	inline Xmmi LogicalShiftRight() const;
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
-	static Deep_Inline Xmmi Select(const XmmiArg in_a, const XmmiArg in_b, const XmmiArg in_control);
+	static inline Xmmi Select(const XmmiArg in_a, const XmmiArg in_b, const XmmiArg in_control);
 
 	//
 
@@ -104,31 +104,31 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 	friend bool operator==(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Component wise Add
-	Deep_Inline Xmmi& operator+=(const XmmiArg in_other);
-	friend Deep_Inline Xmmi operator+(Xmmi in_a, const XmmiArg in_b);
+	inline Xmmi& operator+=(const XmmiArg in_other);
+	friend inline Xmmi operator+(Xmmi in_a, const XmmiArg in_b);
 
 	// Component wise Sub
-	Deep_Inline Xmmi& operator-=(const XmmiArg in_other);
-	friend Deep_Inline Xmmi operator-(Xmmi in_a, const XmmiArg in_b);
-	friend Deep_Inline Xmmi operator-(const XmmiArg in_a);
+	inline Xmmi& operator-=(const XmmiArg in_other);
+	friend inline Xmmi operator-(Xmmi in_a, const XmmiArg in_b);
+	friend inline Xmmi operator-(const XmmiArg in_a);
 
 	// Component wise Mul
-	Deep_Inline Xmmi& operator*=(const XmmiArg in_other);
-	friend Deep_Inline Xmmi operator*(Xmmi in_a, const XmmiArg in_b);
+	inline Xmmi& operator*=(const XmmiArg in_other);
+	friend inline Xmmi operator*(Xmmi in_a, const XmmiArg in_b);
 
 	// Component wise Div
-	Deep_Inline Xmmi& operator/=(const XmmiArg in_other);
-	friend Deep_Inline Xmmi operator/(Xmmi in_a, const XmmiArg in_b);
+	inline Xmmi& operator/=(const XmmiArg in_other);
+	friend inline Xmmi operator/(Xmmi in_a, const XmmiArg in_b);
 
 	// Mul components with float
-	Deep_Inline Xmmi& operator*=(int32 in_other);
-	friend Deep_Inline Xmmi operator*(Xmmi in_vec, int32 in_val);
-	friend Deep_Inline Xmmi operator*(int32 in_val, const XmmiArg in_vec);
+	inline Xmmi& operator*=(int32 in_other);
+	friend inline Xmmi operator*(Xmmi in_vec, int32 in_val);
+	friend inline Xmmi operator*(int32 in_val, const XmmiArg in_vec);
 
 	// Div components with float
-	Deep_Inline Xmmi& operator/=(int32 in_other);
-	friend Deep_Inline Xmmi operator/(Xmmi in_vec, int32 in_val);
-	friend Deep_Inline Xmmi operator/(int32 in_val, const XmmiArg in_vec);
+	inline Xmmi& operator/=(int32 in_other);
+	friend inline Xmmi operator/(Xmmi in_vec, int32 in_val);
+	friend inline Xmmi operator/(int32 in_val, const XmmiArg in_vec);
 
 	//
 

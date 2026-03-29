@@ -312,13 +312,13 @@ Mat4 Mat4::inversed() const {
 #endif
 }
 
-Deep_Inline bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
+inline bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
 	return Xmmi::And(Xmmi::And(Xmm::Equals(in_a.m_cols[0], in_b.m_cols[0]), Xmm::Equals(in_a.m_cols[1], in_b.m_cols[1])),
 	                 Xmmi::And(Xmm::Equals(in_a.m_cols[2], in_b.m_cols[2]), Xmm::Equals(in_a.m_cols[3], in_b.m_cols[3])))
 	           .ToBooleanBitMask()
 	       != 0b1111;
 }
-Deep_Inline bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b) {
+inline bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b) {
 	return !(in_a != in_b);
 }
 

@@ -15,22 +15,22 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmmi) Vec4i {
 	Vec4i() = default;
 	Vec4i(const Vec4i&) = default;
 	Vec4i& operator=(const Vec4i&) = default;
-	Deep_Inline Vec4i(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
-	explicit Deep_Inline Vec4i(Xmmi in_xmmi);
-	explicit Deep_Inline Vec4i(Arg_Vec3i in_xyz, int32 in_w);
+	inline Vec4i(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
+	explicit inline Vec4i(Xmmi in_xmmi);
+	explicit inline Vec4i(Arg_Vec3i in_xyz, int32 in_w);
 
 	//
 
-	explicit Deep_Inline operator Vec4() const;
+	explicit inline operator Vec4() const;
 
 	//
 
-	[[nodiscard]] Deep_Inline int32 manhattanDistance() const;
+	[[nodiscard]] inline int32 manhattanDistance() const;
 
-	[[nodiscard]] Deep_Inline float32 sqrdMagnitude() const;
-	[[nodiscard]] Deep_Inline float32 magnitude() const;
+	[[nodiscard]] inline float32 sqrdMagnitude() const;
+	[[nodiscard]] inline float32 magnitude() const;
 
-	[[nodiscard]] static Deep_Inline int32 Dot(Arg_Vec4i in_a, Arg_Vec4i in_b);
+	[[nodiscard]] static inline int32 Dot(Arg_Vec4i in_a, Arg_Vec4i in_b);
 
 	//
 
@@ -39,31 +39,31 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmmi) Vec4i {
 	friend bool operator==(Arg_Vec4i in_a, Arg_Vec4i in_b);
 
 	// Add vectors
-	Deep_Inline Vec4i& operator+=(Arg_Vec4i in_other);
-	friend Deep_Inline Vec4i operator+(Arg_Vec4i in_a, Arg_Vec4i in_b);
+	inline Vec4i& operator+=(Arg_Vec4i in_other);
+	friend inline Vec4i operator+(Arg_Vec4i in_a, Arg_Vec4i in_b);
 
 	// Sub vectors
-	Deep_Inline Vec4i& operator-=(Arg_Vec4i in_other);
-	friend Deep_Inline Vec4i operator-(Arg_Vec4i in_a, Arg_Vec4i in_b);
-	friend Deep_Inline Vec4i operator-(Arg_Vec4i in_a);
+	inline Vec4i& operator-=(Arg_Vec4i in_other);
+	friend inline Vec4i operator-(Arg_Vec4i in_a, Arg_Vec4i in_b);
+	friend inline Vec4i operator-(Arg_Vec4i in_a);
 
 	// Mul vectors
-	Deep_Inline Vec4i& operator*=(Arg_Vec4i in_other);
-	friend Deep_Inline Vec4i operator*(Arg_Vec4i in_a, Arg_Vec4i in_b);
+	inline Vec4i& operator*=(Arg_Vec4i in_other);
+	friend inline Vec4i operator*(Arg_Vec4i in_a, Arg_Vec4i in_b);
 
 	// Div vectors
-	Deep_Inline Vec4i& operator/=(Arg_Vec4i in_other);
-	friend Deep_Inline Vec4i operator/(Arg_Vec4i in_a, Arg_Vec4i in_b);
+	inline Vec4i& operator/=(Arg_Vec4i in_other);
+	friend inline Vec4i operator/(Arg_Vec4i in_a, Arg_Vec4i in_b);
 
 	// Mul vector and int
-	Deep_Inline Vec4i& operator*=(int32 in_other);
-	friend Deep_Inline Vec4i operator*(Arg_Vec4i in_vec, int32 in_val);
-	friend Deep_Inline Vec4i operator*(int32 in_val, Arg_Vec4i in_vec);
+	inline Vec4i& operator*=(int32 in_other);
+	friend inline Vec4i operator*(Arg_Vec4i in_vec, int32 in_val);
+	friend inline Vec4i operator*(int32 in_val, Arg_Vec4i in_vec);
 
 	// Div vector and int
-	Deep_Inline Vec4i& operator/=(int32 in_other);
-	friend Deep_Inline Vec4i operator/(Arg_Vec4i in_vec, int32 in_val);
-	friend Deep_Inline Vec4i operator/(int32 in_val, Arg_Vec4i in_vec);
+	inline Vec4i& operator/=(int32 in_other);
+	friend inline Vec4i operator/(Arg_Vec4i in_vec, int32 in_val);
+	friend inline Vec4i operator/(int32 in_val, Arg_Vec4i in_vec);
 
 	//
 

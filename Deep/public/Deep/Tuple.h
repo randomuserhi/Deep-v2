@@ -15,9 +15,9 @@ template<typename T>
 struct TupleStorage {
 	typename T::Type data;
 
-	constexpr Deep_Inline auto& get();
+	constexpr inline auto& get();
 
-	constexpr Deep_Inline const auto& get() const;
+	constexpr inline const auto& get() const;
 };
 
 template<std::size_t I, typename T>
@@ -42,10 +42,10 @@ struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag
 	constexpr inline TupleImpl(Args&&... args);
 
 	template<std::size_t I>
-	constexpr Deep_Inline decltype(auto) get();
+	constexpr inline decltype(auto) get();
 
 	template<std::size_t I>
-	constexpr Deep_Inline decltype(auto) get() const;
+	constexpr inline decltype(auto) get() const;
 };
 
 } // namespace Detail
@@ -75,10 +75,10 @@ struct tuple_element<I, Deep::Tuple<Ts...>> {
 };
 
 template<std::size_t I, typename... Ts>
-constexpr Deep_Inline decltype(auto) get(Deep::Tuple<Ts...>& in_tuple);
+constexpr inline decltype(auto) get(Deep::Tuple<Ts...>& in_tuple);
 
 template<std::size_t I, typename... Ts>
-constexpr Deep_Inline decltype(auto) get(const Deep::Tuple<Ts...>& in_tuple);
+constexpr inline decltype(auto) get(const Deep::Tuple<Ts...>& in_tuple);
 
 } // namespace std
 
