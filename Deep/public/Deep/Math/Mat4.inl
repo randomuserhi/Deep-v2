@@ -112,20 +112,67 @@ Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
 
 float32 Mat4::determinant() const {
 #ifdef DEEP_USE_SSE
-	// TODO(randomuserhi):
-	return 0;
-#else
-	// TODO(randomuserhi): verify the below
+	// Algorithm from: http://download.intel.com/design/PentiumIII/sml/24504301.pdf
+	// Mirror: https://peertje.daanberg.net/drivers/intel/download.intel.com/design/PentiumIII/sml/24504301.pdf
+	// Streaming SIMD Extensions - Inverse of 4x4 Matrix
+	// Adapted to load data using _mm_shuffle_ps instead of loading from memory
+	// Replaced _mm_rcp_ps with _mm_div_ps for better accuracy
+	__m128 tmp1 = _mm_shuffle_ps(m_cols[0], m_cols[1], _MM_SHUFFLE(1, 0, 1, 0));
+	__m128 row1 = _mm_shuffle_ps(m_cols[2], m_cols[3], _MM_SHUFFLE(1, 0, 1, 0));
+	__m128 row0 = _mm_shuffle_ps(tmp1, row1, _MM_SHUFFLE(2, 0, 2, 0));
+	row1 = _mm_shuffle_ps(row1, tmp1, _MM_SHUFFLE(3, 1, 3, 1));
+	tmp1 = _mm_shuffle_ps(m_cols[0], m_cols[1], _MM_SHUFFLE(3, 2, 3, 2));
+	__m128 row3 = _mm_shuffle_ps(m_cols[2], m_cols[3], _MM_SHUFFLE(3, 2, 3, 2));
+	__m128 row2 = _mm_shuffle_ps(tmp1, row3, _MM_SHUFFLE(2, 0, 2, 0));
+	row3 = _mm_shuffle_ps(row3, tmp1, _MM_SHUFFLE(3, 1, 3, 1));
 
+	tmp1 = _mm_mul_ps(row2, row3);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(2, 3, 0, 1));
+	__m128 minor0 = _mm_mul_ps(row1, tmp1);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(1, 0, 3, 2));
+	minor0 = _mm_sub_ps(_mm_mul_ps(row1, tmp1), minor0);
+
+	tmp1 = _mm_mul_ps(row1, row2);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(2, 3, 0, 1));
+	minor0 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor0);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(1, 0, 3, 2));
+	minor0 = _mm_sub_ps(minor0, _mm_mul_ps(row3, tmp1));
+
+	tmp1 = _mm_mul_ps(_mm_shuffle_ps(row1, row1, _MM_SHUFFLE(1, 0, 3, 2)), row3);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(2, 3, 0, 1));
+	row2 = _mm_shuffle_ps(row2, row2, _MM_SHUFFLE(1, 0, 3, 2));
+	minor0 = _mm_add_ps(_mm_mul_ps(row2, tmp1), minor0);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, _MM_SHUFFLE(1, 0, 3, 2));
+	minor0 = _mm_sub_ps(minor0, _mm_mul_ps(row2, tmp1));
+
+	__m128 det = _mm_mul_ps(row0, minor0);
+	// NOTE(randomuserhi): Original code did (x + z) + (y + w), changed to (x + y) + (z + w) to match the non vectorised
+	//                     code
+	det = _mm_add_ps(_mm_shuffle_ps(det, det, _MM_SHUFFLE(2, 3, 0, 1)), det);
+	det = _mm_add_ss(_mm_shuffle_ps(det, det, _MM_SHUFFLE(1, 0, 3, 2)), det);
+
+	return _mm_cvtss_f32(det);
+#else
 	float32 m00 = this->m00, m01 = this->m01, m02 = this->m02, m03 = this->m03;
 	float32 m10 = this->m10, m11 = this->m11, m12 = this->m12, m13 = this->m13;
 	float32 m20 = this->m20, m21 = this->m21, m22 = this->m22, m23 = this->m23;
 	float32 m30 = this->m30, m31 = this->m31, m32 = this->m32, m33 = this->m33;
 
-	float det = m00 * (m11 * (m22 * m33 - m23 * m32) - m12 * (m21 * m33 - m23 * m31) + m13 * (m21 * m32 - m22 * m31))
-	            - m01 * (m10 * (m22 * m33 - m23 * m32) - m12 * (m20 * m33 - m23 * m30) + m13 * (m20 * m32 - m22 * m30))
-	            + m02 * (m10 * (m21 * m33 - m23 * m31) - m11 * (m20 * m33 - m23 * m30) + m13 * (m20 * m31 - m21 * m30))
-	            - m03 * (m10 * (m21 * m32 - m22 * m31) - m11 * (m20 * m32 - m22 * m30) + m12 * (m20 * m31 - m21 * m30));
+	float32 b0 = m20 * m31 - m21 * m30;
+	float32 b1 = m20 * m32 - m22 * m30;
+	float32 b2 = m20 * m33 - m23 * m30;
+	float32 b3 = m21 * m32 - m22 * m31;
+	float32 b4 = m21 * m33 - m23 * m31;
+	float32 b5 = m22 * m33 - m23 * m32;
+
+	float32 t0 = m00 * m11 - m01 * m10;
+	float32 t1 = m00 * m12 - m02 * m10;
+	float32 t2 = m00 * m13 - m03 * m10;
+	float32 t3 = m01 * m12 - m02 * m11;
+	float32 t4 = m01 * m13 - m03 * m11;
+	float32 t5 = m02 * m13 - m03 * m12;
+
+	float32 det = t0 * b5 - t1 * b4 + t2 * b3 + t3 * b2 - t4 * b1 + t5 * b0;
 
 	return det;
 #endif

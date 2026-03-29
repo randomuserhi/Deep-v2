@@ -44,7 +44,7 @@ const TestInfo* RegisterTest(const char* roTestGroup, const char* roTestName, co
 	return info.back();
 }
 
-void RunAllTests() {
+int RunAllTests() {
 	int totalTestsFailed = 0;
 
 	for (const auto& kv : GetTests()) {
@@ -109,5 +109,7 @@ void RunAllTests() {
 	} else {
 		std::cout << totalTestsFailed << " tests failed!" << std::endl;
 	}
+
+	return static_cast<int>(totalTestsFailed > 0);
 }
 } // namespace Test

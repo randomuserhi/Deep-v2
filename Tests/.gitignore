@@ -1,6 +1,7 @@
 .cache/
 bin/
 build/
+all/
 /.vs
 .idea/
 Makefile

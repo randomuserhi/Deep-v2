@@ -1,36 +1,36 @@
 # TODO(randomuserhi): Migrate to just use clang (remove MSVC entirely)
 #                     clang-cl should be supported -> still bind to propert runtime and stuff on windows
 
-cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
 project(Deep VERSION 0.0.1 LANGUAGES CXX)
 
-if (NOT DEFINED RELEASE_BUILD)
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-		message(STATUS "Configuring for Debug build")
-		set(_USE_ASSERTS ON)
-		set(RELEASE_BUILD OFF)
-		set(GENERATE_DEBUG_SYMBOLS ON)
-	elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-		message(STATUS "Configuring for Release build")
-		set(_USE_ASSERTS OFF)
-		set(RELEASE_BUILD ON)
-		set(GENERATE_DEBUG_SYMBOLS OFF)
-	elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-		message(STATUS "Configuring for Release build (With Debug Info)")
-		set(_USE_ASSERTS ON)
-		set(RELEASE_BUILD ON)
-		set(GENERATE_DEBUG_SYMBOLS ON)
-	else()
-		message(FATAL_ERROR "Unknown build type: ${CMAKE_BUILD_TYPE}")
-	endif()
+set(MESSAGE_PREFIX "[${PROJECT_NAME}]")
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	message(STATUS "${MESSAGE_PREFIX} Configuring for Debug build")
+	set(USE_ASSERTS_DEFAULT ON)
+	set(RELEASE_BUILD OFF)
+	set(GENERATE_DEBUG_SYMBOLS ON)
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+	message(STATUS "${MESSAGE_PREFIX} Configuring for Release build")
+	set(USE_ASSERTS_DEFAULT OFF)
+	set(RELEASE_BUILD ON)
+	set(GENERATE_DEBUG_SYMBOLS OFF)
+elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+	message(STATUS "${MESSAGE_PREFIX} Configuring for Release build (With Debug Info)")
+	set(USE_ASSERTS_DEFAULT ON)
+	set(RELEASE_BUILD ON)
+	set(GENERATE_DEBUG_SYMBOLS ON)
+else()
+	message(FATAL_ERROR "${MESSAGE_PREFIX} Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
 # When turning this option on, the library will be compiled as a shared library.
 option(BUILD_SHARED_LIBS "Compile Deep as a shared library" OFF)
 
 # When turning this option on, the library will be compiled using assertions. By default asserts are enabled in Debug build.
-option(USE_ASSERTS "Enable asserts" ${_USE_ASSERTS})
+option(USE_ASSERTS "Enable asserts" ${USE_ASSERTS_DEFAULT})
 
 # When turning this on, the library will be compiled with C++ exceptions enabled.
 option(CPP_EXCEPTIONS_ENABLED "Enable C++ exceptions" OFF)
@@ -53,6 +53,8 @@ option(USE_TZCNT "Enable TZCNT" ON)
 option(USE_F16C "Enable F16C" ON)
 option(USE_FMADD "Enable FMADD" ON)
 
+option(USE_C_BINDINGS "Enable C Bindings" OFF)
+
 include(CMakeDependentOption)
 
 # When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
@@ -68,7 +70,7 @@ cmake_dependent_option(USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runt
 if (NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 20)
 elseif (CMAKE_CXX_STANDARD LESS 20)
-	message(FATAL_ERROR "CMAKE_CXX_STANDARD must be at least 20. Provided: ${CMAKE_CXX_STANDARD}")
+	message(FATAL_ERROR "${MESSAGE_PREFIX} CMAKE_CXX_STANDARD must be at least 20. Provided: ${CMAKE_CXX_STANDARD}")
 endif()
 
 # Detect compiler
@@ -94,17 +96,21 @@ function(SET_INTERPROCEDURAL_OPTIMIZATION)
 	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION OFF PARENT_SCOPE)
 
 	# When compiling as a shared lib, turning on LTO causes errors of the form 'ld.exe: cannot export symbol X wrong type (4 vs 3)'
-	if (INTERPROCEDURAL_OPTIMIZATION
-		AND NOT (BUILD_SHARED_LIBS))
-		include(CheckIPOSupported)
-		check_ipo_supported(RESULT IS_IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
+	if (INTERPROCEDURAL_OPTIMIZATION)
+		if (NOT (BUILD_SHARED_LIBS))
+			include(CheckIPOSupported)
+			check_ipo_supported(RESULT IS_IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
 
-		if (IS_IPO_SUPPORTED)
-			message(STATUS "Interprocedural optimizations are turned on")
-			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON PARENT_SCOPE)
-			set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION ON PARENT_SCOPE)
+			if (IS_IPO_SUPPORTED)
+				message(STATUS "${MESSAGE_PREFIX} Interprocedural optimizations are turned on")
+				set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON PARENT_SCOPE)
+				set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_DISTRIBUTION ON PARENT_SCOPE)
+			else()
+				message(WARNING "${MESSAGE_PREFIX} Interprocedural optimizations are not supported for this target, turn off the option INTERPROCEDURAL_OPTIMIZATION to disable this warning")
+				message(STATUS "${IPO_CHECK_OUTPUT}")
+			endif()
 		else()
-			message("Warning: Interprocedural optimizations are not supported for this target, turn off the option INTERPROCEDURAL_OPTIMIZATION to disable this warning")
+			message(WARNING "${MESSAGE_PREFIX} Interprocedural optimizations do not play nice with shared libraries, and thus is ignored.")
 		endif()
 	endif()
 endfunction()
@@ -164,7 +170,7 @@ if (CLANG)
 endif()
 
 if (MSVC)
-	message(FATAL_ERROR "Unsupported compiler")
+	message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
 elseif (CLANG)
 	# Disable floating point exceptions
 	target_compile_options(Deep PRIVATE -fno-trapping-math)
@@ -178,7 +184,7 @@ elseif (CLANG)
 	endif()
 
 	# Enable/Disable exceptions
-	message(STATUS "CPP_EXCEPTIONS_ENABLED: ${CPP_EXCEPTIONS_ENABLED}")
+	message(STATUS "${MESSAGE_PREFIX} CPP_EXCEPTIONS_ENABLED: ${CPP_EXCEPTIONS_ENABLED}")
 	if (NOT CPP_EXCEPTIONS_ENABLED)
 		target_compile_options(Deep PRIVATE -fno-exceptions)
 	else()
@@ -190,7 +196,7 @@ elseif (CLANG)
 		$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-fno-stack-protector>
 	)
 else()
-	message(FATAL_ERROR "Unsupported compiler")
+	message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
 endif()
 
 # Emit Strict Aliasing
@@ -199,11 +205,13 @@ if (USE_STRICT_ALIASING)
 endif()
 
 # Emit Asserts
+message(STATUS "${MESSAGE_PREFIX} USE_ASSERTS: ${USE_ASSERTS}")
 if (USE_ASSERTS)
 	target_compile_definitions(Deep PUBLIC DEEP_USE_ASSERTS)
 endif()
 
 # Emit C Bindings
+message(STATUS "${MESSAGE_PREFIX} USE_C_BINDINGS: ${USE_C_BINDINGS}")
 if (USE_C_BINDINGS)
 	target_compile_definitions(Deep PUBLIC DEEP_USE_C_BINDINGS)
 endif()
@@ -241,7 +249,7 @@ endfunction()
 
 # Add the compiler commandline flags to select the right instruction sets
 if (NOT NO_SIMD_INTRINSICS)
-	message(STATUS "Using SIMD Intrinsics")
+	message(STATUS "${MESSAGE_PREFIX} Using SIMD Intrinsics")
 
 	if (MSVC)
 		if (USE_AVX512)
@@ -263,7 +271,7 @@ if (NOT NO_SIMD_INTRINSICS)
 		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
 	else()
 		# TODO(randomuserhi)
-		message(FATAL_ERROR "Unsupported compiler")
+		message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
 	endif()
 else()
 	target_compile_definitions(Deep PUBLIC DEEP_DONT_USE_SIMD_INTRINSICS)

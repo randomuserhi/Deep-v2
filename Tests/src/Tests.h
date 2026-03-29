@@ -198,7 +198,7 @@ extern bool g_testFailed;
 
 } // namespace internal
 
-void RunAllTests();
+int RunAllTests();
 
 } // namespace Test
 

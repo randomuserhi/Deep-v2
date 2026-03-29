@@ -56,3 +56,14 @@ TEST(Mat4, Multiplication) {
 
 	EXPECT_EQ((a * b), c);
 }
+
+TEST(Mat4, Determinant) {
+	const Deep::Mat4 a{
+		1, 1, 0, 0, //
+		0, 0, 2, 0, //
+		0, 3, 0, 0, //
+		0, 0, 0, 1  //
+	};
+
+	EXPECT_EQ(a.determinant(), -6);
+}

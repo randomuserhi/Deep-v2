@@ -185,7 +185,7 @@
 #define Deep_Restrict __restrict__
 
 #elif defined(DEEP_COMPILER_MSVC)
-#define Deep_Inline __forceinline
+#define Deep_Inline inline __forceinline
 #define Deep_NoInline __declspec(noinline)
 #define Deep_AlignOf(type) alignof(type)
 
