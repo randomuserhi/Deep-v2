@@ -64,7 +64,7 @@ for /L %%j in (1,1,%LIB_TYPE_COUNT%) do (
                     echo ^^! -- CMake configuration failed for !CURRENT_PATH!
                     set "FAILS=!FAILS! "!CURRENT_NAME!""
                 ) else (
-                    cmake --build "!CURRENT_PATH!"  > "!CURRENT_LOG_PATH!\cmake_build.txt" 2>&1
+                    cmake --build "!CURRENT_PATH!" -j 16 > "!CURRENT_LOG_PATH!\cmake_build.txt" 2>&1
                     
                     if !ERRORLEVEL! NEQ 0 (
                         echo ^^! -- Build failed for !CURRENT_PATH!
