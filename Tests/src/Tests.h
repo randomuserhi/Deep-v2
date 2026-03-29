@@ -13,7 +13,7 @@
 #endif
 
 #if defined(TEST_COMPILER_CLANG)
-#define Test_Inline inline __attribute__((always_inline))
+#define Test_ForceInline inline __attribute__((always_inline))
 #define Test_AlignOf(type) __alignof__(type)
 
 #define Test_PushPack
@@ -26,7 +26,7 @@
 #define Test_LINE_ __LINE__
 
 #elif defined(TEST_COMPILER_GCC)
-#define Test_Inline inline __attribute__((always_inline))
+#define Test_ForceInline inline __attribute__((always_inline))
 #define Test_AlignOf(type) __alignof__(type)
 
 #define Test_PushPack
@@ -39,7 +39,7 @@
 #define Test_LINE_ __LINE__
 
 #elif defined(TEST_COMPILER_MSVC)
-#define Test_Inline __forceinline
+#define Test_ForceInline __forceinline
 #define Test_AlignOf(type) alignof(type)
 
 #define Test_PushPack __pragma(pack(push, 1))
