@@ -67,18 +67,18 @@ DEEP_NAMESPACE_END
 namespace std {
 
 template<typename... Ts>
-struct tuple_size<Deep::Tuple<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
+struct tuple_size<::Deep::Tuple<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
 
 template<std::size_t I, typename... Ts>
-struct tuple_element<I, Deep::Tuple<Ts...>> {
+struct tuple_element<I, ::Deep::Tuple<Ts...>> {
 	using type = typename std::tuple_element<I, std::tuple<Ts...>>::type;
 };
 
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) get(Deep::Tuple<Ts...>& in_tuple);
+constexpr inline decltype(auto) get(::Deep::Tuple<Ts...>& in_tuple);
 
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) get(const Deep::Tuple<Ts...>& in_tuple);
+constexpr inline decltype(auto) get(const ::Deep::Tuple<Ts...>& in_tuple);
 
 } // namespace std
 

@@ -1,10 +1,24 @@
-#include "Deep/Math/Vec3.h"
-#include "Deep/Physics3D/Ray.h"
 #include "Tests.h"
 
+#include "Deep/Math/Vec3.h"
+#include "Deep/Physics3D/Ray.h"
 #include "Deep/Physics3D/Aabb.h"
 
 TEST(Aabb3D, IsOverlapping) {
+	{
+		Deep::Vec3 point{ 0.25f, 0.25f, 0.25f };
+		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+
+		EXPECT_TRUE(Deep::IsOverlapping(point, a));
+	}
+
+	{
+		Deep::Vec3 point{ 1.0f, 1.0f, 1.0f };
+		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+
+		EXPECT_FALSE(Deep::IsOverlapping(point, a));
+	}
+
 	{
 		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
 		Deep::Aabb3D b{ .m_center = { 0.25f, 0.25f, 0.25f }, .m_extents = { 0.5f, 0.5f, 0.5f } };

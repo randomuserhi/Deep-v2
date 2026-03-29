@@ -18,7 +18,7 @@ Quat Quat::FromMat4(Arg_Mat4 in_mat) {
 	float trace = in_mat.m00 + in_mat.m11 + in_mat.m22;
 
 	if (trace >= 0.0f) {
-		float s = Deep::Sqrt(trace + 1.0f);
+		float s = Sqrt(trace + 1.0f);
 		float is = 0.5f / s;
 		return Quat((in_mat.m12 - in_mat.m21) * is, (in_mat.m20 - in_mat.m02) * is, (in_mat.m01 - in_mat.m10) * is,
 		            0.5f * s);
@@ -28,19 +28,19 @@ Quat Quat::FromMat4(Arg_Mat4 in_mat) {
 		if (in_mat.m22 > in_mat.m_cols[i].values[i]) i = 2;
 
 		if (i == 0) {
-			float s = Deep::Sqrt(in_mat.m00 - (in_mat.m11 + in_mat.m22) + 1.0f);
+			float s = Sqrt(in_mat.m00 - (in_mat.m11 + in_mat.m22) + 1.0f);
 			float is = 0.5f / s;
 			return Quat(0.5f * s, (in_mat.m10 + in_mat.m01) * is, (in_mat.m02 + in_mat.m20) * is,
 			            (in_mat.m12 - in_mat.m21) * is);
 		} else if (i == 1) {
-			float s = Deep::Sqrt(in_mat.m11 - (in_mat.m22 + in_mat.m00) + 1.0f);
+			float s = Sqrt(in_mat.m11 - (in_mat.m22 + in_mat.m00) + 1.0f);
 			float is = 0.5f / s;
 			return Quat((in_mat.m10 + in_mat.m01) * is, 0.5f * s, (in_mat.m21 + in_mat.m12) * is,
 			            (in_mat.m20 - in_mat.m02) * is);
 		} else {
 			Deep_Assert(i == 2, "Index should be 2.");
 
-			float s = Deep::Sqrt(in_mat.m22 - (in_mat.m00 + in_mat.m11) + 1.0f);
+			float s = Sqrt(in_mat.m22 - (in_mat.m00 + in_mat.m11) + 1.0f);
 			float is = 0.5f / s;
 			return Quat((in_mat.m02 + in_mat.m20) * is, (in_mat.m21 + in_mat.m12) * is, 0.5f * s,
 			            (in_mat.m01 - in_mat.m10) * is);

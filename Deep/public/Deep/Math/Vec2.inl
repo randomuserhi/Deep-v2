@@ -20,7 +20,7 @@ Vec2::Vec2(Arg_Vec4 in_vec) :
 
 Vec2& Vec2::Normalize() {
 	float32 magnitudeSqrd = sqrdMagnitude();
-	if (magnitudeSqrd != 0.0f) *this /= Deep::Sqrt(magnitudeSqrd);
+	if (magnitudeSqrd != 0.0f) *this /= Sqrt(magnitudeSqrd);
 	return *this;
 }
 Vec2 Vec2::normalized() const {
@@ -28,14 +28,14 @@ Vec2 Vec2::normalized() const {
 	return v.Normalize();
 }
 bool Vec2::IsNormalized(float tolerance) const {
-	return Deep::Abs(sqrdMagnitude() - 1.0f) <= tolerance;
+	return Abs(sqrdMagnitude() - 1.0f) <= tolerance;
 }
 
 float32 Vec2::sqrdMagnitude() const {
 	return x * x + y * y;
 }
 float32 Vec2::magnitude() const {
-	return Deep::Sqrt(sqrdMagnitude());
+	return Sqrt(sqrdMagnitude());
 }
 
 float32 Vec2::Dot(Arg_Vec2 in_a, Arg_Vec2 in_b) {
@@ -47,15 +47,15 @@ float32 Vec2::Cross(Arg_Vec2 in_a, Arg_Vec2 in_b) {
 }
 
 Vec2 Vec2::Rotate(Arg_Vec2 in_a, float in_radians) {
-	float32 cos = Deep::Cos(in_radians);
-	float32 sin = Deep::Sin(in_radians);
+	float32 cos = Cos(in_radians);
+	float32 sin = Sin(in_radians);
 	return Vec2{ in_a.x * cos - in_a.y * sin, in_a.x * sin + in_a.y * cos };
 }
 
 float32 Vec2::Angle(Arg_Vec2 in_a, Arg_Vec2 in_b) {
 	float32 dot = Vec2::Dot(in_a, in_b);
 	float32 cross = Vec2::Cross(in_a, in_b);
-	return Deep::ATan2(cross, dot);
+	return ATan2(cross, dot);
 }
 
 Vec2 Vec2::Lerp(Arg_Vec2 in_a, Arg_Vec2 in_b, float32 in_t) {

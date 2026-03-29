@@ -19,14 +19,14 @@ int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo
 
 	float32 dx1 = maxB.x - minA.x;
 	float32 dx2 = maxA.x - minB.x;
-	contactInfo.m_penetrationDistance = Deep::Min(dx1, dx2);
+	contactInfo.m_penetrationDistance = Min(dx1, dx2);
 	contactInfo.m_normal = { dx1 < dx2 ? -1.0f : 1.0f, 0.0f, 0.0f };
 
 	if (contactInfo.m_penetrationDistance <= 0) return 0;
 
 	float32 dy1 = maxB.y - minA.y;
 	float32 dy2 = maxA.y - minB.y;
-	float32 py = Deep::Min(dy1, dy2);
+	float32 py = Min(dy1, dy2);
 	if (py <= 0) return 0;
 	if (py < contactInfo.m_penetrationDistance) {
 		contactInfo.m_penetrationDistance = py;
@@ -35,7 +35,7 @@ int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo
 
 	float32 dz1 = maxB.z - minA.z;
 	float32 dz2 = maxA.z - minB.z;
-	float32 pz = Deep::Min(dz1, dz2);
+	float32 pz = Min(dz1, dz2);
 	if (pz <= 0) return 0;
 	if (pz < contactInfo.m_penetrationDistance) {
 		contactInfo.m_penetrationDistance = pz;
@@ -62,11 +62,11 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	Xmm tmin = Xmm::Min(t1.xmm, t2.xmm);
 	Xmm tmax = Xmm::Max(t1.xmm, t2.xmm);
 
-	float32 tEnter = Deep::Max(Deep::Max(tmin.x, tmin.y), tmin.z);
-	float32 tExit = Deep::Min(Deep::Min(tmax.x, tmax.y), tmax.z);
+	float32 tEnter = Max(Max(tmin.x, tmin.y), tmin.z);
+	float32 tExit = Min(Min(tmax.x, tmax.y), tmax.z);
 
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
-		if (tEnter < 0) return false;
+		if (tEnter < 0.0f) return false;
 	}
 	return tEnter <= tExit && tExit > 0.0f;
 }
@@ -110,7 +110,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 		out_hit->m_distance = distance;
 		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * distance;
 		out_hit->m_normal = Vec3::k_zero;
-		out_hit->m_normal.m_values[axis] = Deep::Sign(in_ray.m_direction.m_values[axis]) * multiplier;
+		out_hit->m_normal.m_values[axis] = Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 	} else {
 		if (tEnter > tExit || tExit < 0.0f) return false;
 
@@ -120,7 +120,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 		out_hit->m_distance = distance;
 		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * distance;
 		out_hit->m_normal = Vec3::k_zero;
-		out_hit->m_normal.m_values[axis] = Deep::Sign(in_ray.m_direction.m_values[axis]) * multiplier;
+		out_hit->m_normal.m_values[axis] = Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 	}
 
 	return true;
@@ -165,7 +165,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 		out_hits[hitCount].m_distance = distance;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
 		out_hits[hitCount].m_normal = Vec3::k_zero;
-		out_hits[hitCount].m_normal.m_values[enterAxis] = Deep::Sign(in_ray.m_direction.m_values[enterAxis]) * -1.0f;
+		out_hits[hitCount].m_normal.m_values[enterAxis] = Sign(in_ray.m_direction.m_values[enterAxis]) * -1.0f;
 		++hitCount;
 	}
 
@@ -179,7 +179,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 		out_hits[hitCount].m_distance = distance;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
 		out_hits[hitCount].m_normal = Vec3::k_zero;
-		out_hits[hitCount].m_normal.m_values[exitAxis] = Deep::Sign(in_ray.m_direction.m_values[exitAxis]);
+		out_hits[hitCount].m_normal.m_values[exitAxis] = Sign(in_ray.m_direction.m_values[exitAxis]);
 		++hitCount;
 	}
 

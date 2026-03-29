@@ -38,7 +38,7 @@ Vec3& Vec3::Normalize() {
 	return *this;
 #else
 	float32 magnitudeSqrd = sqrdMagnitude();
-	if (magnitudeSqrd != 0.0f) *this /= Deep::Sqrt(magnitudeSqrd);
+	if (magnitudeSqrd != 0.0f) *this /= Sqrt(magnitudeSqrd);
 	return *this;
 #endif
 }
@@ -47,7 +47,7 @@ Vec3 Vec3::normalized() const {
 	return v.Normalize();
 }
 bool Vec3::IsNormalized(float tolerance) const {
-	return Deep::Abs(sqrdMagnitude() - 1.0f) <= tolerance;
+	return Abs(sqrdMagnitude() - 1.0f) <= tolerance;
 }
 
 float32 Vec3::sqrdMagnitude() const {
@@ -61,7 +61,7 @@ float32 Vec3::magnitude() const {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(xmm, xmm, 0x7f)));
 #else
-	return Deep::Sqrt(sqrdMagnitude());
+	return Sqrt(sqrdMagnitude());
 #endif
 }
 
@@ -80,11 +80,11 @@ Vec3 Vec3::Cross(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 	Xmm t2 = _mm_shuffle_ps(in_a.xmm, in_a.xmm, _MM_SHUFFLE(0, 0, 2, 1)); // Assure Z and W are the same
 	t2 = _mm_mul_ps(t2, in_b.xmm);
 	Xmm t3 = _mm_sub_ps(t1, t2);
-	return Deep::Vec3{ _mm_shuffle_ps(t3, t3, _MM_SHUFFLE(0, 0, 2, 1)) }; // Assure Z and W are the same
+	return Vec3{ _mm_shuffle_ps(t3, t3, _MM_SHUFFLE(0, 0, 2, 1)) }; // Assure Z and W are the same
 #else
-	return Deep::Vec3{ in_a.m_values[1] * in_b.m_values[2] - in_a.m_values[2] * in_b.m_values[1],
-		               in_a.m_values[2] * in_b.m_values[0] - in_a.m_values[0] * in_b.m_values[2],
-		               in_a.m_values[0] * in_b.m_values[1] - in_a.m_values[1] * in_b.m_values[0] };
+	return Vec3{ in_a.m_values[1] * in_b.m_values[2] - in_a.m_values[2] * in_b.m_values[1],
+		         in_a.m_values[2] * in_b.m_values[0] - in_a.m_values[0] * in_b.m_values[2],
+		         in_a.m_values[0] * in_b.m_values[1] - in_a.m_values[1] * in_b.m_values[0] };
 #endif
 }
 

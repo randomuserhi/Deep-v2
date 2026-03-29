@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Constants.h"
 #include <Deep.h>
 #include <Deep/Bit.h>
 
@@ -71,11 +72,11 @@ inline constexpr T ATan2(const T& in_y, const T& in_x) {
 }
 
 template<typename T>
-inline constexpr bool isClose(const T& in_a, const T& in_b, const T& in_relTolerance = 1e-05f,
-                              const T& in_absoluteTolerance = 1e-06f) {
-	// NOTE(randomuserhi): https://numpy.org/devdocs/reference/generated/numpy.isclose.html, uses `a` instead `b` as
-	// relative point NOTE(randomuserhi): Does not account for NaN
-	return Abs(in_a - in_b) <= (in_absoluteTolerance + in_relTolerance * Abs(in_a));
+inline constexpr bool isClose(const T& in_a, const T& in_b, const T& in_relTolerance = static_cast<T>(k_relTolerance),
+                              const T& in_absTolerance = static_cast<T>(k_absTolerance)) {
+	// Based on https://numpy.org/devdocs/reference/generated/numpy.isclose.html
+	// NOTE(randomuserhi): Does not account for NaN
+	return Abs(in_a - in_b) <= (in_absTolerance + in_relTolerance * Abs(in_b));
 }
 
 DEEP_NAMESPACE_END

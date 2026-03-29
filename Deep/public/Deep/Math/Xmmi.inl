@@ -57,11 +57,11 @@ Xmm Xmmi::ReinterpretAsFloat() const {
 #ifdef DEEP_USE_SSE
 	return _mm_castsi128_ps(_internal);
 #else
-	return Deep::BitCast<Xmm>(*this);
+	return BitCast<Xmm>(*this);
 #endif
 }
 constexpr Xmm Xmmi::Constexpr_ReinterpretAsFloat() const {
-	return Deep::BitCast<Xmm>(*this);
+	return BitCast<Xmm>(*this);
 }
 
 Xmmi Xmmi::Replicate(int in_value) {
@@ -111,10 +111,10 @@ Xmmi Xmmi::Min(const XmmiArg in_a, const XmmiArg in_b) {
 	return _mm_min_epi32(in_a, in_b);
 #else
 	return Xmmi{
-		Deep::Min(in_a.x, in_b.x), //
-		Deep::Min(in_a.y, in_b.y), //
-		Deep::Min(in_a.z, in_b.z), //
-		Deep::Min(in_a.w, in_b.w)  //
+		Min(in_a.x, in_b.x), //
+		Min(in_a.y, in_b.y), //
+		Min(in_a.z, in_b.z), //
+		Min(in_a.w, in_b.w)  //
 	};
 #endif
 }
@@ -124,10 +124,10 @@ Xmmi Xmmi::Max(const XmmiArg in_a, const XmmiArg in_b) {
 	return _mm_max_epi32(in_a, in_b);
 #else
 	return Xmmi{
-		Deep::Max(in_a.x, in_b.x), //
-		Deep::Max(in_a.y, in_b.y), //
-		Deep::Max(in_a.z, in_b.z), //
-		Deep::Max(in_a.w, in_b.w)  //
+		Max(in_a.x, in_b.x), //
+		Max(in_a.y, in_b.y), //
+		Max(in_a.z, in_b.z), //
+		Max(in_a.w, in_b.w)  //
 	};
 #endif
 }

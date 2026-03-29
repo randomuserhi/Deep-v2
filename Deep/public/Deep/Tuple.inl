@@ -52,12 +52,12 @@ DEEP_NAMESPACE_END
 namespace std {
 
 template<std::size_t I, typename... Ts>
-constexpr decltype(auto) get(Deep::Tuple<Ts...>& in_tuple) {
+constexpr decltype(auto) get(::Deep::Tuple<Ts...>& in_tuple) {
 	return in_tuple.template get<I>();
 }
 
 template<std::size_t I, typename... Ts>
-constexpr decltype(auto) get(const Deep::Tuple<Ts...>& in_tuple) {
+constexpr decltype(auto) get(const ::Deep::Tuple<Ts...>& in_tuple) {
 	return in_tuple.template get<I>();
 }
 

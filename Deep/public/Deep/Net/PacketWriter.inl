@@ -36,7 +36,7 @@ void PacketWriter::WriteUInt8(uint8 in_byte) {
 void PacketWriter::WriteBytes(const uint8* in_bytes, size_t in_numBytes) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + in_numBytes);
-	Deep::Memcpy(m_buffer.data() + old, in_bytes, in_numBytes);
+	Memcpy(m_buffer.data() + old, in_bytes, in_numBytes);
 }
 
 void PacketWriter::WriteUInt16(uint16 in_value) {

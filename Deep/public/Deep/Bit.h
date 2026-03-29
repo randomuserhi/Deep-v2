@@ -117,10 +117,10 @@ inline int64 ReverseEndianness(const int64 in_value) {
 }
 
 inline uint32 AsUInt(const float32 in_value) {
-	return Deep::BitCast<const uint32>(in_value);
+	return BitCast<const uint32>(in_value);
 }
 inline float32 AsFloat(const uint32 in_value) {
-	return Deep::BitCast<const float32>(in_value);
+	return BitCast<const float32>(in_value);
 }
 
 inline float32 HalfToFloat(const uint16 in_value) { // IEEE-754 16-bit floating-point format (without infinity): 1-5-10,

@@ -21,7 +21,7 @@ TEST(Quat, Conjugate) {
 }
 
 TEST(Quat, FromAxisAngle) {
-	const Deep::Quat a{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, Deep::Pi };
+	const Deep::Quat a{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, Deep::k_pi };
 
 	EXPECT_TRUE(Deep::isClose(a.x, 0.0f));
 	EXPECT_TRUE(Deep::isClose(a.y, 1.0f));
@@ -30,7 +30,7 @@ TEST(Quat, FromAxisAngle) {
 }
 
 TEST(Quat, RotateVector) {
-	const Deep::Quat q{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, 0.5 * Deep::Pi };
+	const Deep::Quat q{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, 0.5 * Deep::k_pi };
 	const Deep::Vec3 v{ 1.0f, 0.0f, 0.0f };
 	const Deep::Vec3 result = q * v;
 
@@ -40,7 +40,7 @@ TEST(Quat, RotateVector) {
 }
 
 TEST(Quat, InverseRotateVector) {
-	Deep::Quat q{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, 0.5f * Deep::Pi };
+	Deep::Quat q{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, 0.5f * Deep::k_pi };
 	const Deep::Vec3 v{ 1.0f, 0.0f, 0.0f };
 	const Deep::Vec3 result = Deep::Quat::InverseRotate(q, v);
 
