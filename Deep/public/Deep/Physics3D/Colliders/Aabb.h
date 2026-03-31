@@ -35,4 +35,4 @@ extern template DEEP_EXPORT int32 RaycastAll<RaycastType::e_startsOutside>(Arg_R
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Physics3D/Aabb.inl" // IWYU pragma: export
+#include "Deep/Physics3D/Colliders/Aabb.inl" // IWYU pragma: export

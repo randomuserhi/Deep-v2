@@ -2,7 +2,7 @@
 
 #include "Deep/Math/Vec3.h"
 #include "Deep/Physics3D/Ray.h"
-#include "Deep/Physics3D/Sphere.h"
+#include "Deep/Physics3D/Colliders.h"
 
 TEST(Sphere, IsOverlapping) {
 	{

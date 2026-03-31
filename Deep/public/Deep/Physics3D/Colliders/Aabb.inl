@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Math/Vec3.h"
-#include "Deep/Physics3D/Aabb.h"
+#include "Deep/Physics3D/Colliders/Aabb.h"
 
 DEEP_NAMESPACE_BEGIN
 

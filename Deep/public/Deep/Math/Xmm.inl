@@ -95,10 +95,10 @@ Xmm Xmm::Min(const XmmArg in_a, const XmmArg in_b) {
 	return _mm_min_ps(in_a, in_b);
 #else
 	return Xmm{
-		Min(in_a.x, in_b.x), //
-		Min(in_a.y, in_b.y), //
-		Min(in_a.z, in_b.z), //
-		Min(in_a.w, in_b.w)  //
+		Deep::Min(in_a.x, in_b.x), //
+		Deep::Min(in_a.y, in_b.y), //
+		Deep::Min(in_a.z, in_b.z), //
+		Deep::Min(in_a.w, in_b.w)  //
 	};
 #endif
 }
@@ -108,10 +108,10 @@ Xmm Xmm::Max(const XmmArg in_a, const XmmArg in_b) {
 	return _mm_max_ps(in_a, in_b);
 #else
 	return Xmm{
-		Max(in_a.x, in_b.x), //
-		Max(in_a.y, in_b.y), //
-		Max(in_a.z, in_b.z), //
-		Max(in_a.w, in_b.w)  //
+		Deep::Max(in_a.x, in_b.x), //
+		Deep::Max(in_a.y, in_b.y), //
+		Deep::Max(in_a.z, in_b.z), //
+		Deep::Max(in_a.w, in_b.w)  //
 	};
 #endif
 }
