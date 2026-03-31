@@ -14,9 +14,9 @@ struct DEEP_EXPORT Sphere {
 
 using Arg_Sphere = const Sphere&;
 
-inline bool IsOverlapping(Arg_Vec3 in_point, Arg_Sphere in_a);
-inline bool IsOverlapping(Arg_Sphere in_a, Arg_Sphere in_b);
-DEEP_EXPORT int IsOverlapping(Arg_Sphere in_a, Arg_Sphere in_b, ContactInfo* out_contactInfo);
+inline bool IsOverlapping(Arg_Vec3 in_point, Arg_Sphere in_sphere);
+inline bool IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB);
+DEEP_EXPORT int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out_contactInfo);
 
 template<RaycastType in_queryType = RaycastType::e_default>
 bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere);

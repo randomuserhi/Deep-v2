@@ -6,15 +6,15 @@
 
 DEEP_NAMESPACE_BEGIN
 
-int IsOverlapping(Arg_Sphere in_a, Arg_Sphere in_b, ContactInfo* out_contactInfo) {
-	Deep_Assert(in_a.m_radius > 0, "Radius of sphere > 0.");
-	Deep_Assert(in_b.m_radius > 0, "Radius of sphere > 0.");
+int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out_contactInfo) {
+	Deep_Assert(in_sphereA.m_radius > 0, "Radius of sphere > 0.");
+	Deep_Assert(in_sphereB.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
 
-	Vec3 delta = in_b.m_center - in_a.m_center;
+	Vec3 delta = in_sphereB.m_center - in_sphereA.m_center;
 	float32 distanceSqrd = delta.sqrdMagnitude();
 
-	float32 radiusSum = in_a.m_radius + in_b.m_radius;
+	float32 radiusSum = in_sphereA.m_radius + in_sphereB.m_radius;
 	float32 radiusSumSqrd = radiusSum * radiusSum;
 
 	if (distanceSqrd >= radiusSumSqrd) {

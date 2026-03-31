@@ -5,17 +5,19 @@
 
 DEEP_NAMESPACE_BEGIN
 
-int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo) {
-	Deep_Assert(in_a.m_extents.x > 0 && in_a.m_extents.y > 0 && in_a.m_extents.z > 0, "Extents of box must be > 0.");
-	Deep_Assert(in_b.m_extents.x > 0 && in_b.m_extents.y > 0 && in_b.m_extents.z > 0, "Extents of box must be > 0.");
+int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_contactInfo) {
+	Deep_Assert(in_boxA.m_extents.x > 0 && in_boxA.m_extents.y > 0 && in_boxA.m_extents.z > 0,
+	            "Extents of box must be > 0.");
+	Deep_Assert(in_boxB.m_extents.x > 0 && in_boxB.m_extents.y > 0 && in_boxB.m_extents.z > 0,
+	            "Extents of box must be > 0.");
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
 
 	ContactInfo contactInfo;
 
-	Vec3 minA = in_a.m_center - in_a.m_extents;
-	Vec3 maxA = in_a.m_center + in_a.m_extents;
-	Vec3 minB = in_b.m_center - in_b.m_extents;
-	Vec3 maxB = in_b.m_center + in_b.m_extents;
+	Vec3 minA = in_boxA.m_center - in_boxA.m_extents;
+	Vec3 maxA = in_boxA.m_center + in_boxA.m_extents;
+	Vec3 minB = in_boxB.m_center - in_boxB.m_extents;
+	Vec3 maxB = in_boxB.m_center + in_boxB.m_extents;
 
 	float32 dx1 = maxB.x - minA.x;
 	float32 dx2 = maxA.x - minB.x;

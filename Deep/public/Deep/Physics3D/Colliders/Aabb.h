@@ -14,9 +14,9 @@ struct DEEP_EXPORT Aabb3D {
 
 using Arg_Aabb3D = const Aabb3D&;
 
-inline bool IsOverlapping(Arg_Vec3 in_point, Arg_Aabb3D in_a);
-inline bool IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b);
-DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_a, Arg_Aabb3D in_b, ContactInfo* out_contactInfo);
+inline bool IsOverlapping(Arg_Vec3 in_point, Arg_Aabb3D in_box);
+inline bool IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB);
+DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_contactInfo);
 
 template<RaycastType in_queryType = RaycastType::e_default>
 bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box);
