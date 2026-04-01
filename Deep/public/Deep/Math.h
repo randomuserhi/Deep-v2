@@ -14,6 +14,8 @@
 #include "Deep/Math/Constants.h" // IWYU pragma: export
 #include "Deep/Math/Xmm.h"       // IWYU pragma: export
 #include "Deep/Math/Xmmi.h"      // IWYU pragma: export
+#include "Deep/Math/Vec2.h"      // IWYU pragma: export
+#include "Deep/Math/Vec2i.h"     // IWYU pragma: export
 #include "Deep/Math/Vec3.h"      // IWYU pragma: export
 #include "Deep/Math/Vec3i.h"     // IWYU pragma: export
 #include "Deep/Math/Vec4.h"      // IWYU pragma: export
