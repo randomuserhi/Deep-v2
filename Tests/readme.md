@@ -6,3 +6,6 @@ cmake --build build
 ```
 scripts\all.bat
 ```
+
+Possible TODO:
+Use `-DCMAKE_CXX_FLAGS="-Rpass=inline"` flag with `Release` build and examine output to check certain methods inline properly
