@@ -63,12 +63,14 @@ int RunAllTests() {
 			    continue;
 			}*/
 
+			std::cout << info->m_testName;
+
 			internal::g_testFailed = false;
 
+			// NOTE(randomuserhi): If a test fails, the timing includes how long it took to write the fail message to output
 			auto start = std::chrono::high_resolution_clock::now();
-
-			std::cout << info->m_testName;
 			info->m_testObj->TestBody();
+			auto end = std::chrono::high_resolution_clock::now();
 
 			if (internal::g_testFailed == true) {
 				std::cout << "\n";
@@ -76,8 +78,6 @@ int RunAllTests() {
 			} else {
 				std::cout << " - ";
 			}
-
-			auto end = std::chrono::high_resolution_clock::now();
 
 			auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 			if (duration_us.count() < 1000) {
