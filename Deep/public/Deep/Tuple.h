@@ -13,7 +13,14 @@ namespace Detail {
 
 template<typename T>
 struct TupleStorage {
-	typename T::Type data;
+	using Type = typename T::Type;
+	Type data;
+
+	constexpr TupleStorage() = default;
+
+	template<typename U>
+	constexpr TupleStorage(U&& in_val) :
+		data(std::forward<U>(in_val)) {}
 
 	constexpr inline auto& get();
 
@@ -38,6 +45,12 @@ struct TupleImpl;
 
 template<std::size_t... Is, typename... Ts>
 struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag<Is, Ts>>... {
+	constexpr TupleImpl() = default;
+	constexpr TupleImpl(const TupleImpl&) = default;
+	constexpr TupleImpl(TupleImpl&&) = default;
+	constexpr TupleImpl& operator=(const TupleImpl&) = default;
+	constexpr TupleImpl& operator=(TupleImpl&&) = default;
+
 	template<typename... Args>
 	constexpr inline TupleImpl(Args&&... args);
 
@@ -47,6 +60,25 @@ struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag
 	template<std::size_t I>
 	constexpr inline decltype(auto) get() const;
 };
+
+#if __cplusplus >= 202002L
+template<typename T>
+using Unwrap = std::unwrap_ref_decay_t<T>;
+#else
+// Manual implementation of std::unwrap_ref_decay_t<T> for C++11/14/17
+template<typename T>
+struct UnwrapType {
+	using type = std::decay_t<T>;
+};
+
+template<typename T>
+struct UnwrapType<std::reference_wrapper<T>> {
+	using type = T&;
+};
+
+template<typename T>
+using Unwrap = typename UnwrapType<std::decay_t<T>>::type;
+#endif
 
 } // namespace Detail
 
@@ -71,7 +103,7 @@ struct tuple_size<::Deep::Tuple<Ts...>> : std::integral_constant<std::size_t, si
 
 template<std::size_t I, typename... Ts>
 struct tuple_element<I, ::Deep::Tuple<Ts...>> {
-	using type = typename std::tuple_element<I, std::tuple<Ts...>>::type;
+	using type = typename ::Deep::Detail::TupleTypeAtIndex<I, Ts...>::type;
 };
 
 template<std::size_t I, typename... Ts>

@@ -39,7 +39,11 @@ constexpr decltype(auto) TupleImpl<std::index_sequence<Is...>, Ts...>::get() con
 
 template<typename... Ts>
 constexpr auto MakeTuple(Ts&&... in_args) {
-	return Tuple<std::decay_t<Ts>...>(std::forward<Ts>(in_args)...);
+#if __cplusplus >= 202002L
+	return Tuple<Deep::Detail::Unwrap<Ts>...>(std::forward<Ts>(in_args)...);
+#else
+	return Tuple<Deep::Detail::Unwrap<Ts>...>(std::forward<Ts>(in_args)...);
+#endif
 }
 
 template<typename... Ts>

@@ -94,6 +94,7 @@ int RunAllTests() {
 			std::cout << '\n';
 
 			// Teardown test object after running test
+			// NOTE(randomuserhi): Isn't needed as of right now as test lifetime matches program lifetime
 			/*delete info.testObj;
 			info.testObj = nullptr;*/
 		}
