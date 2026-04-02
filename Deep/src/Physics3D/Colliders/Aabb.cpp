@@ -161,18 +161,18 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 
 	int32 hitCount = 0;
 
-	// Handle entry hit
-	if (tEnter >= 0.0f) {
-		float32 distance = tEnter;
-		out_hits[hitCount].m_distance = distance;
-		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
-		out_hits[hitCount].m_normal = Vec3::k_zero;
-		out_hits[hitCount].m_normal.m_values[enterAxis] = Sign(in_ray.m_direction.m_values[enterAxis]) * -1.0f;
-		++hitCount;
-	}
-
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
 		if (tEnter < 0.0f) return 0;
+	} else {
+		// Handle entry hit
+		if (tEnter > 0.0f) {
+			float32 distance = tEnter;
+			out_hits[hitCount].m_distance = distance;
+			out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
+			out_hits[hitCount].m_normal = Vec3::k_zero;
+			out_hits[hitCount].m_normal.m_values[enterAxis] = Sign(in_ray.m_direction.m_values[enterAxis]) * -1.0f;
+			++hitCount;
+		}
 	}
 
 	// Handle exit hit

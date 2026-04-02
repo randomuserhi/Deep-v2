@@ -4,6 +4,13 @@
 #include "Deep/Physics3D/Ray.h"
 #include "Deep/Physics3D/Colliders.h"
 
+// TODO(randomuserhi): Add grazing tests (when box edge == second box edge, or point lies on edge or ray origin starts on
+//                     edge)
+// TODO(randomuserhi): Standardize grazing behaviour:
+//                     - for overlap, graze counts as true
+//                     - for raycasts, graze counts as outside the collider, ray moving away has 0 hits, ray going towards
+//                       gives 2 hits for RaycastAll and returns the ray origin as the hit point for regular raycast
+
 TEST(Aabb3D, IsOverlapping) {
 	{
 		Deep::Vec3 point{ 0.25f, 0.25f, 0.25f };
