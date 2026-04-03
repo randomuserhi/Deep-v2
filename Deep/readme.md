@@ -7,6 +7,7 @@ cmake --build build
 
 # Naming convention shizzle
 
+`g_camelCase` for globals
 `m_camelCase` for members
 `k_camelCase` for constants
 `e_camelCase` for enum values

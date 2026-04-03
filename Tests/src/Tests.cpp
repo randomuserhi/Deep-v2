@@ -1,16 +1,45 @@
 #include "Tests.h"
+#include <string>
 
 TEST_SUPPRESS_WARNINGS_STD_BEGIN
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <chrono>
 #include <cstring>
 TEST_SUPPRESS_WARNINGS_STD_END
 
 namespace Test {
 
-TestBase::~TestBase() = default;
+void TestBase::Init() {
+	m_failed = false;
+}
+
+TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
+	m_caseName(in_caseName), m_testObj(in_testObj) {
+
+	m_testObj.m_out += '\t';
+	m_testObj.m_out += in_caseName;
+
+	m_start = std::chrono::high_resolution_clock::now();
+}
+
+TestCase::~TestCase() {
+	m_end = std::chrono::high_resolution_clock::now();
+
+	m_testObj.m_out += " - ";
+
+	auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(m_end - m_start);
+	if (duration_us.count() < 1000) {
+		m_testObj.m_out += std::to_string(duration_us.count());
+		m_testObj.m_out += " microseconds";
+	} else {
+		auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(m_end - m_start);
+		m_testObj.m_out += std::to_string(duration_ms.count());
+		m_testObj.m_out += " milliseconds";
+	}
+
+	m_testObj.m_out += '\n';
+}
 
 struct CStrHash {
 	size_t operator()(const char* s) const {
@@ -21,29 +50,28 @@ struct CStrHash {
 TEST_SUPPRESS_WARNING_PUSH
 TEST_CLANG_SUPPRESS_WARNING("-Wunsafe-buffer-usage")
 struct CStrEqual {
-	bool operator()(const char* a, const char* b) const {
-		return std::strcmp(a, b) == 0;
+	bool operator()(const char* in_a, const char* in_b) const {
+		return std::strcmp(in_a, in_b) == 0;
 	}
 };
 TEST_SUPPRESS_WARNING_POP
 
-bool internal::g_testFailed = false;
 // NOTE(randomuserhi): Required to be wrapped in a getter with static storage as the initialization order of globals is
 //                     only guaranteed top-to-bottom within a single file. Thus other files accessing `tests` dictionary
 //                     to create tests may access it before it has been constructed.
 //
 //                     This getter prevents this issue entirely.
-static std::unordered_map<const char*, std::vector<const TestInfo*>, CStrHash, CStrEqual>& GetTests(void) {
+static std::unordered_map<const char*, std::vector<TestInfo*>, CStrHash, CStrEqual>& GetTests(void) {
 	// intentionally leaked singleton
-	static std::unordered_map<const char*, std::vector<const TestInfo*>, CStrHash, CStrEqual>* s_tests =
-		new std::unordered_map<const char*, std::vector<const TestInfo*>, CStrHash, CStrEqual>{};
+	static std::unordered_map<const char*, std::vector<TestInfo*>, CStrHash, CStrEqual>* s_tests =
+		new std::unordered_map<const char*, std::vector<TestInfo*>, CStrHash, CStrEqual>{};
 	return *s_tests;
 }
 
-const TestInfo* RegisterTest(const char* roTestGroup, const char* roTestName, const char* roFile, int roLine,
-                             const TestBase* roTestObj) {
-	std::vector<const TestInfo*>& info = GetTests()[roTestGroup];
-	info.emplace_back(new TestInfo(roTestGroup, roTestName, roFile, roLine, roTestObj));
+const TestInfo* RegisterTest(const char* in_testGroup, const char* in_testName, const char* in_file, int in_line,
+                             TestBase* in_testObj) {
+	std::vector<TestInfo*>& info = GetTests()[in_testGroup];
+	info.emplace_back(new TestInfo(in_testGroup, in_testName, in_file, in_line, in_testObj));
 	return info.back();
 }
 
@@ -51,7 +79,7 @@ int RunAllTests() {
 	int totalTestsFailed = 0;
 
 	for (const auto& kv : GetTests()) {
-		const std::vector<const TestInfo*>& units = kv.second;
+		const std::vector<TestInfo*>& units = kv.second;
 
 		int testFailCount = 0;
 
@@ -65,19 +93,17 @@ int RunAllTests() {
 
 			std::cout << info->m_testName;
 
-			internal::g_testFailed = false;
+			TestBase& testObj = *(info->m_testObj);
+			testObj.Init();
 
-			// NOTE(randomuserhi): If a test fails, the timing includes how long it took to write the fail message to output
+			// TODO(randomuserhi): Timing includes how long it took to write to standard output (test case names, fail
+			//                     messages etc...) Ideally should collect messages into a `std::ostream` then print at the
+			//                     end
 			auto start = std::chrono::high_resolution_clock::now();
-			info->m_testObj->TestBody();
+			testObj.TestBody();
 			auto end = std::chrono::high_resolution_clock::now();
 
-			if (internal::g_testFailed == true) {
-				std::cout << "\n";
-				++testFailCount;
-			} else {
-				std::cout << " - ";
-			}
+			std::cout << " - ";
 
 			auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 			if (duration_us.count() < 1000) {
@@ -87,11 +113,15 @@ int RunAllTests() {
 				std::cout << duration_ms.count() << " milliseconds";
 			}
 
-			if (internal::g_testFailed == true) {
-				std::cout << '\n';
+			std::cout << '\n';
+
+			if (testObj.m_out.size() != 0) {
+				std::cout << testObj.m_out;
 			}
 
-			std::cout << '\n';
+			if (testObj.m_failed == true) {
+				++testFailCount;
+			}
 
 			// Teardown test object after running test
 			// NOTE(randomuserhi): Isn't needed as of right now as test lifetime matches program lifetime

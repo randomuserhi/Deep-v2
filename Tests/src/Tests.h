@@ -1,5 +1,9 @@
-#include <iostream> // IWYU pragma: keep
-					// Used by EXPECT_ macros to print results
+#include <iostream> // IWYU pragma: export
+#include <string>
+#include <chrono>
+
+// TODO(randomuserhi): Benchmarking lib to support proper benchmkars (timings are mostly just how long it took to execute the
+//                     test)
 
 #if defined(__clang__)
 #define TEST_COMPILER_CLANG
@@ -124,40 +128,45 @@ TEST_SUPPRESS_WARNINGS
 //
 // Complaining about the argument to TEST_STRINGIFY_ being empty.
 // This is allowed by the spec.
-#define TEST_STRINGIFY_HELPER_(name, ...) #name
+#define TEST_STRINGIFY_HELPER_(in_name, ...) #in_name
 #define TEST_STRINGIFY_(...) TEST_STRINGIFY_HELPER_(__VA_ARGS__, )
 
-#define TEST_CLASSNAME_(group, name) TEST_CLASS_##group##_##name
-#define TEST_CLASSNAME_INFO(group, name) TEST_CLASS_##group##_##name##_INFO
+#define TEST_CLASSNAME_(in_group, in_name) TEST_CLASS_##in_group##_##in_name
+#define TEST_CLASSNAME_INFO(in_group, in_name) TEST_CLASS_##in_group##_##in_name##_INFO
+
+#define TEST_CASENAME_(in_caseName) TEST_CASE_##in_caseName
 
 #define EXPECT_EQ(a, b)                                                                                                     \
 	do {                                                                                                                    \
 		if ((a) != (b)) {                                                                                                   \
-			Test::internal::g_testFailed = true;                                                                            \
-			std::cout << "\n\tEquality between " << #a << " and " << #b << " failed\n\t - " << Test_FILE_                   \
-					  << " (ln: " << Test_LINE_ << ")";                                                                     \
+			this->m_failed = true;                                                                                          \
+			this->m_out += "\n\tEquality between " #a " and " #b                                                            \
+						   " failed\n\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";           \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_NE(a, b)                                                                                                     \
 	do {                                                                                                                    \
 		if ((a) == (b)) {                                                                                                   \
-			Test::internal::g_testFailed = true;                                                                            \
-			std::cout << "\n\tInequality between " << #a << " and " << #b << " failed";                                     \
+			this->m_failed = true;                                                                                          \
+			this->m_out += "\n\tInequality between " #a " and " #b                                                          \
+						   " failed\n\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";           \
 		}                                                                                                                   \
 	} while (0)
 
 #define EXPECT_TRUE(condition)                                                                                              \
 	do {                                                                                                                    \
 		if (!(condition)) {                                                                                                 \
-			Test::internal::g_testFailed = true;                                                                            \
-			std::cout << "\n\tCondition '" << #condition << "' was false, but expected true.";                              \
+			this->m_failed = true;                                                                                          \
+			this->m_out += "\n\tCondition '" #condition "' was false, but expected true\n\t - " TEST_STRINGIFY_(            \
+				Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                                                       \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_FALSE(condition)                                                                                             \
 	do {                                                                                                                    \
 		if ((condition)) {                                                                                                  \
-			Test::internal::g_testFailed = true;                                                                            \
-			std::cout << "\n\tCondition '" << #condition << "' was true, but expected false.";                              \
+			this->m_failed = true;                                                                                          \
+			this->m_out += "\n\tCondition '" #condition "' was true, but expected false\n\t - " TEST_STRINGIFY_(            \
+				Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                                                       \
 		}                                                                                                                   \
 	} while (0)
 
@@ -166,58 +175,77 @@ namespace Test {
 TEST_SUPPRESS_WARNING_PUSH
 TEST_CLANG_SUPPRESS_WARNING("-Wpadded")
 class TestBase {
-protected:
-	virtual ~TestBase();
-
 public:
-	virtual void TestBody() const = 0;
+	virtual void TestBody() = 0;
 
 	TestBase() = default;
 	TestBase(const TestBase&) = delete;
+
+	void Init();
+
+	std::string m_out;
+	bool m_failed = false;
+
+protected:
+	virtual ~TestBase() = default;
 };
 TEST_SUPPRESS_WARNING_POP
 
+class TestCase {
+public:
+	TestCase(const char* in_caseName, TestBase& in_testObj);
+	~TestCase();
+
+	const char* m_caseName;
+	TestBase& m_testObj;
+	bool m_hasRun = false;
+
+private:
+	using TimePoint = decltype(std::chrono::high_resolution_clock::now());
+
+	TimePoint m_start;
+	TimePoint m_end;
+};
+
 struct TestInfo {
 	int m_line;
-	const TestBase* m_testObj;
+	TestBase* m_testObj;
 	const char* m_testGroup;
 	const char* m_testName;
 	const char* m_file;
 
-	inline TestInfo(const char* roTestGroup, const char* roTestName, const char* roFile, int roLine,
-	                const TestBase* roTestObj) :
-		m_line(roLine), m_testObj(roTestObj), m_testGroup(roTestGroup), m_testName(roTestName), m_file(roFile) {}
+	inline TestInfo(const char* in_testGroup, const char* in_testName, const char* in_file, int in_line,
+	                TestBase* in_testObj) :
+		m_line(in_line), m_testObj(in_testObj), m_testGroup(in_testGroup), m_testName(in_testName), m_file(in_file) {}
 };
 
-const TestInfo* RegisterTest(const char* roTestGroup, const char* roTestName, const char* roFile, int roLine,
-                             const TestBase* roTestObj);
-
-namespace internal {
-
-extern bool g_testFailed;
-
-} // namespace internal
+const TestInfo* RegisterTest(const char* in_testGroup, const char* in_testName, const char* in_file, int in_lLine,
+                             TestBase* in_testObj);
 
 int RunAllTests();
 
 } // namespace Test
 
-#define TEST(testGroup, testName)                                                                                           \
-	static_assert(sizeof(TEST_STRINGIFY_(testGroup)) > 1, "Test name must not be empty");                                   \
-	static_assert(sizeof(TEST_STRINGIFY_(testName)) > 1, "Test name must not be empty");                                    \
+#define TEST(in_testGroup, in_testName)                                                                                     \
+	static_assert(sizeof(TEST_STRINGIFY_(in_testGroup)) > 1, "Test name must not be empty");                                \
+	static_assert(sizeof(TEST_STRINGIFY_(in_testName)) > 1, "Test name must not be empty");                                 \
 	TEST_SUPPRESS_WARNING_PUSH                                                                                              \
 	TEST_SUPPRESS_WARNINGS                                                                                                  \
-	class TEST_CLASSNAME_(testGroup, testName) :                                                                            \
+	class TEST_CLASSNAME_(in_testGroup, in_testName) :                                                                      \
 		public Test::TestBase {                                                                                             \
 	public:                                                                                                                 \
-		void TestBody() const final override;                                                                               \
-		TEST_CLASSNAME_(testGroup, testName)() = default;                                                                   \
-		TEST_CLASSNAME_(testGroup, testName)(TEST_CLASSNAME_(testGroup, testName) &) = delete;                              \
-		~TEST_CLASSNAME_(testGroup, testName)() override = default;                                                         \
+		void TestBody() final override;                                                                                     \
+		TEST_CLASSNAME_(in_testGroup, in_testName)() = default;                                                             \
+		TEST_CLASSNAME_(in_testGroup, in_testName)(TEST_CLASSNAME_(in_testGroup, in_testName) &) = delete;                  \
+		~TEST_CLASSNAME_(in_testGroup, in_testName)() override = default;                                                   \
 	};                                                                                                                      \
-	const Test::TestInfo* const TEST_CLASSNAME_INFO(testGroup, testName) =                                                  \
-		Test::RegisterTest(#testGroup, #testName, Test_FILE_, Test_LINE_, new TEST_CLASSNAME_(testGroup, testName)());      \
+	const Test::TestInfo* const TEST_CLASSNAME_INFO(in_testGroup, in_testName) = Test::RegisterTest(                        \
+		#in_testGroup, #in_testName, Test_FILE_, Test_LINE_, new TEST_CLASSNAME_(in_testGroup, in_testName)());             \
 	TEST_SUPPRESS_WARNING_POP                                                                                               \
-	void TEST_CLASSNAME_(testGroup, testName)::TestBody() const
+	void TEST_CLASSNAME_(in_testGroup, in_testName)::TestBody()
+
+#define TEST_CASE(in_caseName)                                                                                              \
+	for (::Test::TestCase TEST_CASENAME_(in_caseName){ #in_caseName, *this }; !TEST_CASENAME_(in_caseName).m_hasRun;        \
+	     TEST_CASENAME_(in_caseName).m_hasRun = true)
 
 TEST_SUPPRESS_WARNING_POP

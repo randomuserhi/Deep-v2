@@ -69,6 +69,9 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
 
 	// TODO(randomuserhi)
+	(void)in_ray;
+	(void)in_sphere;
+	(void)out_hits;
 
 	return false;
 }

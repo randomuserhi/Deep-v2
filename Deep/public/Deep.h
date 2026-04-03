@@ -289,9 +289,9 @@ inline bool AssertFailed(const char* in_expression, const char* in_file, int32 i
 
 DEEP_NAMESPACE_END
 
-#define Deep_Assert(expression, message)                                                                                    \
+#define Deep_Assert(in_expression, in_message)                                                                              \
 	do {                                                                                                                    \
-		if (!(expression) && ::Deep::AssertFailed((#expression), Deep_FILE_, Deep_LINE_, (message))) {                      \
+		if (!(in_expression) && ::Deep::AssertFailed((#in_expression), Deep_FILE_, Deep_LINE_, (in_message))) {             \
 			Deep_Break;                                                                                                     \
 		}                                                                                                                   \
 	} while (false)

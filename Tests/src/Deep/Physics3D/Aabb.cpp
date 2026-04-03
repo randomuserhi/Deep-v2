@@ -137,3 +137,39 @@ TEST(Aabb3D, RaycastHitStartInside) {
 		EXPECT_EQ(hit.m_distance, 0.5f);
 	}
 }
+
+TEST(Aabb3D, GrazingIsOverlapping) {
+	{
+		Deep::Vec3 point{ 0.5f, 0.0f, 0.0f };
+		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+
+		EXPECT_FALSE(Deep::IsOverlapping(point, a));
+	}
+
+	{
+		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+		Deep::Aabb3D b{ .m_center = { 1.0f, 0.0f, 0.0f }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+
+		EXPECT_FALSE(Deep::IsOverlapping(a, b));
+	}
+}
+
+TEST(Aabb3D, GrazingRaycast) {
+	{
+		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+		Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { -1, 0, 0 } };
+		EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
+		EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
+	}
+
+	{
+		Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+		Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { 1, 0, 0 } };
+		EXPECT_FALSE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
+		EXPECT_FALSE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
+	}
+}
+
+TEST(Aabb3D, GrazingRaycastHit) {
+	// TODO(randomuserhi)
+}
