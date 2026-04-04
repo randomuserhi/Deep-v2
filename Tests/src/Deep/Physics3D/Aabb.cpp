@@ -220,6 +220,7 @@ TEST(Aabb3D, Grazing) {
 			EXPECT_EQ(hits[0].m_point.y, 0.0f);
 			EXPECT_EQ(hits[0].m_point.z, 0.0f);
 			EXPECT_EQ(hits[0].m_distance, 0.0f);
+
 			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_left);
 			EXPECT_EQ(hits[1].m_point.x, -0.5f);
 			EXPECT_EQ(hits[1].m_point.y, 0.0f);
@@ -232,6 +233,7 @@ TEST(Aabb3D, Grazing) {
 			EXPECT_EQ(hits[0].m_point.y, 0.0f);
 			EXPECT_EQ(hits[0].m_point.z, 0.0f);
 			EXPECT_EQ(hits[0].m_distance, 0.0f);
+
 			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_left);
 			EXPECT_EQ(hits[1].m_point.x, -0.5f);
 			EXPECT_EQ(hits[1].m_point.y, 0.0f);
