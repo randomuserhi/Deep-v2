@@ -185,8 +185,17 @@ TEST(Aabb3D, Grazing) {
 
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a, hits));
 			EXPECT_EQ(hits->m_normal, Deep::Vec3::k_right);
+			EXPECT_EQ(hits->m_point.x, 0.5f);
+			EXPECT_EQ(hits->m_point.y, 0.0f);
+			EXPECT_EQ(hits->m_point.z, 0.0f);
+			EXPECT_EQ(hits->m_distance, 0.0f);
 
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a, hits));
+			EXPECT_EQ(hits->m_normal, Deep::Vec3::k_right);
+			EXPECT_EQ(hits->m_point.x, 0.5f);
+			EXPECT_EQ(hits->m_point.y, 0.0f);
+			EXPECT_EQ(hits->m_point.z, 0.0f);
+			EXPECT_EQ(hits->m_distance, 0.0f);
 		}
 
 		TEST_CASE(NoHit) {
@@ -200,6 +209,43 @@ TEST(Aabb3D, Grazing) {
 	}
 
 	TEST_CASE(RaycastHitAll) {
-		// TODO(randomuserhi): ...
+		TEST_CASE(ShouldHit) {
+			Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+			Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { -1, 0, 0 } };
+			Deep::RayHit3D hits[2];
+
+			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsOutside>(ray, a, hits), 2);
+			EXPECT_EQ(hits[0].m_normal, Deep::Vec3::k_right);
+			EXPECT_EQ(hits[0].m_point.x, 0.5f);
+			EXPECT_EQ(hits[0].m_point.y, 0.0f);
+			EXPECT_EQ(hits[0].m_point.z, 0.0f);
+			EXPECT_EQ(hits[0].m_distance, 0.0f);
+			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_left);
+			EXPECT_EQ(hits[1].m_point.x, -0.5f);
+			EXPECT_EQ(hits[1].m_point.y, 0.0f);
+			EXPECT_EQ(hits[1].m_point.z, 0.0f);
+			EXPECT_EQ(hits[1].m_distance, 1.0f);
+
+			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsInside>(ray, a, hits), 2);
+			EXPECT_EQ(hits[0].m_normal, Deep::Vec3::k_right);
+			EXPECT_EQ(hits[0].m_point.x, 0.5f);
+			EXPECT_EQ(hits[0].m_point.y, 0.0f);
+			EXPECT_EQ(hits[0].m_point.z, 0.0f);
+			EXPECT_EQ(hits[0].m_distance, 0.0f);
+			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_left);
+			EXPECT_EQ(hits[1].m_point.x, -0.5f);
+			EXPECT_EQ(hits[1].m_point.y, 0.0f);
+			EXPECT_EQ(hits[1].m_point.z, 0.0f);
+			EXPECT_EQ(hits[1].m_distance, 1.0f);
+		}
+
+		TEST_CASE(NoHit) {
+			Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
+			Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { 1, 0, 0 } };
+			Deep::RayHit3D hits[2];
+
+			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsOutside>(ray, a, hits), 0);
+			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsInside>(ray, a, hits), 0);
+		}
 	}
 }

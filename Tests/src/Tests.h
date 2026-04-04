@@ -1,5 +1,5 @@
 #include <iostream> // IWYU pragma: export
-#include <string>
+#include <sstream>
 #include <chrono>
 
 // TODO(randomuserhi): Benchmarking lib to support proper benchmkars (timings are mostly just how long it took to execute the
@@ -136,24 +136,21 @@ TEST_SUPPRESS_WARNINGS
 
 #define TEST_CASENAME_(in_caseName) TEST_CASE_##in_caseName
 
+#define PRINTLN (this->Indent()) << '\t'
 #define EXPECT_EQ(a, b)                                                                                                     \
 	do {                                                                                                                    \
 		if ((a) != (b)) {                                                                                                   \
 			this->m_failed = true;                                                                                          \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\tEquality between " #a " and " #b " failed";                                                  \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
+			PRINTLN << "Equality between " #a " and " #b " failed";                                                         \
+			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_NE(a, b)                                                                                                     \
 	do {                                                                                                                    \
 		if ((a) == (b)) {                                                                                                   \
 			this->m_failed = true;                                                                                          \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\tInequality between " #a " and " #b " failed";                                                \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
+			PRINTLN << "Inequality between " #a " and " #b " failed";                                                       \
+			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
 		}                                                                                                                   \
 	} while (0)
 
@@ -161,20 +158,16 @@ TEST_SUPPRESS_WARNINGS
 	do {                                                                                                                    \
 		if (!(condition)) {                                                                                                 \
 			this->m_failed = true;                                                                                          \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\tCondition '" #condition "' was false, but expected true";                                    \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
+			PRINTLN << "Condition '" #condition "' was false, but expected true";                                           \
+			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_FALSE(condition)                                                                                             \
 	do {                                                                                                                    \
 		if ((condition)) {                                                                                                  \
 			this->m_failed = true;                                                                                          \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\tCondition '" #condition "' was true, but expected false";                                    \
-			this->Indent();                                                                                                 \
-			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
+			PRINTLN << "Condition '" #condition "' was true, but expected false";                                           \
+			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
 		}                                                                                                                   \
 	} while (0)
 
@@ -193,10 +186,11 @@ public:
 	void Init();
 
 	// Writes indentation to the output string based on `m_depth`
-	void Indent(bool in_newLine = true);
+	// Returns the `std::ostringstream` used for writing
+	std::ostringstream& Indent(bool in_newLine = true);
 
-	std::string m_buf;
-	std::string* m_out = &m_buf;
+	std::ostringstream m_buf;
+	std::ostringstream* m_out = &m_buf;
 	size_t m_depth = 1;
 	bool m_failed = false;
 
@@ -216,10 +210,10 @@ public:
 	TestBase& m_testObj;
 
 	// Previous out buffer to write messages to
-	std::string* m_out;
+	std::ostringstream* m_out;
 
 	// Current out buffer messages get written to whilst within this case
-	std::string m_buf;
+	std::ostringstream m_buf;
 
 	bool m_hasRun = false;
 

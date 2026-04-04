@@ -104,7 +104,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 
 	bool outside = tEnter >= 0;
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
-		if (!outside || tEnter > tExit || tExit < 0.0f) return false;
+		if (!outside || tEnter > tExit || tExit <= 0.0f) return false;
 
 		const int32 axis = enterAxis;
 		const float32 distance = tEnter;
@@ -157,7 +157,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	exitAxis = (tmax.z < tExit) ? 2 : exitAxis;
 	tExit = (tmax.z < tExit) ? tmax.z : tExit;
 
-	if (tEnter > tExit || tExit < 0.0f) return 0;
+	if (tEnter > tExit || tExit <= 0.0f) return 0;
 
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
 		if (tEnter < 0.0f) return 0;
@@ -166,7 +166,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	int32 hitCount = 0;
 
 	// Handle entry hit
-	if (tEnter > 0.0f) {
+	if (tEnter >= 0.0f) {
 		float32 distance = tEnter;
 		out_hits[hitCount].m_distance = distance;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;

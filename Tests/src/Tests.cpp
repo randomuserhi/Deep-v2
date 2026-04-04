@@ -1,5 +1,5 @@
 #include "Tests.h"
-#include <string>
+#include <sstream>
 
 TEST_SUPPRESS_WARNINGS_STD_BEGIN
 #include <string_view>
@@ -14,13 +14,14 @@ void TestBase::Init() {
 	m_failed = false;
 }
 
-void TestBase::Indent(bool in_newLine) {
+std::ostringstream& TestBase::Indent(bool in_newLine) {
 	if (in_newLine) {
-		*m_out += "\n";
+		*m_out << "\n";
 	}
 	for (size_t i = 0; i < m_depth; ++i) {
-		*m_out += '\t';
+		*m_out << '\t';
 	}
+	return *m_out;
 }
 
 TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
@@ -31,8 +32,7 @@ TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
 	m_testObj.Indent();
 
 	// Write case name
-	*m_testObj.m_out += '[';
-	*m_testObj.m_out += in_caseName;
+	*m_testObj.m_out << '[' << in_caseName;
 
 	// Swap out write buffer to this test case object's one
 	// All writes that occure will now be under this test case
@@ -51,22 +51,18 @@ TestCase::~TestCase() {
 	--m_testObj.m_depth;
 
 	// Write duration to the test output
-	*m_testObj.m_out += " - ";
+	*m_testObj.m_out << " - ";
 
 	auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(m_end - m_start);
 	if (duration_us.count() < 1000) {
-		*m_testObj.m_out += std::to_string(duration_us.count());
-		*m_testObj.m_out += " microseconds]";
+		*m_testObj.m_out << duration_us.count() << " microseconds]";
 	} else {
 		auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(m_end - m_start);
-		*m_testObj.m_out += std::to_string(duration_ms.count());
-		*m_testObj.m_out += " milliseconds]";
+		*m_testObj.m_out << duration_ms.count() << " milliseconds]";
 	}
 
 	// Write the test case output to test output if there was any
-	if (m_buf.size() != 0) {
-		*m_testObj.m_out += m_buf;
-	}
+	*m_testObj.m_out << m_buf.str();
 }
 
 struct CStrHash {
@@ -141,11 +137,7 @@ int RunAllTests() {
 				std::cout << duration_ms.count() << " milliseconds]";
 			}
 
-			if (testObj.m_out->size() != 0) {
-				std::cout << *testObj.m_out;
-			}
-
-			std::cout << '\n';
+			std::cout << testObj.m_out->str() << '\n';
 
 			if (testObj.m_failed == true) {
 				++testFailCount;
