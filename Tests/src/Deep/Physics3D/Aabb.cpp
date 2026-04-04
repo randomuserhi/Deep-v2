@@ -71,23 +71,16 @@ TEST(Aabb3D, RaycastHit) {
 			Deep::RayHit3D hits[2];
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a, hits));
 			EXPECT_EQ(hits->m_normal, Deep::Vec3::k_left);
-			EXPECT_EQ(hits->m_point.x, -0.5f);
-			EXPECT_EQ(hits->m_point.y, 0.0f);
-			EXPECT_EQ(hits->m_point.z, 0.0f);
-			EXPECT_EQ(hits->m_distance, 0.5f);
+			EXPECT_EQ(hits->m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a, hits));
 			EXPECT_EQ(hits->m_normal, Deep::Vec3::k_left);
-			EXPECT_EQ(hits->m_point.x, -0.5f);
-			EXPECT_EQ(hits->m_point.y, 0.0f);
-			EXPECT_EQ(hits->m_point.z, 0.0f);
+			EXPECT_EQ(hits->m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits->m_distance, 0.5f);
 
 			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsOutside>(ray, a, hits), 2);
 			EXPECT_EQ(hits[0].m_normal, Deep::Vec3::k_left);
-			EXPECT_EQ(hits[0].m_point.x, -0.5f);
-			EXPECT_EQ(hits[0].m_point.y, 0.0f);
-			EXPECT_EQ(hits[0].m_point.z, 0.0f);
+			EXPECT_EQ(hits[0].m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[0].m_distance, 0.5f);
 			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_right);
 			EXPECT_EQ(hits[1].m_point.x, 0.5f);
@@ -97,14 +90,10 @@ TEST(Aabb3D, RaycastHit) {
 
 			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsInside>(ray, a, hits), 2);
 			EXPECT_EQ(hits[0].m_normal, Deep::Vec3::k_left);
-			EXPECT_EQ(hits[0].m_point.x, -0.5f);
-			EXPECT_EQ(hits[0].m_point.y, 0.0f);
-			EXPECT_EQ(hits[0].m_point.z, 0.0f);
+			EXPECT_EQ(hits[0].m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[0].m_distance, 0.5f);
 			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_right);
-			EXPECT_EQ(hits[1].m_point.x, 0.5f);
-			EXPECT_EQ(hits[1].m_point.y, 0.0f);
-			EXPECT_EQ(hits[1].m_point.z, 0.0f);
+			EXPECT_EQ(hits[1].m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[1].m_distance, 1.5f);
 		}
 
@@ -128,18 +117,14 @@ TEST(Aabb3D, RaycastHit) {
 
 		EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a, hits));
 		EXPECT_EQ(hits->m_normal, Deep::Vec3::k_right);
-		EXPECT_EQ(hits->m_point.x, 0.5f);
-		EXPECT_EQ(hits->m_point.y, 0.0f);
-		EXPECT_EQ(hits->m_point.z, 0.0f);
+		EXPECT_EQ(hits->m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 		EXPECT_EQ(hits->m_distance, 0.5f);
 
 		EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsOutside>(ray, a, hits), 0);
 
 		EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsInside>(ray, a, hits), 1);
 		EXPECT_EQ(hits->m_normal, Deep::Vec3::k_right);
-		EXPECT_EQ(hits->m_point.x, 0.5f);
-		EXPECT_EQ(hits->m_point.y, 0.0f);
-		EXPECT_EQ(hits->m_point.z, 0.0f);
+		EXPECT_EQ(hits->m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 		EXPECT_EQ(hits->m_distance, 0.5f);
 	}
 }
@@ -185,16 +170,12 @@ TEST(Aabb3D, Grazing) {
 
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a, hits));
 			EXPECT_EQ(hits->m_normal, Deep::Vec3::k_right);
-			EXPECT_EQ(hits->m_point.x, 0.5f);
-			EXPECT_EQ(hits->m_point.y, 0.0f);
-			EXPECT_EQ(hits->m_point.z, 0.0f);
+			EXPECT_EQ(hits->m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits->m_distance, 0.0f);
 
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a, hits));
 			EXPECT_EQ(hits->m_normal, Deep::Vec3::k_right);
-			EXPECT_EQ(hits->m_point.x, 0.5f);
-			EXPECT_EQ(hits->m_point.y, 0.0f);
-			EXPECT_EQ(hits->m_point.z, 0.0f);
+			EXPECT_EQ(hits->m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits->m_distance, 0.0f);
 		}
 
@@ -216,28 +197,20 @@ TEST(Aabb3D, Grazing) {
 
 			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsOutside>(ray, a, hits), 2);
 			EXPECT_EQ(hits[0].m_normal, Deep::Vec3::k_right);
-			EXPECT_EQ(hits[0].m_point.x, 0.5f);
-			EXPECT_EQ(hits[0].m_point.y, 0.0f);
-			EXPECT_EQ(hits[0].m_point.z, 0.0f);
+			EXPECT_EQ(hits[0].m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[0].m_distance, 0.0f);
 
 			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_left);
-			EXPECT_EQ(hits[1].m_point.x, -0.5f);
-			EXPECT_EQ(hits[1].m_point.y, 0.0f);
-			EXPECT_EQ(hits[1].m_point.z, 0.0f);
+			EXPECT_EQ(hits[1].m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[1].m_distance, 1.0f);
 
 			EXPECT_EQ(Deep::RaycastAll<Deep::RaycastType::e_startsInside>(ray, a, hits), 2);
 			EXPECT_EQ(hits[0].m_normal, Deep::Vec3::k_right);
-			EXPECT_EQ(hits[0].m_point.x, 0.5f);
-			EXPECT_EQ(hits[0].m_point.y, 0.0f);
-			EXPECT_EQ(hits[0].m_point.z, 0.0f);
+			EXPECT_EQ(hits[0].m_point, (Deep::Vec3{ 0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[0].m_distance, 0.0f);
 
 			EXPECT_EQ(hits[1].m_normal, Deep::Vec3::k_left);
-			EXPECT_EQ(hits[1].m_point.x, -0.5f);
-			EXPECT_EQ(hits[1].m_point.y, 0.0f);
-			EXPECT_EQ(hits[1].m_point.z, 0.0f);
+			EXPECT_EQ(hits[1].m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits[1].m_distance, 1.0f);
 		}
 
