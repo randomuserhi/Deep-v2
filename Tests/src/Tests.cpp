@@ -14,11 +14,29 @@ void TestBase::Init() {
 	m_failed = false;
 }
 
-TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
-	m_caseName(in_caseName), m_testObj(in_testObj) {
+void TestBase::Indent(bool in_newLine) {
+	if (in_newLine) {
+		*m_out += "\n";
+	}
+	for (size_t i = 0; i < m_depth; ++i) {
+		*m_out += '\t';
+	}
+}
 
-	m_testObj.m_out += '\t';
-	m_testObj.m_out += in_caseName;
+TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
+	m_caseName{ in_caseName }, m_testObj{ in_testObj }, m_out{ m_testObj.m_out } {
+
+	// Increment depth in test object to display nested cases properly
+	++m_testObj.m_depth;
+	m_testObj.Indent();
+
+	// Write case name
+	*m_testObj.m_out += '[';
+	*m_testObj.m_out += in_caseName;
+
+	// Swap out write buffer to this test case object's one
+	// All writes that occure will now be under this test case
+	m_testObj.m_out = &m_buf;
 
 	m_start = std::chrono::high_resolution_clock::now();
 }
@@ -26,19 +44,29 @@ TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
 TestCase::~TestCase() {
 	m_end = std::chrono::high_resolution_clock::now();
 
-	m_testObj.m_out += " - ";
+	// Restore the write buffer to what it was before entering this test case
+	m_testObj.m_out = m_out;
+
+	// Decrement depth as we exit the test case
+	--m_testObj.m_depth;
+
+	// Write duration to the test output
+	*m_testObj.m_out += " - ";
 
 	auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(m_end - m_start);
 	if (duration_us.count() < 1000) {
-		m_testObj.m_out += std::to_string(duration_us.count());
-		m_testObj.m_out += " microseconds";
+		*m_testObj.m_out += std::to_string(duration_us.count());
+		*m_testObj.m_out += " microseconds]";
 	} else {
 		auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(m_end - m_start);
-		m_testObj.m_out += std::to_string(duration_ms.count());
-		m_testObj.m_out += " milliseconds";
+		*m_testObj.m_out += std::to_string(duration_ms.count());
+		*m_testObj.m_out += " milliseconds]";
 	}
 
-	m_testObj.m_out += '\n';
+	// Write the test case output to test output if there was any
+	if (m_buf.size() != 0) {
+		*m_testObj.m_out += m_buf;
+	}
 }
 
 struct CStrHash {
@@ -83,7 +111,7 @@ int RunAllTests() {
 
 		int testFailCount = 0;
 
-		std::cout << "[" << kv.first << "]\n\n";
+		std::cout << "[" << kv.first << "]\n";
 
 		for (const TestInfo* info : units) {
 			/*if (info.testObj == nullptr) {
@@ -91,7 +119,7 @@ int RunAllTests() {
 			    continue;
 			}*/
 
-			std::cout << info->m_testName;
+			std::cout << "\t[" << info->m_testName;
 
 			TestBase& testObj = *(info->m_testObj);
 			testObj.Init();
@@ -107,17 +135,17 @@ int RunAllTests() {
 
 			auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 			if (duration_us.count() < 1000) {
-				std::cout << duration_us.count() << " microseconds";
+				std::cout << duration_us.count() << " microseconds]";
 			} else {
 				auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-				std::cout << duration_ms.count() << " milliseconds";
+				std::cout << duration_ms.count() << " milliseconds]";
+			}
+
+			if (testObj.m_out->size() != 0) {
+				std::cout << *testObj.m_out;
 			}
 
 			std::cout << '\n';
-
-			if (testObj.m_out.size() != 0) {
-				std::cout << testObj.m_out;
-			}
 
 			if (testObj.m_failed == true) {
 				++testFailCount;

@@ -114,7 +114,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 		out_hit->m_normal = Vec3::k_zero;
 		out_hit->m_normal.m_values[axis] = Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 	} else {
-		if (tEnter > tExit || tExit < 0.0f) return false;
+		if (tEnter > tExit || tExit <= 0.0f) return false;
 
 		const int32 axis = outside ? enterAxis : exitAxis;
 		const float32 distance = outside ? tEnter : tExit;

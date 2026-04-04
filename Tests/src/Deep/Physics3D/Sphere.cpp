@@ -14,14 +14,14 @@
 
 TEST(Sphere, IsOverlapping) {
 	TEST_CASE(Point) {
-		{
+		TEST_CASE(ShouldOverlap) {
 			Deep::Vec3 point{ 0.25f, 0.25f, 0.25f };
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 
 			EXPECT_TRUE(Deep::IsOverlapping(point, a));
 		}
 
-		{
+		TEST_CASE(NoOverlap) {
 			Deep::Vec3 point{ 1.25f, 0.25f, 0.25f };
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 
@@ -30,14 +30,14 @@ TEST(Sphere, IsOverlapping) {
 	}
 
 	TEST_CASE(Sphere) {
-		{
+		TEST_CASE(ShouldOverlap) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Sphere b{ .m_center = { 0.25f, 0.25f, 0.25f }, .m_radius = 0.5f };
 
 			EXPECT_TRUE(Deep::IsOverlapping(a, b));
 		}
 
-		{
+		TEST_CASE(NoOverlap) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Sphere b{ .m_center = { 1.0f, 1.0f, 1.0f }, .m_radius = 0.5f };
 
@@ -48,14 +48,14 @@ TEST(Sphere, IsOverlapping) {
 
 TEST(Sphere, Raycast) {
 	TEST_CASE(Outside) {
-		{
+		TEST_CASE(ShouldHit) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Ray3D ray{ .m_origin = { -1, 0, 0 }, .m_direction = { 1, 0, 0 } };
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
 		}
 
-		{
+		TEST_CASE(NoHit) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Ray3D ray{ .m_origin = { -1, 0, 0 }, .m_direction = { -1, 0, 0 } };
 			EXPECT_FALSE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
@@ -64,25 +64,23 @@ TEST(Sphere, Raycast) {
 	}
 
 	TEST_CASE(Inside) {
-		{
-			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
-			Deep::Ray3D ray{ .m_origin = { 0, 0, 0 }, .m_direction = { 1, 0, 0 } };
-			EXPECT_FALSE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
-			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
-		}
+		Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
+		Deep::Ray3D ray{ .m_origin = { 0, 0, 0 }, .m_direction = { 1, 0, 0 } };
+		EXPECT_FALSE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
+		EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
 	}
 }
 
 TEST(Sphere, Grazing) {
 	TEST_CASE(IsOverlapping) {
-		{
+		TEST_CASE(Point) {
 			Deep::Vec3 point{ 0.5f, 0.0f, 0.0f };
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 
 			EXPECT_FALSE(Deep::IsOverlapping(point, a));
 		}
 
-		{
+		TEST_CASE(Sphere) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Sphere b{ .m_center = { 1.0f, 0.0f, 0.0f }, .m_radius = 0.5f };
 
@@ -91,14 +89,14 @@ TEST(Sphere, Grazing) {
 	}
 
 	TEST_CASE(Raycast) {
-		{
+		TEST_CASE(ShouldHit) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { -1, 0, 0 } };
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
 		}
 
-		{
+		TEST_CASE(NoHit) {
 			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
 			Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { 1, 0, 0 } };
 			EXPECT_FALSE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));

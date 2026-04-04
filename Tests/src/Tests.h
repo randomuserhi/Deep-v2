@@ -140,16 +140,20 @@ TEST_SUPPRESS_WARNINGS
 	do {                                                                                                                    \
 		if ((a) != (b)) {                                                                                                   \
 			this->m_failed = true;                                                                                          \
-			this->m_out += "\n\tEquality between " #a " and " #b                                                            \
-						   " failed\n\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";           \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\tEquality between " #a " and " #b " failed";                                                  \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_NE(a, b)                                                                                                     \
 	do {                                                                                                                    \
 		if ((a) == (b)) {                                                                                                   \
 			this->m_failed = true;                                                                                          \
-			this->m_out += "\n\tInequality between " #a " and " #b                                                          \
-						   " failed\n\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";           \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\tInequality between " #a " and " #b " failed";                                                \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
 		}                                                                                                                   \
 	} while (0)
 
@@ -157,16 +161,20 @@ TEST_SUPPRESS_WARNINGS
 	do {                                                                                                                    \
 		if (!(condition)) {                                                                                                 \
 			this->m_failed = true;                                                                                          \
-			this->m_out += "\n\tCondition '" #condition "' was false, but expected true\n\t - " TEST_STRINGIFY_(            \
-				Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                                                       \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\tCondition '" #condition "' was false, but expected true";                                    \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_FALSE(condition)                                                                                             \
 	do {                                                                                                                    \
 		if ((condition)) {                                                                                                  \
 			this->m_failed = true;                                                                                          \
-			this->m_out += "\n\tCondition '" #condition "' was true, but expected false\n\t - " TEST_STRINGIFY_(            \
-				Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                                                       \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\tCondition '" #condition "' was true, but expected false";                                    \
+			this->Indent();                                                                                                 \
+			*this->m_out += "\t - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                   \
 		}                                                                                                                   \
 	} while (0)
 
@@ -181,9 +189,15 @@ public:
 	TestBase() = default;
 	TestBase(const TestBase&) = delete;
 
+	// Initializes the test
 	void Init();
 
-	std::string m_out;
+	// Writes indentation to the output string based on `m_depth`
+	void Indent(bool in_newLine = true);
+
+	std::string m_buf;
+	std::string* m_out = &m_buf;
+	size_t m_depth = 1;
 	bool m_failed = false;
 
 protected:
@@ -197,7 +211,16 @@ public:
 	~TestCase();
 
 	const char* m_caseName;
+
+	// Owning Test Object
 	TestBase& m_testObj;
+
+	// Previous out buffer to write messages to
+	std::string* m_out;
+
+	// Current out buffer messages get written to whilst within this case
+	std::string m_buf;
+
 	bool m_hasRun = false;
 
 private:
