@@ -28,4 +28,22 @@ using Arg_Quat = const Quat;
 struct Mat4;
 using Arg_Mat4 = const Mat4&;
 
+struct Int2;
+using Arg_Int2 = const Int2;
+
+struct Float2;
+using Arg_Float2 = const Float2;
+
+struct Int3;
+using Arg_Int3 = const Int3;
+
+struct Float3;
+using Arg_Float3 = const Float3;
+
+struct Int4;
+using Arg_Int4 = const Int4;
+
+struct Float4;
+using Arg_Float4 = const Float4;
+
 DEEP_NAMESPACE_END

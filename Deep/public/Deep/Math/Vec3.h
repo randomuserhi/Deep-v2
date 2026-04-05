@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Math/VecArgs.h"
+#include "Deep/Math/VecArgs.h" // IWYU pragma: export
 #include "Deep/Math/Xmm.h"
 
 #include <type_traits>

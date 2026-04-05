@@ -6,7 +6,7 @@
 DEEP_NAMESPACE_BEGIN
 
 PacketReader::PacketReader(const uint8* in_data) :
-	m_head(in_data), m_data(in_data) {}
+	m_head{ in_data }, m_data{ in_data } {}
 
 uint8 PacketReader::ReadUInt8() {
 	uint8 value = *m_head;

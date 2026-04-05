@@ -7,23 +7,18 @@
 
 DEEP_NAMESPACE_BEGIN
 
-#ifdef DEEP_USE_SSE4_1
 Vec4::Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
-	xmm(in_x, in_y, in_z, in_w) {}
-#else
-Vec4::Vec4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
-	x(in_x), y(in_y), z(in_z), w(in_w) {}
-#endif
+	xmm{ in_x, in_y, in_z, in_w } {}
 
 Vec4::Vec4(Xmm in_xmm) :
-	xmm(in_xmm) {}
+	xmm{ in_xmm } {}
 
 #ifdef DEEP_USE_SSE4_1
 Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
-	xmm(_mm_blend_ps(in_xyz.xmm, _mm_set1_ps(in_w), 8)) {}
+	xmm{ _mm_blend_ps(in_xyz.xmm, _mm_set1_ps(in_w), 8) } {}
 #else
 Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
-	x(in_xyz.x), y(in_xyz.y), z(in_xyz.z), w(in_w) {}
+	x{ in_xyz.x }, y{ in_xyz.y }, z{ in_xyz.z }, w{ in_w } {}
 #endif
 
 Vec4& Vec4::Normalize() {

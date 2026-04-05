@@ -6,29 +6,14 @@
 
 DEEP_NAMESPACE_BEGIN
 
-#ifdef DEEP_USE_SSE4_1
 Vec3i::Vec3i(int32 in_x, int32 in_y, int32 in_z) :
-	xmmi(in_x, in_y, in_z, in_z) {}
-#else
-Vec3i::Vec3i(int32 in_x, int32 in_y, int32 in_z) :
-	x(in_x), y(in_y), z(in_z) {}
-#endif
+	xmmi{ in_x, in_y, in_z, in_z } {}
 
-#ifdef DEEP_USE_SSE4_1
 Vec3i::Vec3i(Arg_Vec4i in_vec) :
-	xmmi(in_vec.xmmi) {}
-#else
-Vec3i::Vec3i(Arg_Vec4i in_vec) :
-	x(in_vec.x), y(in_vec.y), z(in_vec.z) {}
-#endif
+	xmmi{ in_vec.xmmi } {}
 
-#ifdef DEEP_USE_SSE4_1
 Vec3i::Vec3i(Xmmi in_xmmi) :
 	xmmi(in_xmmi) {}
-#else
-Vec3i::Vec3i(Xmmi in_xmmi) :
-	x(in_xmmi.x), y(in_xmmi.y), z(in_xmmi.z) {}
-#endif
 
 float32 Vec3i::sqrdMagnitude() const {
 	return static_cast<Vec3>(*this).sqrdMagnitude();

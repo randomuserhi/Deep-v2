@@ -5,23 +5,18 @@
 
 DEEP_NAMESPACE_BEGIN
 
-#ifdef DEEP_USE_SSE4_1
 Vec4i::Vec4i(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
-	xmmi(in_x, in_y, in_z, in_w) {}
-#else
-Vec4i::Vec4i(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
-	x(in_x), y(in_y), z(in_z), w(in_w) {}
-#endif
+	xmmi{ in_x, in_y, in_z, in_w } {}
 
 Vec4i::Vec4i(Xmmi in_xmmi) :
-	xmmi(in_xmmi) {}
+	xmmi{ in_xmmi } {}
 
 #ifdef DEEP_USE_SSE4_1
 Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
-	xmmi(_mm_blend_epi32(in_xyz.xmmi, _mm_set1_epi32(in_w), 8)) {}
+	xmmi{ _mm_blend_epi32(in_xyz.xmmi, _mm_set1_epi32(in_w), 8) } {}
 #else
 Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
-	x(in_xyz.x), y(in_xyz.y), z(in_xyz.z), w(in_w) {}
+	x{ in_xyz.x }, y{ in_xyz.y }, z{ in_xyz.z }, w{ in_w } {}
 #endif
 
 float32 Vec4i::sqrdMagnitude() const {

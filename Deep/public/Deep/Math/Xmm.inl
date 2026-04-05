@@ -10,16 +10,14 @@
 
 DEEP_NAMESPACE_BEGIN
 
-Xmm::Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_set_ps(in_w, in_z, in_y, in_x);
+Xmm::Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
+	_internal{ _mm_set_ps(in_w, in_z, in_y, in_x) } {}
 #else
-	x = in_x;
-	y = in_y;
-	z = in_z;
-	w = in_w;
+Xmm::Xmm(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
+	x{ in_x }, y{ in_y }, z{ in_z }, w{ in_w } {}
 #endif
-}
+
 constexpr Xmm::Xmm(Type in_internal) :
 	_internal(in_internal) {}
 
