@@ -112,6 +112,9 @@ Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
 
 float32 Mat4::determinant() const {
 #ifdef DEEP_USE_SSE
+	// TODO(randomuserhi): Optimize, there may be a lot of unnecessary calculations here
+	//                     as its stripped straight from Mat4::Inverse()
+
 	// Algorithm from: http://download.intel.com/design/PentiumIII/sml/24504301.pdf
 	// Mirror: https://peertje.daanberg.net/drivers/intel/download.intel.com/design/PentiumIII/sml/24504301.pdf
 	// Streaming SIMD Extensions - Inverse of 4x4 Matrix

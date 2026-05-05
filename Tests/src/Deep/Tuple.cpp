@@ -2,7 +2,6 @@
 
 #include "Deep.h"
 #include "Deep/Memory.h"
-#include <cstddef>
 #include "Deep/Tuple.h"
 
 TEST(Tuple, Primitives) {
