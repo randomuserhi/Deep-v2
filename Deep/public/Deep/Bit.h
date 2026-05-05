@@ -41,10 +41,8 @@ constexpr inline Container* ContainerOf(Member* in_memberAddr, Member Container:
 }
 
 // Returns true on a system that uses BigEndian
-inline bool IsBigEndian() {
-	uint32 x = 1;
-	uint8* c = reinterpret_cast<uint8*>(&x);
-	return static_cast<uint8>(*c) == 0; // 0 if big endian, 1 if little endian
+constexpr inline bool IsBigEndian() {
+	return std::endian::native == std::endian::big;
 }
 
 // Check if value is a power of 2
@@ -146,55 +144,105 @@ inline float16 FloatToHalf(const float32 in_value) { // IEEE-754 16-bit floating
 }
 
 // Host to Network conversion methods
+// NOTE(randomuserhi) This uses little endian as the network byte order as majority of x86 systems
+//                    use little endian.
 
 inline uint16 hton(const uint16 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline uint32 hton(const uint32 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline uint64 hton(const uint64 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline int16 hton(const int16 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline int32 hton(const int32 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline int64 hton(const int64 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 // Network to Host conversion methods
 
 inline uint16 ntoh(const uint16 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline uint32 ntoh(const uint32 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline uint64 ntoh(const uint64 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline int16 ntoh(const int16 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline int32 ntoh(const int32 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 inline int64 ntoh(const int64 in_value) {
-	return !IsBigEndian() ? in_value : ReverseEndianness(in_value);
+	if constexpr (IsBigEndian()) {
+		return ReverseEndianness(in_value);
+	} else {
+		return in_value;
+	}
 }
 
 DEEP_NAMESPACE_END
