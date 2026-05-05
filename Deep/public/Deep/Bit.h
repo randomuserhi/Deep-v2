@@ -28,9 +28,9 @@ constexpr inline To BitCast(const From& in_value) {
 //
 // A obj = {};
 // int* objA = &obj.m_b;
-// A* fromMember = ContainerOf(objA, &A::m_a);
+// A* objFromMember = ContainerOf(objA, &A::m_a);
 //
-// assert(&obj == fromMember);
+// Deep_Assert(&obj == objFromMember);
 //
 template<typename Container, typename Member>
 constexpr inline Container* ContainerOf(Member* in_memberAddr, Member Container::* in_memberPtr) noexcept {
@@ -40,6 +40,7 @@ constexpr inline Container* ContainerOf(Member* in_memberAddr, Member Container:
 	return reinterpret_cast<Container*>(memberAddr - base);
 }
 
+// Returns true on a system that uses BigEndian
 inline bool IsBigEndian() {
 	uint32 x = 1;
 	uint8* c = reinterpret_cast<uint8*>(&x);
