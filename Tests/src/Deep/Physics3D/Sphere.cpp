@@ -90,10 +90,19 @@ TEST(Sphere, Grazing) {
 
 	TEST_CASE(Raycast) {
 		TEST_CASE(ShouldHit) {
-			Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
-			Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { -1, 0, 0 } };
-			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
-			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
+			TEST_CASE(OnEdge) {
+				Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
+				Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0 }, .m_direction = { -1, 0, 0 } };
+				EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
+				EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
+			}
+
+			TEST_CASE(WithEdge) {
+				Deep::Sphere a{ .m_center = { 0, 0, 0 }, .m_radius = 0.5f };
+				Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0.5f }, .m_direction = { -1, 0, 0 } };
+				EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
+				EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
+			}
 		}
 
 		TEST_CASE(NoHit) {
