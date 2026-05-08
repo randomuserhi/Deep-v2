@@ -22,3 +22,9 @@
 #include "Deep/Math/Vec4i.h"     // IWYU pragma: export
 #include "Deep/Math/Quat.h"      // IWYU pragma: export
 #include "Deep/Math/Mat4.h"      // IWYU pragma: export
+#include "Deep/Math/Float2.h"    // IWYU pragma: export
+#include "Deep/Math/Float3.h"    // IWYU pragma: export
+#include "Deep/Math/Float4.h"    // IWYU pragma: export
+#include "Deep/Math/Int2.h"      // IWYU pragma: export
+#include "Deep/Math/Int3.h"      // IWYU pragma: export
+#include "Deep/Math/Int4.h"      // IWYU pragma: export

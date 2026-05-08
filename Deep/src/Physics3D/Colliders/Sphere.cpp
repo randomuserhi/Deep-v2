@@ -26,10 +26,10 @@ int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out
 	float32 distance = Sqrt(distanceSqrd);
 
 	if (distance > k_absTolerance) {
-		contactInfo.m_normal = delta / distance;
+		contactInfo.normal4() = delta / distance;
 	} else {
 		// Arbitrary normal if centers coincide
-		contactInfo.m_normal = Vec3::k_up;
+		contactInfo.normal4() = Vec3::k_up;
 	}
 
 	contactInfo.m_penetrationDistance = radiusSum - distance;
@@ -112,7 +112,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 		if (distance > 0.0f) {
 			float32 t = -dot - discriminant;
 			out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * t;
-			out_hits[hitCount].m_normal =
+			out_hits[hitCount].normal4() =
 				(out_hits[hitCount].m_point - in_sphere.m_center) * invRadius; // normalize via division
 			++hitCount;
 		}
@@ -126,7 +126,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 	{
 		float32 t = -dot + discriminant;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * t;
-		out_hits[hitCount].m_normal =
+		out_hits[hitCount].normal4() =
 			(out_hits[hitCount].m_point - in_sphere.m_center) * invRadius; // normalize via division
 		++hitCount;
 	}
