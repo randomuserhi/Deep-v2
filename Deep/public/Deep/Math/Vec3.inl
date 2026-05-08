@@ -251,4 +251,8 @@ Vec3 operator/(float32 in_val, Arg_Vec3 in_vec) {
 #endif
 }
 
+std::ostream& operator<<(std::ostream& in_os, const Vec3& in_vec) {
+	return in_os << "{ " << in_vec.x << ", " << in_vec.y << ", " << in_vec.z << " }";
+}
+
 DEEP_NAMESPACE_END

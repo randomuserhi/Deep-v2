@@ -5,6 +5,7 @@
 #include "Deep/Math/Xmm.h"
 
 #include <type_traits>
+#include <ostream>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -91,6 +92,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec4 {
 
 static_assert(std::is_trivial<Vec4>(), "Is supposed to be a trivial type!");
 static_assert(std::is_standard_layout<Vec4>(), "Is supposed to be standard layout!");
+
+inline std::ostream& operator<<(std::ostream& in_os, const Vec4& in_vec);
 
 DEEP_NAMESPACE_END
 

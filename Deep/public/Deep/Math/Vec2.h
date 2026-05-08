@@ -4,6 +4,7 @@
 #include "Deep/Math/VecArgs.h" // IWYU pragma: export
 
 #include <type_traits>
+#include <ostream>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -97,6 +98,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(int64) Vec2 {
 
 static_assert(std::is_trivial<Vec2>(), "Is supposed to be a trivial type!");
 static_assert(std::is_standard_layout<Vec2>(), "Is supposed to be standard layout!");
+
+inline std::ostream& operator<<(std::ostream& in_os, const Vec2& in_vec);
 
 DEEP_NAMESPACE_END
 

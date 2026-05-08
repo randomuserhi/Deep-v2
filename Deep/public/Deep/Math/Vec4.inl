@@ -165,4 +165,8 @@ Vec4 operator/(float32 in_val, Arg_Vec4 in_vec) {
 	return result;
 }
 
+std::ostream& operator<<(std::ostream& in_os, const Vec4& in_vec) {
+	return in_os << "{ " << in_vec.x << ", " << in_vec.y << ", " << in_vec.z << ", " << in_vec.w << " }";
+}
+
 DEEP_NAMESPACE_END

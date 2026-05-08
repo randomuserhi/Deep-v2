@@ -323,5 +323,3 @@ int RunAllTests();
 	     TEST_CASENAME_(in_caseName).m_hasRun = true)
 
 TEST_SUPPRESS_WARNING_POP
-
-#include "ostream.h" // IWYU pragma: export

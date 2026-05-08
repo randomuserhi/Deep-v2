@@ -144,4 +144,8 @@ Vec2 operator/(float32 in_val, Arg_Vec2 in_vec) {
 	return Vec2{ in_val / in_vec.x, in_val / in_vec.y };
 }
 
+std::ostream& operator<<(std::ostream& in_os, const Vec2& in_vec) {
+	return in_os << "{ " << in_vec.x << ", " << in_vec.y << " }";
+}
+
 DEEP_NAMESPACE_END
