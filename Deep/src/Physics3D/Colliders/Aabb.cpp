@@ -64,8 +64,13 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	Xmm tmin = Xmm::Min(t1.xmm, t2.xmm);
 	Xmm tmax = Xmm::Max(t1.xmm, t2.xmm);
 
-	float32 tEnter = Max(Max(tmin.x, tmin.y), tmin.z);
-	float32 tExit = Min(Min(tmax.x, tmax.y), tmax.z);
+	// NOTE(randomuserhi): Order of max/min comparisons matches that of Raycast(Arg_Ray3D, Arg_Aabb3D, RayHit3D*)
+	//                     This is necessary to keep behaviour of nan and inf values consistent.
+	//
+	//                     Refer to Deep::Max and Deep::Min, which follow Intel Instruction convention where if either
+	//                     values are nan/inf, the second provided value is defaulted to as the result.
+	float32 tEnter = Max(tmin.z, Max(tmin.y, tmin.x));
+	float32 tExit = Min(tmax.z, Min(tmax.y, tmax.x));
 
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
 		if (tEnter < 0.0f) return false;
@@ -91,6 +96,12 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 
 	Xmm tmin = Xmm::Min(t1.xmm, t2.xmm);
 	Xmm tmax = Xmm::Max(t1.xmm, t2.xmm);
+
+	// NOTE(randomuserhi): Order of max/min comparisons matches that of Raycast(Arg_Ray3D, Arg_Aabb3D)
+	//                     This is necessary to keep behaviour of nan and inf values consistent.
+	//
+	//                     Refer to Deep::Max and Deep::Min, which follow Intel Instruction convention where if either
+	//                     values are nan/inf, the second provided value is defaulted to as the result.
 
 	int32 enterAxis = (tmin.y > tmin.x) ? 1 : 0;
 	float32 tEnter = (tmin.y > tmin.x) ? tmin.y : tmin.x;
@@ -146,6 +157,12 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 
 	Xmm tmin = Xmm::Min(t1.xmm, t2.xmm);
 	Xmm tmax = Xmm::Max(t1.xmm, t2.xmm);
+
+	// NOTE(randomuserhi): Order of max/min comparisons matches that of Raycast(Arg_Ray3D, Arg_Aabb3D)
+	//                     This is necessary to keep behaviour of nan and inf values consistent.
+	//
+	//                     Refer to Deep::Max and Deep::Min, which follow Intel Instruction convention where if either
+	//                     values are nan/inf, the second provided value is defaulted to as the result.
 
 	int32 enterAxis = (tmin.y > tmin.x) ? 1 : 0;
 	float32 tEnter = (tmin.y > tmin.x) ? tmin.y : tmin.x;

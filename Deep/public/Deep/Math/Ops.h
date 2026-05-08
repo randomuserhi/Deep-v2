@@ -13,12 +13,18 @@ DEEP_NAMESPACE_BEGIN
 
 template<typename T>
 inline constexpr const T& Min(const T& in_a, const T& in_b) {
-	return (in_b < in_a) ? in_b : in_a;
+	// NOTE(randomuserhi): Matches MIN(SRC1, SRC2) from Intel's Instruction Set Reference, A-Z
+	//                     https://cdrdv2-public.intel.com/782156/325383-sdm-vol-2abcd.pdf
+	//                     This is important in regards to keeping SSE and Non-SSE operations consistent.
+	return (in_a < in_b) ? in_a : in_b;
 }
 
 template<typename T>
 inline constexpr const T& Max(const T& in_a, const T& in_b) {
-	return (in_b > in_a) ? in_b : in_a;
+	// NOTE(randomuserhi): Matches MAX(SRC1, SRC2) from Intel's Instruction Set Reference, A-Z
+	//                     https://cdrdv2-public.intel.com/782156/325383-sdm-vol-2abcd.pdf
+	//                     This is important in regards to keeping SSE and Non-SSE operations consistent.
+	return (in_a > in_b) ? in_a : in_b;
 }
 
 template<typename T>

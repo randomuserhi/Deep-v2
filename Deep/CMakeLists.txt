@@ -192,8 +192,10 @@ elseif (CLANG)
 		)
 
 	# Optionally generate debug symbols
+	message(STATUS "${MESSAGE_PREFIX} GENERATE_DEBUG_SYMBOLS: ${GENERATE_DEBUG_SYMBOLS}")
 	if (GENERATE_DEBUG_SYMBOLS)
-		target_compile_options(Deep PRIVATE -g)
+		target_compile_options(Deep PRIVATE -g -gcodeview)
+		target_link_options(Deep PRIVATE -fuse-ld=lld -Wl,/debug)
 	endif()
 
 	# Disable RTTI

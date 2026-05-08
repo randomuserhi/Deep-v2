@@ -164,8 +164,10 @@ elseif (CLANG)
 	endif()
 
 	# Optionally generate debug symbols
+	message(STATUS "${MESSAGE_PREFIX} GENERATE_DEBUG_SYMBOLS: ${GENERATE_DEBUG_SYMBOLS}")
 	if (GENERATE_DEBUG_SYMBOLS)
-		target_compile_options(Tests PRIVATE -g)
+		target_compile_options(Tests PRIVATE -g -gcodeview)
+		target_link_options(Tests PRIVATE -fuse-ld=lld -Wl,/debug)
 	endif()
 
 	# Enable/Disable exceptions

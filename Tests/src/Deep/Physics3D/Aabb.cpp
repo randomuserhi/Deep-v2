@@ -157,7 +157,7 @@ TEST(Aabb3D, Grazing) {
 
 			TEST_CASE(WithEdge) {
 				Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
-				Deep::Ray3D ray{ .m_origin = { 0.5f, 0, 0.5f }, .m_direction = { -1, 0, 0 } };
+				Deep::Ray3D ray{ .m_origin = { 1.0f, 0, 0.5f }, .m_direction = { -1, 0, 0 } };
 				EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsOutside>(ray, a));
 				EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a));
 			}
@@ -189,7 +189,7 @@ TEST(Aabb3D, Grazing) {
 				EXPECT_EQ(hits->m_distance, 0.0f);
 			}
 
-			TEST_CASE(WidthEdge) {
+			TEST_CASE(WithEdge) {
 				Deep::Aabb3D a{ .m_center = { 0, 0, 0 }, .m_extents = { 0.5f, 0.5f, 0.5f } };
 				Deep::Ray3D ray{ .m_origin = { 1.0f, 0, 0.5f }, .m_direction = { -1, 0, 0 } };
 				Deep::RayHit3D hits[2];
