@@ -1,6 +1,9 @@
 #include <iostream> // IWYU pragma: export
+#include <ostream>
 #include <sstream>
 #include <chrono>
+#include <utility>
+#include <type_traits>
 
 // TODO(randomuserhi): Benchmarking lib to support proper benchmkars (timings are mostly just how long it took to execute the
 //                     test)
@@ -136,21 +139,54 @@ TEST_SUPPRESS_WARNINGS
 
 #define TEST_CASENAME_(in_caseName) TEST_CASE_##in_caseName
 
+#define PRINT (*this->m_out)
 #define PRINTLN (this->Indent()) << '\t'
 #define EXPECT_EQ(a, b)                                                                                                     \
 	do {                                                                                                                    \
-		if ((a) != (b)) {                                                                                                   \
+		auto&& _a = (a);                                                                                                    \
+		auto&& _b = (b);                                                                                                    \
+		if (!Test::Equality(_a, _b)) {                                                                                      \
 			this->m_failed = true;                                                                                          \
 			PRINTLN << "Equality between " #a " and " #b " failed";                                                         \
 			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
+			if constexpr (Test::OstreamWritable<decltype(_a)>) {                                                            \
+				PRINT << "\n";                                                                                              \
+				PRINTLN << "   " #a " = \n";                                                                                \
+				PRINTLN << "\t";                                                                                            \
+				Test::PrintValueIfPossible(PRINT, _a);                                                                      \
+				PRINT << "\n";                                                                                              \
+			}                                                                                                               \
+			if constexpr (Test::OstreamWritable<decltype(_b)>) {                                                            \
+				PRINT << "\n";                                                                                              \
+				PRINTLN << "   " #b " = \n";                                                                                \
+				PRINTLN << "\t";                                                                                            \
+				Test::PrintValueIfPossible(PRINT, _b);                                                                      \
+				PRINT << "\n";                                                                                              \
+			}                                                                                                               \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_NE(a, b)                                                                                                     \
 	do {                                                                                                                    \
-		if ((a) == (b)) {                                                                                                   \
+		auto&& _a = (a);                                                                                                    \
+		auto&& _b = (b);                                                                                                    \
+		if (Test::Equality(_a, _b)) {                                                                                       \
 			this->m_failed = true;                                                                                          \
 			PRINTLN << "Inequality between " #a " and " #b " failed";                                                       \
 			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
+			if constexpr (Test::OstreamWritable<decltype(_a)>) {                                                            \
+				PRINT << "\n";                                                                                              \
+				PRINTLN << "   " #a " = \n";                                                                                \
+				PRINTLN << "\t";                                                                                            \
+				Test::PrintValueIfPossible(PRINT, _a);                                                                      \
+				PRINT << "\n";                                                                                              \
+			}                                                                                                               \
+			if constexpr (Test::OstreamWritable<decltype(_b)>) {                                                            \
+				PRINT << "\n";                                                                                              \
+				PRINTLN << "   " #b " = \n";                                                                                \
+				PRINTLN << "\t";                                                                                            \
+				Test::PrintValueIfPossible(PRINT, _b);                                                                      \
+				PRINT << "\n";                                                                                              \
+			}                                                                                                               \
 		}                                                                                                                   \
 	} while (0)
 
@@ -172,6 +208,27 @@ TEST_SUPPRESS_WARNINGS
 	} while (0)
 
 namespace Test {
+
+template<typename T>
+concept OstreamWritable = requires(std::ostream& in_os, const T& in_value) {
+	{ in_os << in_value } -> std::same_as<std::ostream&>;
+};
+
+template<typename T>
+void PrintValueIfPossible(std::ostream& in_os, const T& in_value) {
+	if constexpr (OstreamWritable<T>) {
+		in_os << in_value;
+	}
+}
+
+template<typename A, typename B>
+constexpr bool Equality(const A& a, const B& b) {
+	if constexpr (std::is_integral_v<A> && std::is_integral_v<B>) {
+		return std::cmp_equal(a, b); // Handles signed/unsigned safely
+	} else {
+		return a == b;
+	}
+}
 
 TEST_SUPPRESS_WARNING_PUSH
 TEST_CLANG_SUPPRESS_WARNING("-Wpadded")
@@ -266,3 +323,5 @@ int RunAllTests();
 	     TEST_CASENAME_(in_caseName).m_hasRun = true)
 
 TEST_SUPPRESS_WARNING_POP
+
+#include "ostream.h" // IWYU pragma: export
