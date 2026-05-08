@@ -26,6 +26,7 @@ struct RayHit3D {
 
 	// Returns `m_normal` and `m_distance` as a packed Vec3
 	inline Vec3& normal4();
+	inline const Vec3& normal4() const;
 };
 
 using Arg_RayHit3D = const RayHit3D&;
