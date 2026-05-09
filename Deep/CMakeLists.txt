@@ -194,8 +194,19 @@ elseif (CLANG)
 	# Optionally generate debug symbols
 	message(STATUS "${MESSAGE_PREFIX} GENERATE_DEBUG_SYMBOLS: ${GENERATE_DEBUG_SYMBOLS}")
 	if (GENERATE_DEBUG_SYMBOLS)
-		target_compile_options(Deep PRIVATE -g -gcodeview)
-		target_link_options(Deep PRIVATE -fuse-ld=lld -Wl,/debug)
+		target_compile_options(Deep PRIVATE -g)
+
+		# Generate pdb files for windows debugging
+		if (WIN32)
+			include(CheckLinkerFlag)
+			check_linker_flag(CXX "-fuse-ld=lld" HAS_LLD)
+			if(HAS_LLD)
+				target_compile_options(Deep PRIVATE -gcodeview)
+				target_link_options(Deep PRIVATE -fuse-ld=lld -Wl,/debug)
+			else()
+				message(WARNING "lld not available, skipping PDB generation.")
+			endif()
+		endif()
 	endif()
 
 	# Disable RTTI
