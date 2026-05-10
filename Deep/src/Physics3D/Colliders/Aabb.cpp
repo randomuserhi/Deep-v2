@@ -69,6 +69,10 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	//
 	//                     Refer to Deep::Max and Deep::Min, which follow Intel Instruction convention where if either
 	//                     values are nan/inf, the second provided value is defaulted to as the result.
+	//
+	// TODO(randomuserhi): Modify the algorithm to be robust across architectures - currently relies on Intel Instruction
+	//                     convention which is not reliable for ARM Neon
+
 	float32 tEnter = Max(tmin.z, Max(tmin.y, tmin.x));
 	float32 tExit = Min(tmax.z, Min(tmax.y, tmax.x));
 
@@ -102,6 +106,9 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 	//
 	//                     Refer to Deep::Max and Deep::Min, which follow Intel Instruction convention where if either
 	//                     values are nan/inf, the second provided value is defaulted to as the result.
+	//
+	// TODO(randomuserhi): Modify the algorithm to be robust across architectures - currently relies on Intel Instruction
+	//                     convention which is not reliable for ARM Neon
 
 	int32 enterAxis = (tmin.y > tmin.x) ? 1 : 0;
 	float32 tEnter = (tmin.y > tmin.x) ? tmin.y : tmin.x;
@@ -163,6 +170,9 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	//
 	//                     Refer to Deep::Max and Deep::Min, which follow Intel Instruction convention where if either
 	//                     values are nan/inf, the second provided value is defaulted to as the result.
+	//
+	// TODO(randomuserhi): Modify the algorithm to be robust across architectures - currently relies on Intel Instruction
+	//                     convention which is not reliable for ARM Neon
 
 	int32 enterAxis = (tmin.y > tmin.x) ? 1 : 0;
 	float32 tEnter = (tmin.y > tmin.x) ? tmin.y : tmin.x;
