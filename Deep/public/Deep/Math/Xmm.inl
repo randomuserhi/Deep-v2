@@ -261,6 +261,15 @@ Xmm operator/(float32 in_val, const XmmArg in_vec) {
 #endif
 }
 
+Xmmi Xmm::IsNegative(const XmmArg in_value) {
+#ifdef DEEP_USE_SSE4_1
+	return _mm_castps_si128(_mm_cmplt_ps(in_value, _mm_setzero_ps()));
+#else
+	return Xmmi{ in_value.x < 0 ? int32(0xffffffff) : 0, in_value.y < 0 ? int32(0xffffffff) : 0,
+		         in_value.z < 0 ? int32(0xffffffff) : 0, in_value.w < 0 ? int32(0xffffffff) : 0 }
+#endif
+}
+
 Xmm Xmm::Select(const XmmArg in_a, const XmmArg in_b, XmmiArg in_control) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_blendv_ps(in_a, in_b, _mm_castsi128_ps(in_control));

@@ -75,6 +75,9 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmm {
 	static inline Xmmi Equals(const XmmArg in_a, const XmmArg in_b);
 	constexpr static inline Xmmi Constexpr_Equals(const XmmArg in_a, const XmmArg in_b);
 
+	// Returns 0xFFFFFFFF for each lane where val < 0.0f
+	static inline Xmmi IsNegative(const XmmArg in_value);
+
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
 	static inline Xmm Select(const XmmArg in_a, const XmmArg in_b, const XmmiArg in_control);
 
