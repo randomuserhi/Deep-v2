@@ -266,7 +266,7 @@ Xmmi Xmm::IsNegative(const XmmArg in_value) {
 	return _mm_castps_si128(_mm_cmplt_ps(in_value, _mm_setzero_ps()));
 #else
 	return Xmmi{ in_value.x < 0 ? int32(0xffffffff) : 0, in_value.y < 0 ? int32(0xffffffff) : 0,
-		         in_value.z < 0 ? int32(0xffffffff) : 0, in_value.w < 0 ? int32(0xffffffff) : 0 }
+		         in_value.z < 0 ? int32(0xffffffff) : 0, in_value.w < 0 ? int32(0xffffffff) : 0 };
 #endif
 }
 
