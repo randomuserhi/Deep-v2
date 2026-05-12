@@ -124,11 +124,9 @@ set(DEEP_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Obtain source files
 file(GLOB_RECURSE DEEP_SRC_FILES CONFIGURE_DEPENDS "${DEEP_ROOT}/src/*.cpp")
-file(GLOB_RECURSE DEEP_HEADER_FILES CONFIGURE_DEPENDS "${DEEP_ROOT}/public/*.h")
-file(GLOB_RECURSE DEEP_INL_FILES CONFIGURE_DEPENDS "${DEEP_ROOT}/public/*.inl")
 
 # Create Deep lib
-add_library(Deep ${DEEP_SRC_FILES} ${DEEP_HEADER_FILES} ${DEEP_INL_FILES})
+add_library(Deep ${DEEP_SRC_FILES})
 
 # Add include directory
 target_include_directories(Deep PUBLIC "${DEEP_ROOT}/public")
