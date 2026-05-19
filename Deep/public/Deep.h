@@ -9,13 +9,13 @@
  */
 
 #if defined(__clang__)
-#define DEEP_COMPILER_CLANG
+	#define DEEP_COMPILER_CLANG
 
 #elif defined(__GNUC__) || defined(__GNUG__)
-#define DEEP_COMPILER_GCC
+	#define DEEP_COMPILER_GCC
 
 #elif defined(_MSC_VER)
-#define DEEP_COMPILER_MSVC
+	#define DEEP_COMPILER_MSVC
 
 #endif
 
@@ -24,13 +24,13 @@
  */
 
 #if defined(_WIN32)
-#define DEEP_PLATFORM_WINDOWS
+	#define DEEP_PLATFORM_WINDOWS
 
 #elif defined(__APPLE__)
-#define DEEP_PLATFORM_MAC
+	#define DEEP_PLATFORM_MAC
 
 #else
-#define DEEP_PLATFORM_UNIX
+	#define DEEP_PLATFORM_UNIX
 
 #endif
 
@@ -38,46 +38,46 @@
  * Warning pragmas
  */
 #ifdef DEEP_COMPILER_CLANG
-#define DEEP_PRAGMA(x) _Pragma(#x)
-#define DEEP_SUPPRESS_WARNING_PUSH DEEP_PRAGMA(clang diagnostic push)
-#define DEEP_SUPPRESS_WARNING_POP DEEP_PRAGMA(clang diagnostic pop)
-#define DEEP_CLANG_SUPPRESS_WARNING(w) DEEP_PRAGMA(clang diagnostic ignored w)
-#if __clang_major__ >= 13
-#define DEEP_CLANG_13_PLUS_SUPPRESS_WARNING(w) DEEP_CLANG_SUPPRESS_WARNING(w)
+	#define DEEP_PRAGMA(x) _Pragma(#x)
+	#define DEEP_SUPPRESS_WARNING_PUSH DEEP_PRAGMA(clang diagnostic push)
+	#define DEEP_SUPPRESS_WARNING_POP DEEP_PRAGMA(clang diagnostic pop)
+	#define DEEP_CLANG_SUPPRESS_WARNING(w) DEEP_PRAGMA(clang diagnostic ignored w)
+	#if __clang_major__ >= 13
+		#define DEEP_CLANG_13_PLUS_SUPPRESS_WARNING(w) DEEP_CLANG_SUPPRESS_WARNING(w)
+	#else
+		#define DEEP_CLANG_13_PLUS_SUPPRESS_WARNING(w)
+	#endif
+	#if __clang_major__ >= 16
+		#define DEEP_CLANG_16_PLUS_SUPPRESS_WARNING(w) DEEP_CLANG_SUPPRESS_WARNING(w)
+	#else
+		#define DEEP_CLANG_16_PLUS_SUPPRESS_WARNING(w)
+	#endif
 #else
-#define DEEP_CLANG_13_PLUS_SUPPRESS_WARNING(w)
-#endif
-#if __clang_major__ >= 16
-#define DEEP_CLANG_16_PLUS_SUPPRESS_WARNING(w) DEEP_CLANG_SUPPRESS_WARNING(w)
-#else
-#define DEEP_CLANG_16_PLUS_SUPPRESS_WARNING(w)
-#endif
-#else
-#define DEEP_CLANG_SUPPRESS_WARNING(w)
-#define DEEP_CLANG_13_PLUS_SUPPRESS_WARNING(w)
-#define DEEP_CLANG_16_PLUS_SUPPRESS_WARNING(w)
+	#define DEEP_CLANG_SUPPRESS_WARNING(w)
+	#define DEEP_CLANG_13_PLUS_SUPPRESS_WARNING(w)
+	#define DEEP_CLANG_16_PLUS_SUPPRESS_WARNING(w)
 #endif
 #ifdef DEEP_COMPILER_GCC
-#define DEEP_PRAGMA(x) _Pragma(#x)
-#define DEEP_SUPPRESS_WARNING_PUSH DEEP_PRAGMA(GCC diagnostic push)
-#define DEEP_SUPPRESS_WARNING_POP DEEP_PRAGMA(GCC diagnostic pop)
-#define DEEP_GCC_SUPPRESS_WARNING(w) DEEP_PRAGMA(GCC diagnostic ignored w)
+	#define DEEP_PRAGMA(x) _Pragma(#x)
+	#define DEEP_SUPPRESS_WARNING_PUSH DEEP_PRAGMA(GCC diagnostic push)
+	#define DEEP_SUPPRESS_WARNING_POP DEEP_PRAGMA(GCC diagnostic pop)
+	#define DEEP_GCC_SUPPRESS_WARNING(w) DEEP_PRAGMA(GCC diagnostic ignored w)
 #else
-#define DEEP_GCC_SUPPRESS_WARNING(w)
+	#define DEEP_GCC_SUPPRESS_WARNING(w)
 #endif
 #ifdef DEEP_COMPILER_MSVC
-#define DEEP_PRAGMA(x) __pragma(x)
-#define DEEP_SUPPRESS_WARNING_PUSH DEEP_PRAGMA(warning(push))
-#define DEEP_SUPPRESS_WARNING_POP DEEP_PRAGMA(warning(pop))
-#define DEEP_MSVC_SUPPRESS_WARNING(w) DEEP_PRAGMA(warning(disable : w))
-#if _MSC_VER >= 1920 && _MSC_VER < 1930
-#define DEEP_MSVC2019_SUPPRESS_WARNING(w) DEEP_MSVC_SUPPRESS_WARNING(w)
+	#define DEEP_PRAGMA(x) __pragma(x)
+	#define DEEP_SUPPRESS_WARNING_PUSH DEEP_PRAGMA(warning(push))
+	#define DEEP_SUPPRESS_WARNING_POP DEEP_PRAGMA(warning(pop))
+	#define DEEP_MSVC_SUPPRESS_WARNING(w) DEEP_PRAGMA(warning(disable : w))
+	#if _MSC_VER >= 1920 && _MSC_VER < 1930
+		#define DEEP_MSVC2019_SUPPRESS_WARNING(w) DEEP_MSVC_SUPPRESS_WARNING(w)
+	#else
+		#define DEEP_MSVC2019_SUPPRESS_WARNING(w)
+	#endif
 #else
-#define DEEP_MSVC2019_SUPPRESS_WARNING(w)
-#endif
-#else
-#define DEEP_MSVC_SUPPRESS_WARNING(w)
-#define DEEP_MSVC2019_SUPPRESS_WARNING(w)
+	#define DEEP_MSVC_SUPPRESS_WARNING(w)
+	#define DEEP_MSVC2019_SUPPRESS_WARNING(w)
 #endif
 
 /*
@@ -85,32 +85,32 @@
  */
 // If this define is set, Deep is compiled as a shared library
 #ifdef DEEP_SHARED_LIBRARY
-#ifdef DEEP_BUILD_SHARED_LIBRARY
-// While building the shared library, we must export these symbols
-#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_COMPILER_MINGW)
-#define DEEP_EXPORT __declspec(dllexport)
+	#ifdef DEEP_BUILD_SHARED_LIBRARY
+		// While building the shared library, we must export these symbols
+		#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_COMPILER_MINGW)
+			#define DEEP_EXPORT __declspec(dllexport)
+		#else
+			#define DEEP_EXPORT __attribute__((visibility("default")))
+			#if defined(DEEP_COMPILER_GCC)
+				// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
+				#define DEEP_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
+			#endif
+		#endif
+	#else
+		// When linking against Deep, we must import these symbols
+		#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_COMPILER_MINGW)
+			#define DEEP_EXPORT __declspec(dllimport)
+		#else
+			#define DEEP_EXPORT __attribute__((visibility("default")))
+			#if defined(DEEP_COMPILER_GCC)
+				// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
+				#define DEEP_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
+			#endif
+		#endif
+	#endif
 #else
-#define DEEP_EXPORT __attribute__((visibility("default")))
-#if defined(DEEP_COMPILER_GCC)
-// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
-#define DEEP_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
-#endif
-#endif
-#else
-// When linking against Deep, we must import these symbols
-#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_COMPILER_MINGW)
-#define DEEP_EXPORT __declspec(dllimport)
-#else
-#define DEEP_EXPORT __attribute__((visibility("default")))
-#if defined(DEEP_COMPILER_GCC)
-// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
-#define DEEP_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
-#endif
-#endif
-#endif
-#else
-// If the define is not set, we use static linking and symbols don't need to be imported or exported
-#define DEEP_EXPORT
+	// If the define is not set, we use static linking and symbols don't need to be imported or exported
+	#define DEEP_EXPORT
 #endif
 
 /*
@@ -153,70 +153,70 @@
 // - Support for ARM / WASM compilation
 
 #if defined(DEEP_COMPILER_CLANG)
-#define Deep_ForceInline inline __attribute__((always_inline))
-#define Deep_NoInline __attribute__((noinline))
-#define Deep_AlignOf(type) __alignof__(type)
+	#define Deep_ForceInline inline __attribute__((always_inline))
+	#define Deep_NoInline __attribute__((noinline))
+	#define Deep_AlignOf(type) __alignof__(type)
 
-#define Deep_PushPack
-#define Deep_PopPack __attribute__((__packed__))
+	#define Deep_PushPack
+	#define Deep_PopPack __attribute__((__packed__))
 
-#define Deep_Unreachable __builtin_unreachable()
+	#define Deep_Unreachable __builtin_unreachable()
 
-#define Deep_FUNCTION_ __func__
-#define Deep_FILE_ __FILE__
-#define Deep_LINE_ __LINE__
+	#define Deep_FUNCTION_ __func__
+	#define Deep_FILE_ __FILE__
+	#define Deep_LINE_ __LINE__
 
-#define Deep_Restrict __restrict__
+	#define Deep_Restrict __restrict__
 
 #elif defined(DEEP_COMPILER_GCC)
-#define Deep_ForceInline inline __attribute__((always_inline))
-#define Deep_NoInline __attribute__((noinline))
-#define Deep_AlignOf(type) __alignof__(type)
+	#define Deep_ForceInline inline __attribute__((always_inline))
+	#define Deep_NoInline __attribute__((noinline))
+	#define Deep_AlignOf(type) __alignof__(type)
 
-#define Deep_PushPack
-#define Deep_PopPack __attribute__((__packed__))
+	#define Deep_PushPack
+	#define Deep_PopPack __attribute__((__packed__))
 
-#define Deep_Unreachable __builtin_unreachable()
+	#define Deep_Unreachable __builtin_unreachable()
 
-#define Deep_FUNCTION_ __func__
-#define Deep_FILE_ __FILE__
-#define Deep_LINE_ __LINE__
+	#define Deep_FUNCTION_ __func__
+	#define Deep_FILE_ __FILE__
+	#define Deep_LINE_ __LINE__
 
-#define Deep_Restrict __restrict__
+	#define Deep_Restrict __restrict__
 
 #elif defined(DEEP_COMPILER_MSVC)
-#define Deep_ForceInline inline __forceinline
-#define Deep_NoInline __declspec(noinline)
-#define Deep_AlignOf(type) alignof(type)
+	#define Deep_ForceInline inline __forceinline
+	#define Deep_NoInline __declspec(noinline)
+	#define Deep_AlignOf(type) alignof(type)
 
-#define Deep_PushPack __pragma(pack(push, 1))
-#define Deep_PopPack __pragma(pack(pop))
+	#define Deep_PushPack __pragma(pack(push, 1))
+	#define Deep_PopPack __pragma(pack(pop))
 
-#define Deep_Unreachable __assume(0)
+	#define Deep_Unreachable __assume(0)
 
-#define Deep_FUNCTION_ __FUNCTION__
-#define Deep_FILE_ __FILE__
-#define Deep_LINE_ __LINE__
+	#define Deep_FUNCTION_ __FUNCTION__
+	#define Deep_FILE_ __FILE__
+	#define Deep_LINE_ __LINE__
 
-#define Deep_Restrict __restrict
+	#define Deep_Restrict __restrict
 
 #else
 
-#error Unsupported Compiler
+	#error Unsupported Compiler
 
 #endif
 
 #ifdef DEEP_COMPILER_MSVC
-// NOTE(randomuserhi): Undef MSVC pre-processor macros:
-// https://stackoverflow.com/questions/21483038/undefining-min-and-max-macros
-#undef min
-#undef max
+	// NOTE(randomuserhi): Undef MSVC pre-processor macros:
+    // https://stackoverflow.com/questions/21483038/undefining-min-and-max-macros
+	#undef min
+	#undef max
 #endif
 
 // Cache line size used to align to cache line
 // Can be defined prior header to set a custom cache line size
 #ifndef DEEP_CACHE_LINE_SIZE
-#define DEEP_CACHE_LINE_SIZE 64
+	#define DEEP_CACHE_LINE_SIZE 64
 #endif
 
 /*
@@ -224,52 +224,58 @@
  */
 
 #if !defined(DEEP_DONT_USE_SIMD_INTRINSICS)
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-#define DEEP_CPU_X86
-#define DEEP_USE_SSE
-#if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && !defined(DEEP_USE_AVX512)
-#define DEEP_USE_AVX512
-#endif
-#if (defined(__AVX2__) || defined(DEEP_USE_AVX512)) && !defined(DEEP_USE_AVX2)
-#define DEEP_USE_AVX2
-#endif
-#if (defined(__AVX__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_AVX)
-#define DEEP_USE_AVX
-#endif
-#if (defined(__SSE4_2__) || defined(DEEP_USE_AVX)) && !defined(DEEP_USE_SSE4_2)
-#define DEEP_USE_SSE4_2
-#endif
-#if (defined(__SSE4_1__) || defined(DEEP_USE_SSE4_2)) && !defined(DEEP_USE_SSE4_1)
-#define DEEP_USE_SSE4_1
-#endif
-#if (defined(__F16C__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_F16C)
-#define DEEP_USE_F16C
-#endif
-#if (defined(__LZCNT__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_LZCNT)
-#define DEEP_USE_LZCNT
-#endif
-#if (defined(__BMI__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_TZCNT)
-#define DEEP_USE_TZCNT
-#endif
-#else
-#error Unsupported CPU architecture
-#endif
+	#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+		#define DEEP_CPU_X86
+		#define DEEP_USE_SSE
+		#if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && !defined(DEEP_USE_AVX512)
+			#define DEEP_USE_AVX512
+		#endif
+		#if (defined(__AVX2__) || defined(DEEP_USE_AVX512)) && !defined(DEEP_USE_AVX2)
+			#define DEEP_USE_AVX2
+		#endif
+		#if (defined(__AVX__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_AVX)
+			#define DEEP_USE_AVX
+		#endif
+		#if (defined(__SSE4_2__) || defined(DEEP_USE_AVX)) && !defined(DEEP_USE_SSE4_2)
+			#define DEEP_USE_SSE4_2
+		#endif
+		#if (defined(__SSE4_1__) || defined(DEEP_USE_SSE4_2)) && !defined(DEEP_USE_SSE4_1)
+			#define DEEP_USE_SSE4_1
+		#endif
+		#if (defined(__F16C__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_F16C)
+			#define DEEP_USE_F16C
+		#endif
+		#if (defined(__LZCNT__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_LZCNT)
+			#define DEEP_USE_LZCNT
+		#endif
+		#if (defined(__BMI__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_TZCNT)
+			#define DEEP_USE_TZCNT
+		#endif
+	#else
+		#error Unsupported CPU architecture
+	#endif
+#elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
+	// ARM CPU architecture
+	#define DEEP_CPU_ARM
+	#if defined(__aarch64__) || defined(_M_ARM64)
+		#define DEEP_USE_NEON
+	#endif
 #endif
 
 /*
  * Asserts
  */
 #ifndef Deep_Break
-#ifdef DEEP_PLATFORM_WINDOWS
-#define Deep_Break __debugbreak()
-#else
-#include <signal.h>
-#ifdef SIGTRAP
-#define Deep_Break raise(SIGTRAP)
-#else
-#define Deep_Break raise(SIGABRT)
-#endif
-#endif
+	#ifdef DEEP_PLATFORM_WINDOWS
+		#define Deep_Break __debugbreak()
+	#else
+		#include <signal.h>
+		#ifdef SIGTRAP
+			#define Deep_Break raise(SIGTRAP)
+		#else
+			#define Deep_Break raise(SIGABRT)
+		#endif
+	#endif
 #endif
 
 #ifdef DEEP_USE_ASSERTS
@@ -289,12 +295,12 @@ inline bool AssertFailed(const char* in_expression, const char* in_file, int32 i
 
 DEEP_NAMESPACE_END
 
-#define Deep_Assert(in_expression, in_message)                                                                              \
-	do {                                                                                                                    \
-		if (!(in_expression) && ::Deep::AssertFailed((#in_expression), Deep_FILE_, Deep_LINE_, (in_message))) {             \
-			Deep_Break;                                                                                                     \
-		}                                                                                                                   \
-	} while (false)
+	#define Deep_Assert(in_expression, in_message)                                                                          \
+		do {                                                                                                                \
+			if (!(in_expression) && ::Deep::AssertFailed((#in_expression), Deep_FILE_, Deep_LINE_, (in_message))) {         \
+				Deep_Break;                                                                                                 \
+			}                                                                                                               \
+		} while (false)
 #else
-#define Deep_Assert(...) ((void)0)
+	#define Deep_Assert(...) ((void)0)
 #endif

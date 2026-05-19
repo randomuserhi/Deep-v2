@@ -4,7 +4,7 @@
 #include "Deep/Math.h"
 
 #if !defined(DEEP_RAYCAST_DEFAULT_TYPE)
-#define DEEP_RAYCAST_DEFAULT_TYPE e_startsOutside
+	#define DEEP_RAYCAST_DEFAULT_TYPE e_startsOutside
 #endif
 
 DEEP_NAMESPACE_BEGIN

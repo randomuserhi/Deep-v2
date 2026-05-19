@@ -4,7 +4,7 @@
 
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-#include <immintrin.h>
+	#include <immintrin.h>
 #endif
 
 #include <bit>
@@ -62,21 +62,21 @@ inline bool IsAligned(T in_pointer, uint64 in_alignment) {
 // Compute number of trailing zero bits (how many low bits are zero)
 inline uint32 NumTrailingZeros(uint32 in_value) {
 #if defined(DEEP_CPU_X86)
-#if defined(DEEP_USE_TZCNT)
+	#if defined(DEEP_USE_TZCNT)
 	return _tzcnt_u32(in_value);
-#elif defined(DEEP_COMPILER_MSVC)
+	#elif defined(DEEP_COMPILER_MSVC)
 	if (in_value == 0) {
 		return 32;
 	}
 	unsigned long result;
 	_BitScanForward(&result, in_value);
 	return result;
-#else
+	#else
 	if (in_value == 0) {
 		return 32;
 	}
 	return __builtin_ctz(in_value);
-#endif
+	#endif
 #else
 	return std::countr_zero(in_value);
 #endif

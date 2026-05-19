@@ -6,7 +6,7 @@
 #include <smmintrin.h>
 
 #if !defined(DEEP_USE_SSE)
-#include "Deep/Math/Ops.h"
+	#include "Deep/Math/Ops.h"
 #endif
 
 DEEP_NAMESPACE_BEGIN

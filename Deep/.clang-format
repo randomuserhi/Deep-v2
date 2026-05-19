@@ -41,6 +41,6 @@ Cpp11BracedListStyle: false
 
 AllowShortLambdasOnASingleLine: Empty
 
-IndentPPDirectives: None
+IndentPPDirectives: BeforeHash
 
 InsertNewlineAtEOF: true
