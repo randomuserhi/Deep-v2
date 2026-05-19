@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug
+cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON
 if !ERRORLEVEL! NEQ 0 (
     echo.
     echo ^^! -- CMake configuration failed

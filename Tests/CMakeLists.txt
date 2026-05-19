@@ -23,9 +23,6 @@ else()
 	message(FATAL_ERROR "${MESSAGE_PREFIX} Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
-# When turning this option on, the tests will be ran against Deep with dynamic linking instead of static linking.
-option(USE_DYNAMIC_LINKING "Use dynamic linking with Deep or static linking" ON)
-
 include(CMakeDependentOption)
 
 # When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
@@ -90,10 +87,7 @@ set(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../")
 set(DEEP_ROOT "${REPO_ROOT}/Deep")
 
 # Add Deep to project
-set(_TEMP_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS ${USE_DYNAMIC_LINKING} CACHE BOOL "Force dynamic build for Deep" FORCE)
 add_subdirectory("${DEEP_ROOT}" "${CMAKE_BINARY_DIR}/thirdparty/Deep")
-set(BUILD_SHARED_LIBS ${_TEMP_BUILD_SHARED_LIBS} CACHE BOOL "Restore global BUILD_SHARED_LIBS" FORCE)
 
 # Root location
 set(TEST_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
