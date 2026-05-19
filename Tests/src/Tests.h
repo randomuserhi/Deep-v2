@@ -9,54 +9,54 @@
 //                     test)
 
 #if defined(__clang__)
-#define TEST_COMPILER_CLANG
+	#define TEST_COMPILER_CLANG
 
 #elif defined(__GNUC__) || defined(__GNUG__)
-#define TEST_COMPILER_GCC
+	#define TEST_COMPILER_GCC
 
 #elif defined(_MSC_VER)
-#define TEST_COMPILER_MSVC
+	#define TEST_COMPILER_MSVC
 
 #endif
 
 #if defined(TEST_COMPILER_CLANG)
-#define Test_ForceInline inline __attribute__((always_inline))
-#define Test_AlignOf(type) __alignof__(type)
+	#define Test_ForceInline inline __attribute__((always_inline))
+	#define Test_AlignOf(type) __alignof__(type)
 
-#define Test_PushPack
-#define Test_PopPack __attribute__((__packed__))
+	#define Test_PushPack
+	#define Test_PopPack __attribute__((__packed__))
 
-#define Test_Unreachable __builtin_unreachable()
+	#define Test_Unreachable __builtin_unreachable()
 
-#define Test_FUNCTION_ __func__
-#define Test_FILE_ __FILE__
-#define Test_LINE_ __LINE__
+	#define Test_FUNCTION_ __func__
+	#define Test_FILE_ __FILE__
+	#define Test_LINE_ __LINE__
 
 #elif defined(TEST_COMPILER_GCC)
-#define Test_ForceInline inline __attribute__((always_inline))
-#define Test_AlignOf(type) __alignof__(type)
+	#define Test_ForceInline inline __attribute__((always_inline))
+	#define Test_AlignOf(type) __alignof__(type)
 
-#define Test_PushPack
-#define Test_PopPack __attribute__((__packed__))
+	#define Test_PushPack
+	#define Test_PopPack __attribute__((__packed__))
 
-#define Test_Unreachable __builtin_unreachable()
+	#define Test_Unreachable __builtin_unreachable()
 
-#define Test_FUNCTION_ __func__
-#define Test_FILE_ __FILE__
-#define Test_LINE_ __LINE__
+	#define Test_FUNCTION_ __func__
+	#define Test_FILE_ __FILE__
+	#define Test_LINE_ __LINE__
 
 #elif defined(TEST_COMPILER_MSVC)
-#define Test_ForceInline __forceinline
-#define Test_AlignOf(type) alignof(type)
+	#define Test_ForceInline __forceinline
+	#define Test_AlignOf(type) alignof(type)
 
-#define Test_PushPack __pragma(pack(push, 1))
-#define Test_PopPack __pragma(pack(pop))
+	#define Test_PushPack __pragma(pack(push, 1))
+	#define Test_PopPack __pragma(pack(pop))
 
-#define Test_Unreachable __assume(0)
+	#define Test_Unreachable __assume(0)
 
-#define Test_FUNCTION_ __FUNCTION__
-#define Test_FILE_ __FILE__
-#define Test_LINE_ __LINE__
+	#define Test_FUNCTION_ __FUNCTION__
+	#define Test_FILE_ __FILE__
+	#define Test_LINE_ __LINE__
 
 #endif
 
@@ -64,46 +64,46 @@
  * Warning pragmas
  */
 #ifdef TEST_COMPILER_CLANG
-#define TEST_PRAGMA(x) _Pragma(#x)
-#define TEST_SUPPRESS_WARNING_PUSH TEST_PRAGMA(clang diagnostic push)
-#define TEST_SUPPRESS_WARNING_POP TEST_PRAGMA(clang diagnostic pop)
-#define TEST_CLANG_SUPPRESS_WARNING(w) TEST_PRAGMA(clang diagnostic ignored w)
-#if __clang_major__ >= 13
-#define TEST_CLANG_13_PLUS_SUPPRESS_WARNING(w) TEST_CLANG_SUPPRESS_WARNING(w)
+	#define TEST_PRAGMA(x) _Pragma(#x)
+	#define TEST_SUPPRESS_WARNING_PUSH TEST_PRAGMA(clang diagnostic push)
+	#define TEST_SUPPRESS_WARNING_POP TEST_PRAGMA(clang diagnostic pop)
+	#define TEST_CLANG_SUPPRESS_WARNING(w) TEST_PRAGMA(clang diagnostic ignored w)
+	#if __clang_major__ >= 13
+		#define TEST_CLANG_13_PLUS_SUPPRESS_WARNING(w) TEST_CLANG_SUPPRESS_WARNING(w)
+	#else
+		#define TEST_CLANG_13_PLUS_SUPPRESS_WARNING(w)
+	#endif
+	#if __clang_major__ >= 16
+		#define TEST_CLANG_16_PLUS_SUPPRESS_WARNING(w) TEST_CLANG_SUPPRESS_WARNING(w)
+	#else
+		#define TEST_CLANG_16_PLUS_SUPPRESS_WARNING(w)
+	#endif
 #else
-#define TEST_CLANG_13_PLUS_SUPPRESS_WARNING(w)
-#endif
-#if __clang_major__ >= 16
-#define TEST_CLANG_16_PLUS_SUPPRESS_WARNING(w) TEST_CLANG_SUPPRESS_WARNING(w)
-#else
-#define TEST_CLANG_16_PLUS_SUPPRESS_WARNING(w)
-#endif
-#else
-#define TEST_CLANG_SUPPRESS_WARNING(w)
-#define TEST_CLANG_13_PLUS_SUPPRESS_WARNING(w)
-#define TEST_CLANG_16_PLUS_SUPPRESS_WARNING(w)
+	#define TEST_CLANG_SUPPRESS_WARNING(w)
+	#define TEST_CLANG_13_PLUS_SUPPRESS_WARNING(w)
+	#define TEST_CLANG_16_PLUS_SUPPRESS_WARNING(w)
 #endif
 #ifdef TEST_COMPILER_GCC
-#define TEST_PRAGMA(x) _Pragma(#x)
-#define TEST_SUPPRESS_WARNING_PUSH TEST_PRAGMA(GCC diagnostic push)
-#define TEST_SUPPRESS_WARNING_POP TEST_PRAGMA(GCC diagnostic pop)
-#define TEST_GCC_SUPPRESS_WARNING(w) TEST_PRAGMA(GCC diagnostic ignored w)
+	#define TEST_PRAGMA(x) _Pragma(#x)
+	#define TEST_SUPPRESS_WARNING_PUSH TEST_PRAGMA(GCC diagnostic push)
+	#define TEST_SUPPRESS_WARNING_POP TEST_PRAGMA(GCC diagnostic pop)
+	#define TEST_GCC_SUPPRESS_WARNING(w) TEST_PRAGMA(GCC diagnostic ignored w)
 #else
-#define TEST_GCC_SUPPRESS_WARNING(w)
+	#define TEST_GCC_SUPPRESS_WARNING(w)
 #endif
 #ifdef TEST_COMPILER_MSVC
-#define TEST_PRAGMA(x) __pragma(x)
-#define TEST_SUPPRESS_WARNING_PUSH TEST_PRAGMA(warning(push))
-#define TEST_SUPPRESS_WARNING_POP TEST_PRAGMA(warning(pop))
-#define TEST_MSVC_SUPPRESS_WARNING(w) TEST_PRAGMA(warning(disable : w))
-#if _MSC_VER >= 1920 && _MSC_VER < 1930
-#define TEST_MSVC2019_SUPPRESS_WARNING(w) TEST_MSVC_SUPPRESS_WARNING(w)
+	#define TEST_PRAGMA(x) __pragma(x)
+	#define TEST_SUPPRESS_WARNING_PUSH TEST_PRAGMA(warning(push))
+	#define TEST_SUPPRESS_WARNING_POP TEST_PRAGMA(warning(pop))
+	#define TEST_MSVC_SUPPRESS_WARNING(w) TEST_PRAGMA(warning(disable : w))
+	#if _MSC_VER >= 1920 && _MSC_VER < 1930
+		#define TEST_MSVC2019_SUPPRESS_WARNING(w) TEST_MSVC_SUPPRESS_WARNING(w)
+	#else
+		#define TEST_MSVC2019_SUPPRESS_WARNING(w)
+	#endif
 #else
-#define TEST_MSVC2019_SUPPRESS_WARNING(w)
-#endif
-#else
-#define TEST_MSVC_SUPPRESS_WARNING(w)
-#define TEST_MSVC2019_SUPPRESS_WARNING(w)
+	#define TEST_MSVC_SUPPRESS_WARNING(w)
+	#define TEST_MSVC2019_SUPPRESS_WARNING(w)
 #endif
 
 /*
