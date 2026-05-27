@@ -25,7 +25,7 @@ endif()
 
 include(CMakeDependentOption)
 
-# When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
+# When turning this option on, rthe library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
 # Note that if you turn this on you need to use SET_INTERPROCEDURAL_OPTIMIZATION() or set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON) to enable LTO specifically for your own project as well.
 # If you don't do this you may get an error: /usr/bin/ld: libDeep.a: error adding symbols: file format not recognized
 cmake_dependent_option(INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimizations" ON "RELEASE_BUILD" OFF)
@@ -150,12 +150,6 @@ elseif (CLANG)
 		-Wdefaulted-function-deleted
 		-Wself-move
 		)
-
-	# Disable RTTI
-	message(STATUS "${MESSAGE_PREFIX} DEEP_USE_RTTI: ${DEEP_USE_RTTI}")
-	if (NOT DEEP_USE_RTTI)
-		target_compile_options(Tests PRIVATE -fno-rtti)
-	endif()
 
 	# Optionally generate debug symbols
 	message(STATUS "${MESSAGE_PREFIX} GENERATE_DEBUG_SYMBOLS: ${GENERATE_DEBUG_SYMBOLS}")
