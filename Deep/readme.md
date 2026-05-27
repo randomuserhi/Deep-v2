@@ -21,6 +21,14 @@ cmake --build build
 `out_camelCase` for out arguments
 `io_camelCase` for in-out arguments
 
+Avoid class / struct level dll export:
+```cpp
+class DEEP_EXPORT A {}
+struct DEEP_EXPORT A {}
+```
+Prefer exporting each function / static member individually.
+This is to prevent issues with inline methods and shared libraries when compilers choose to not inline them and the dll does not emit a definition.
+
 # Notes
 
 The library provides `Arg_` types which give you the fastest way to pass a type as a function argument.
