@@ -9,7 +9,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(int64) Vec2 {
+struct [[nodiscard]] alignas(int64) Vec2 {
 	//
 
 	Vec2() = default;
@@ -43,8 +43,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(int64) Vec2 {
 	//
 
 	// Equality
-	friend bool operator!=(Arg_Vec2 in_a, Arg_Vec2 in_b);
-	friend bool operator==(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	friend inline bool operator!=(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	friend inline bool operator==(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
 	// Add vectors
 	inline Vec2& operator+=(Arg_Vec2 in_other);
@@ -87,13 +87,13 @@ struct DEEP_EXPORT [[nodiscard]] alignas(int64) Vec2 {
 		};
 	};
 
-	static const Vec2 k_zero;
-	static const Vec2 k_one;
+	DEEP_EXPORT static const Vec2 k_zero;
+	DEEP_EXPORT static const Vec2 k_one;
 
-	static const Vec2 k_up;
-	static const Vec2 k_down;
-	static const Vec2 k_left;
-	static const Vec2 k_right;
+	DEEP_EXPORT static const Vec2 k_up;
+	DEEP_EXPORT static const Vec2 k_down;
+	DEEP_EXPORT static const Vec2 k_left;
+	DEEP_EXPORT static const Vec2 k_right;
 };
 
 static_assert(std::is_trivial<Vec2>(), "Is supposed to be a trivial type!");

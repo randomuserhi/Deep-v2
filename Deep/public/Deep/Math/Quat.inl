@@ -94,10 +94,11 @@ Quat::Quat(Vec3 in_axis, float32 in_angle) {
 	xmm = Xmm::Select(in_axis.xmm * s, c, Xmmi{ 0, 0, 0, int32(0xffffffff) });
 }
 
-inline bool operator!=(Arg_Quat in_a, Arg_Quat in_b) {
+bool operator!=(Arg_Quat in_a, Arg_Quat in_b) {
 	return in_a.vec != in_b.vec;
 }
-inline bool operator==(Arg_Quat in_a, Arg_Quat in_b) {
+
+bool operator==(Arg_Quat in_a, Arg_Quat in_b) {
 	return !(in_a != in_b);
 }
 

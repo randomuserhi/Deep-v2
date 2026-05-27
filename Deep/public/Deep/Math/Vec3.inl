@@ -85,14 +85,14 @@ Vec3::operator Vec3i() const {
 #endif
 }
 
-inline bool operator!=(Arg_Vec3 in_a, Arg_Vec3 in_b) {
+bool operator!=(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return (Xmm::Equals(in_a.xmm, in_b.xmm).ToBooleanBitMask() & 0b111) != 0b111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z;
 #endif
 }
-inline bool operator==(Arg_Vec3 a, Arg_Vec3 b) {
+bool operator==(Arg_Vec3 a, Arg_Vec3 b) {
 	return !(a != b);
 }
 

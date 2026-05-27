@@ -11,7 +11,7 @@ DEEP_NAMESPACE_BEGIN
 
 // NOTE(randomuserhi): There are no bound checks on the data buffer being read
 // TODO(randomuserhi): Add bound checks - only in use with asserts
-struct DEEP_EXPORT PacketReader {
+struct PacketReader {
 	//
 
 	inline PacketReader(const uint8* in_data);
@@ -32,10 +32,10 @@ struct DEEP_EXPORT PacketReader {
 	inline float32 ReadFloat32();
 
 	inline Vec3 ReadVec3();
-	Quat ReadQuaternion();
+	DEEP_EXPORT Quat ReadQuaternion();
 
 	inline Vec3 ReadHalfVec3();
-	Quat ReadHalfQuaternion();
+	DEEP_EXPORT Quat ReadHalfQuaternion();
 
 	//
 

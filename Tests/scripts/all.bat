@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-set "COMMON_ARGS=-G Ninja -DCMAKE_CXX_COMPILER=clang++ -DUSE_ASSERTS=ON"
+set "COMMON_ARGS=-G Ninja -DCMAKE_CXX_COMPILER=clang++ -DDEEP_USE_ASSERTS=ON"
 
 set "Build[1]_Name="
 set "Build[1]_Path="
@@ -9,7 +9,7 @@ set "Build[1]_Args=!COMMON_ARGS!"
 
 set "Build[2]_Name= NO_SIMD_INTRINSICS"
 set "Build[2]_Path=-no-simd"
-set "Build[2]_Args=!COMMON_ARGS! -DNO_SIMD_INTRINSICS=ON"
+set "Build[2]_Args=!COMMON_ARGS! -DDEEP_NO_SIMD_INTRINSICS=ON"
 
 set "BUILD_COUNT=2"
 

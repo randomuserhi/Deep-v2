@@ -61,10 +61,10 @@ Vec4i::operator Vec4() const {
 #endif
 }
 
-inline bool operator!=(Arg_Vec4i in_a, Arg_Vec4i in_b) {
+bool operator!=(Arg_Vec4i in_a, Arg_Vec4i in_b) {
 	return in_a.xmmi != in_b.xmmi;
 }
-inline bool operator==(Arg_Vec4i in_a, Arg_Vec4i in_b) {
+bool operator==(Arg_Vec4i in_a, Arg_Vec4i in_b) {
 	return !(in_a != in_b);
 }
 

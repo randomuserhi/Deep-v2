@@ -14,7 +14,7 @@ DEEP_NAMESPACE_BEGIN
 // Notation is column followed by row, so m10 is column 1, row 0.
 //
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
+struct [[nodiscard]] alignas(Xmm) Mat4 {
 	//
 
 	Mat4() = default;
@@ -39,13 +39,13 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
 	inline Mat4& Inverse();
 	[[nodiscard]] inline Mat4 inversed() const;
 
-	Mat4& Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale);
+	DEEP_EXPORT Mat4& Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale);
 
 	//
 
 	// Equality
-	friend bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b);
-	friend bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b);
+	friend inline bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b);
+	friend inline bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b);
 
 	// Mul Matrix4x4s
 	friend inline Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b);
@@ -99,7 +99,7 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Mat4 {
 		};
 	};
 
-	static const Mat4 k_identity;
+	DEEP_EXPORT static const Mat4 k_identity;
 };
 
 static_assert(std::is_trivial<Mat4>(), "Is supposed to be a trivial type!");

@@ -10,7 +10,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec3 {
+struct [[nodiscard]] alignas(Xmm) Vec3 {
 	//
 
 	Vec3() = default;
@@ -41,8 +41,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec3 {
 	//
 
 	// Equality
-	friend bool operator!=(Arg_Vec3 in_a, Arg_Vec3 in_b);
-	friend bool operator==(Arg_Vec3 in_a, Arg_Vec3 in_b);
+	friend inline bool operator!=(Arg_Vec3 in_a, Arg_Vec3 in_b);
+	friend inline bool operator==(Arg_Vec3 in_a, Arg_Vec3 in_b);
 
 	// Add vectors
 	inline Vec3& operator+=(Arg_Vec3 in_other);
@@ -92,18 +92,18 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Vec3 {
 		};
 	};
 
-	static const Vec3 k_zero;
-	static const Vec3 k_one;
+	DEEP_EXPORT static const Vec3 k_zero;
+	DEEP_EXPORT static const Vec3 k_one;
 
-	static const Vec3 k_up;
-	static const Vec3 k_down;
-	static const Vec3 k_left;
-	static const Vec3 k_right;
-	static const Vec3 k_forwards;
-	static const Vec3 k_backwards;
+	DEEP_EXPORT static const Vec3 k_up;
+	DEEP_EXPORT static const Vec3 k_down;
+	DEEP_EXPORT static const Vec3 k_left;
+	DEEP_EXPORT static const Vec3 k_right;
+	DEEP_EXPORT static const Vec3 k_forwards;
+	DEEP_EXPORT static const Vec3 k_backwards;
 
 	static constexpr int k_numAxis = 3;
-	static const Vec3 k_axis[k_numAxis];
+	DEEP_EXPORT static const Vec3 k_axis[k_numAxis];
 };
 
 static_assert(std::is_trivial<Vec3>(), "Is supposed to be a trivial type!");

@@ -34,7 +34,7 @@ using XmmiArg = Xmmi;
 // Abstraction layer for __m128i SIMD type representing 4 independent values
 //
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
+struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 #if defined(DEEP_USE_SSE)
 	using Type = __m128i;
 #else
@@ -110,8 +110,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Xmmi {
 	//
 
 	// Equality
-	friend bool operator!=(const XmmiArg in_a, const XmmiArg in_b);
-	friend bool operator==(const XmmiArg in_a, const XmmiArg in_b);
+	friend inline bool operator!=(const XmmiArg in_a, const XmmiArg in_b);
+	friend inline bool operator==(const XmmiArg in_a, const XmmiArg in_b);
 
 	// Component wise Add
 	inline Xmmi& operator+=(const XmmiArg in_other);

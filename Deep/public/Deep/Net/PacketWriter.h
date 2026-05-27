@@ -13,7 +13,7 @@ DEEP_SUPPRESS_WARNINGS_STD_END
 
 DEEP_NAMESPACE_BEGIN
 
-struct DEEP_EXPORT PacketWriter {
+struct PacketWriter {
 	//
 
 	inline PacketWriter();
@@ -35,11 +35,11 @@ struct DEEP_EXPORT PacketWriter {
 	inline void WriteInt64(int64 in_value);
 	inline void WriteFloat32(float32 in_value);
 	inline void WriteVec3(Vec3 in_value);
-	void Write(Quat in_value);
+	DEEP_EXPORT void Write(Quat in_value);
 
 	inline void WriteFloat16(float32 in_value);
 	inline void WriteHalfVec3(Vec3 in_value);
-	void WriteHalfQuat(Quat in_value);
+	DEEP_EXPORT void WriteHalfQuat(Quat in_value);
 
 	inline void Clear();
 

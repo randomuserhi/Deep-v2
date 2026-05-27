@@ -8,7 +8,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] Float4 {
+struct [[nodiscard]] Float4 {
 	//
 
 	Float4() = default;

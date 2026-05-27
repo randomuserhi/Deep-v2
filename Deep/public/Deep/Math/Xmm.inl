@@ -131,14 +131,14 @@ constexpr Xmmi Xmm::Constexpr_Equals(const XmmArg in_a, const XmmArg in_b) {
 	                       in_a.w == in_b.w ? int32(0xffffffff) : 0);
 }
 
-inline bool operator!=(const XmmArg in_a, const XmmArg in_b) {
+bool operator!=(const XmmArg in_a, const XmmArg in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return Xmm::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
 #endif
 }
-inline bool operator==(const XmmArg in_a, const XmmArg in_b) {
+bool operator==(const XmmArg in_a, const XmmArg in_b) {
 	return !(in_a != in_b);
 }
 

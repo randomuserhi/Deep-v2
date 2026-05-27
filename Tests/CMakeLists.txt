@@ -30,10 +30,6 @@ include(CMakeDependentOption)
 # If you don't do this you may get an error: /usr/bin/ld: libDeep.a: error adding symbols: file format not recognized
 cmake_dependent_option(INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimizations" ON "RELEASE_BUILD" OFF)
 
-# Ability to toggle between the static and DLL versions of the MSVC runtime library
-# Windows Store only supports the DLL version
-cmake_dependent_option(USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runtime library" ON "MSVC" OFF)
-
 # This library supports C++20 and higher, By default will use standard C++20, but you may specify a higher one.
 if (NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 20)
@@ -110,7 +106,7 @@ if (MSVC)
 	target_compile_definitions(Tests PUBLIC _CRT_SECURE_NO_WARNINGS)
 
 	# Set runtime library
-	if (USE_STATIC_MSVC_RUNTIME_LIBRARY)
+	if (DEEP_USE_STATIC_MSVC_RUNTIME_LIBRARY)
 		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	endif()
 
@@ -152,8 +148,8 @@ elseif (CLANG)
 		)
 
 	# Disable RTTI
-	message(STATUS "${MESSAGE_PREFIX} USE_RTTI: ${USE_RTTI}")
-	if (NOT USE_RTTI)
+	message(STATUS "${MESSAGE_PREFIX} DEEP_USE_RTTI: ${DEEP_USE_RTTI}")
+	if (NOT DEEP_USE_RTTI)
 		target_compile_options(Tests PRIVATE -fno-rtti)
 	endif()
 

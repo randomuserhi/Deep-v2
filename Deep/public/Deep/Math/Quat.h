@@ -14,7 +14,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Quat {
+struct [[nodiscard]] alignas(Xmm) Quat {
 	//
 
 	Quat() = default;
@@ -43,8 +43,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Quat {
 	//
 
 	// Equality
-	friend bool operator!=(Arg_Quat in_a, Arg_Quat in_b);
-	friend bool operator==(Arg_Quat in_a, Arg_Quat in_b);
+	friend inline bool operator!=(Arg_Quat in_a, Arg_Quat in_b);
+	friend inline bool operator==(Arg_Quat in_a, Arg_Quat in_b);
 
 	// Add quaternions
 	inline Quat& operator+=(Arg_Quat in_other);
@@ -89,7 +89,7 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmm) Quat {
 		Vec4 vec;
 	};
 
-	static const Quat k_identity;
+	DEEP_EXPORT static const Quat k_identity;
 };
 
 static_assert(std::is_trivial<Quat>(), "Is supposed to be a trivial type!");

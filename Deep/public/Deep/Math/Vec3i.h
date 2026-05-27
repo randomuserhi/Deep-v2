@@ -9,7 +9,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct DEEP_EXPORT [[nodiscard]] alignas(Xmmi) Vec3i {
+struct [[nodiscard]] alignas(Xmmi) Vec3i {
 	//
 
 	Vec3i() = default;
@@ -35,8 +35,8 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmmi) Vec3i {
 	//
 
 	// Equality
-	friend bool operator!=(Arg_Vec3i in_a, Arg_Vec3i in_b);
-	friend bool operator==(Arg_Vec3i in_a, Arg_Vec3i in_b);
+	friend inline bool operator!=(Arg_Vec3i in_a, Arg_Vec3i in_b);
+	friend inline bool operator==(Arg_Vec3i in_a, Arg_Vec3i in_b);
 
 	// Add vectors
 	inline Vec3i& operator+=(Arg_Vec3i in_other);
@@ -80,14 +80,14 @@ struct DEEP_EXPORT [[nodiscard]] alignas(Xmmi) Vec3i {
 		};
 	};
 
-	static const Vec3i k_zero;
+	DEEP_EXPORT static const Vec3i k_zero;
 
-	static const Vec3i k_up;
-	static const Vec3i k_down;
-	static const Vec3i k_left;
-	static const Vec3i k_right;
-	static const Vec3i k_forwards;
-	static const Vec3i k_backwards;
+	DEEP_EXPORT static const Vec3i k_up;
+	DEEP_EXPORT static const Vec3i k_down;
+	DEEP_EXPORT static const Vec3i k_left;
+	DEEP_EXPORT static const Vec3i k_right;
+	DEEP_EXPORT static const Vec3i k_forwards;
+	DEEP_EXPORT static const Vec3i k_backwards;
 };
 
 static_assert(std::is_trivial<Vec3i>(), "Is supposed to be a trivial type!");

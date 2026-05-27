@@ -27,38 +27,42 @@ else()
 endif()
 
 # When turning this option on, the library will be compiled as a shared library.
-option(BUILD_SHARED_LIBS "Compile Deep as a shared library" OFF)
+# Uses the value of BUILD_SHARED_LIBS if provided
+option(DEEP_BUILD_SHARED_LIBS "Compile Deep as a shared library" OFF)
+if (DEFINED BUILD_SHARED_LIBS)
+	set(DEEP_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+endif()
 
 # When turning this option on, the library will be compiled using assertions. By default asserts are enabled in Debug build.
-option(USE_ASSERTS "Enable asserts" ${USE_ASSERTS_DEFAULT})
+option(DEEP_USE_ASSERTS "Enable asserts" ${USE_ASSERTS_DEFAULT})
 
 # When turning this on, the library will be compiled with C++ exceptions enabled.
-option(CPP_EXCEPTIONS_ENABLED "Enable C++ exceptions" OFF)
+option(DEEP_CPP_EXCEPTIONS_ENABLED "Enable C++ exceptions" OFF)
 
 # When turning this on, the library will not use any SIMD intrinsics
-option(NO_SIMD_INTRINSICS "Disable SIMD intrinsics" OFF)
+option(DEEP_NO_SIMD_INTRINSICS "Disable SIMD intrinsics" OFF)
 
 # When turning this on, the library will not use type-punning tricks to abide by strict-aliasing rules and fallback to either
 # memcpy or bitcast to avoid strict aliasing issues.
-option(USE_STRICT_ALIASING "Abide by strict aliasing rules" OFF)
+option(DEEP_USE_STRICT_ALIASING "Abide by strict aliasing rules" OFF)
 
 # When turned on, the library will be compiled with RTTI
-option(USE_RTTI "Enable RTTI" OFF)
+option(DEEP_USE_RTTI "Enable RTTI" OFF)
 
-option(USE_WASM_SIMD "Enable WASM_SIMD" OFF)
+option(DEEP_USE_WASM_SIMD "Enable WASM_SIMD" OFF)
 
 # Select X86 processor features to use (if everything is off it will be SSE2 compatible)
-option(USE_SSE4_1 "Enable SSE4.1" ON)
-option(USE_SSE4_2 "Enable SSE4.2" ON)
-option(USE_AVX "Enable AVX" ON)
-option(USE_AVX2 "Enable AVX2" ON)
-option(USE_AVX512 "Enable AVX512" OFF)
-option(USE_LZCNT "Enable LZCNT" ON)
-option(USE_TZCNT "Enable TZCNT" ON)
-option(USE_F16C "Enable F16C" ON)
-option(USE_FMADD "Enable FMADD" ON)
+option(DEEP_USE_SSE4_1 "Enable SSE4.1" ON)
+option(DEEP_USE_SSE4_2 "Enable SSE4.2" ON)
+option(DEEP_USE_AVX "Enable AVX" ON)
+option(DEEP_USE_AVX2 "Enable AVX2" ON)
+option(DEEP_USE_AVX512 "Enable AVX512" OFF)
+option(DEEP_USE_LZCNT "Enable LZCNT" ON)
+option(DEEP_USE_TZCNT "Enable TZCNT" ON)
+option(DEEP_USE_F16C "Enable F16C" ON)
+option(DEEP_USE_FMADD "Enable FMADD" ON)
 
-option(USE_C_BINDINGS "Enable C Bindings" OFF)
+option(DEEP_USE_C_BINDINGS "Enable C Bindings" OFF)
 
 include(CMakeDependentOption)
 
@@ -69,7 +73,7 @@ cmake_dependent_option(INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural opti
 
 # Ability to toggle between the static and DLL versions of the MSVC runtime library
 # Windows Store only supports the DLL version
-cmake_dependent_option(USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runtime library" ON "MSVC;NOT WINDOWS_STORE" OFF)
+cmake_dependent_option(DEEP_USE_STATIC_MSVC_RUNTIME_LIBRARY "Use the static MSVC runtime library" ON "MSVC;NOT WINDOWS_STORE" OFF)
 
 # This library supports C++20 and higher, By default will use standard C++20, but you may specify a higher one.
 if (NOT DEFINED CMAKE_CXX_STANDARD)
@@ -128,13 +132,17 @@ set(DEEP_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 file(GLOB_RECURSE DEEP_SRC_FILES CONFIGURE_DEPENDS "${DEEP_ROOT}/src/*.cpp")
 
 # Create Deep lib
-add_library(Deep ${DEEP_SRC_FILES})
+if (DEEP_BUILD_SHARED_LIBS)
+	add_library(Deep SHARED ${DEEP_SRC_FILES})
+else()
+	add_library(Deep STATIC ${DEEP_SRC_FILES})
+endif()
 
 # Add include directory
 target_include_directories(Deep PUBLIC "${DEEP_ROOT}/public")
 
 # Handle shared library compilation
-if (BUILD_SHARED_LIBS)
+if (DEEP_BUILD_SHARED_LIBS)
 	# Set default visibility to hidden
 	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
@@ -151,7 +159,7 @@ if (MSVC)
 	target_compile_definitions(Deep PUBLIC _CRT_SECURE_NO_WARNINGS)
 
 	# Set runtime library
-	if (USE_STATIC_MSVC_RUNTIME_LIBRARY)
+	if (DEEP_USE_STATIC_MSVC_RUNTIME_LIBRARY)
 		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	endif()
 
@@ -250,60 +258,60 @@ endif()
 
 # Emit the instruction set definitions to ensure that child projects use the same settings even if they override the used instruction sets (a mismatch causes link errors)
 function(EMIT_X86_INSTRUCTION_SET_DEFINITIONS)
-	if (USE_AVX512)
+	if (DEEP_USE_AVX512)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_AVX512)
 	endif()
-	if (USE_AVX2)
+	if (DEEP_USE_AVX2)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_AVX2)
 	endif()
-	if (USE_AVX)
+	if (DEEP_USE_AVX)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_AVX)
 	endif()
-	if (USE_SSE4_1)
+	if (DEEP_USE_SSE4_1)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_SSE4_1)
 	endif()
-	if (USE_SSE4_2)
+	if (DEEP_USE_SSE4_2)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_SSE4_2)
 	endif()
-	if (USE_LZCNT)
+	if (DEEP_USE_LZCNT)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_LZCNT)
 	endif()
-	if (USE_TZCNT)
+	if (DEEP_USE_TZCNT)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_TZCNT)
 	endif()
-	if (USE_F16C)
+	if (DEEP_USE_F16C)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_F16C)
 	endif()
-	if (USE_FMADD)
+	if (DEEP_USE_FMADD)
 		target_compile_definitions(Deep PUBLIC DEEP_USE_FMADD)
 	endif()
 endfunction()
 
 # Add the compiler commandline flags to select the right instruction sets
-if (NOT NO_SIMD_INTRINSICS)
+if (NOT DEEP_NO_SIMD_INTRINSICS)
 	message(STATUS "${MESSAGE_PREFIX} Using SIMD Intrinsics")
 
 	if (MSVC)
-		if (USE_AVX512)
+		if (DEEP_USE_AVX512)
 			target_compile_options(Deep PUBLIC /arch:AVX512)
-		elseif (USE_AVX2)
+		elseif (DEEP_USE_AVX2)
 			target_compile_options(Deep PUBLIC /arch:AVX2)
-		elseif (USE_AVX)
+		elseif (DEEP_USE_AVX)
 			target_compile_options(Deep PUBLIC /arch:AVX)
 		endif()
 		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
 	elseif (CLANG)
-		if (USE_WASM_SIMD)
+		if (DEEP_USE_WASM_SIMD)
 			# Deep currently doesn't implement the WASM specific SIMD intrinsics so uses the SSE 4.2 intrinsics
 			# See: https://emscripten.org/docs/porting/simd.html#webassembly-simd-intrinsics
 			# Note that this does not require the browser to actually support SSE 4.2 it merely means that it can translate those instructions to WASM SIMD instructions
 			target_compile_options(Jolt PUBLIC -msimd128 -msse4.2)
 		else()
-			if (USE_AVX512)
+			if (DEEP_USE_AVX512)
 				target_compile_options(Deep PUBLIC -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl)
-			elseif (USE_AVX2)
+			elseif (DEEP_USE_AVX2)
 				target_compile_options(Deep PUBLIC -mavx2)
-			elseif (USE_AVX)
+			elseif (DEEP_USE_AVX)
 				target_compile_options(Deep PUBLIC -mavx)
 			endif()
 		endif()
@@ -313,5 +321,5 @@ if (NOT NO_SIMD_INTRINSICS)
 		message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
 	endif()
 else()
-	target_compile_definitions(Deep PUBLIC DEEP_DONT_USE_SIMD_INTRINSICS)
+	target_compile_definitions(Deep PUBLIC DEEP_NO_SIMD_INTRINSICS)
 endif()

@@ -66,10 +66,11 @@ Vec2::operator Vec2i() const {
 	return Vec2i{ static_cast<int>(x), static_cast<int>(y) };
 }
 
-inline bool operator!=(Arg_Vec2 in_a, Arg_Vec2 in_b) {
+bool operator!=(Arg_Vec2 in_a, Arg_Vec2 in_b) {
 	return in_a.x != in_b.x || in_a.y != in_b.y;
 }
-inline bool operator==(Arg_Vec2 a, Arg_Vec2 b) {
+
+bool operator==(Arg_Vec2 a, Arg_Vec2 b) {
 	return !(a != b);
 }
 
