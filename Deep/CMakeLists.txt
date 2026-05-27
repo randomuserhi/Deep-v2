@@ -9,17 +9,17 @@ set(MESSAGE_PREFIX "[${PROJECT_NAME}]")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	message(STATUS "${MESSAGE_PREFIX} Configuring for Debug build")
-	set(USE_ASSERTS_DEFAULT ON)
+	set(DEEP_USE_ASSERTS_DEFAULT ON)
 	set(RELEASE_BUILD OFF)
 	set(GENERATE_DEBUG_SYMBOLS ON)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
 	message(STATUS "${MESSAGE_PREFIX} Configuring for Release build")
-	set(USE_ASSERTS_DEFAULT OFF)
+	set(DEEP_USE_ASSERTS_DEFAULT OFF)
 	set(RELEASE_BUILD ON)
 	set(GENERATE_DEBUG_SYMBOLS OFF)
 elseif (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 	message(STATUS "${MESSAGE_PREFIX} Configuring for Release build (With Debug Info)")
-	set(USE_ASSERTS_DEFAULT ON)
+	set(DEEP_USE_ASSERTS_DEFAULT ON)
 	set(RELEASE_BUILD ON)
 	set(GENERATE_DEBUG_SYMBOLS ON)
 else()
@@ -34,7 +34,7 @@ if (DEFINED BUILD_SHARED_LIBS)
 endif()
 
 # When turning this option on, the library will be compiled using assertions. By default asserts are enabled in Debug build.
-option(DEEP_USE_ASSERTS "Enable asserts" ${USE_ASSERTS_DEFAULT})
+option(DEEP_USE_ASSERTS "Enable asserts" ${DEEP_USE_ASSERTS_DEFAULT})
 
 # When turning this on, the library will be compiled with C++ exceptions enabled.
 option(DEEP_CPP_EXCEPTIONS_ENABLED "Enable C++ exceptions" OFF)
@@ -218,8 +218,8 @@ elseif (CLANG)
 	endif()
 
 	# Disable RTTI
-	message(STATUS "${MESSAGE_PREFIX} USE_RTTI: ${USE_RTTI}")
-	if (NOT USE_RTTI)
+	message(STATUS "${MESSAGE_PREFIX} USE_RTTI: ${DEEP_USE_RTTI}")
+	if (NOT DEEP_USE_RTTI)
 		target_compile_options(Deep PRIVATE -fno-rtti)
 	endif()
 
@@ -240,19 +240,19 @@ else()
 endif()
 
 # Emit Strict Aliasing
-if (USE_STRICT_ALIASING)
+if (DEEP_USE_STRICT_ALIASING)
 	target_compile_definitions(Deep PUBLIC DEEP_USE_STRICT_ALIASING)
 endif()
 
 # Emit Asserts
-message(STATUS "${MESSAGE_PREFIX} USE_ASSERTS: ${USE_ASSERTS}")
-if (USE_ASSERTS)
+message(STATUS "${MESSAGE_PREFIX} USE_ASSERTS: ${DEEP_USE_ASSERTS}")
+if (DEEP_USE_ASSERTS)
 	target_compile_definitions(Deep PUBLIC DEEP_USE_ASSERTS)
 endif()
 
 # Emit C Bindings
-message(STATUS "${MESSAGE_PREFIX} USE_C_BINDINGS: ${USE_C_BINDINGS}")
-if (USE_C_BINDINGS)
+message(STATUS "${MESSAGE_PREFIX} USE_C_BINDINGS: ${DEEP_USE_C_BINDINGS}")
+if (DEEP_USE_C_BINDINGS)
 	target_compile_definitions(Deep PUBLIC DEEP_USE_C_BINDINGS)
 endif()
 
