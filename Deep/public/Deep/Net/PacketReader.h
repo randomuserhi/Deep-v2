@@ -44,6 +44,8 @@ struct PacketReader {
 	//
 
 private:
+	DEEP_PRIVATE_TESTABLE
+
 	//
 
 	const uint8* const m_data;

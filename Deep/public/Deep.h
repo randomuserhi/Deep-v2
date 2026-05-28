@@ -263,6 +263,15 @@
 #endif
 
 /*
+ * Tests
+ */
+#if defined(DEEP_TESTABLE)
+	#define DEEP_PRIVATE_TESTABLE public:
+#else
+	#define DEEP_PRIVATE_TESTABLE
+#endif
+
+/*
  * Asserts
  */
 #ifndef Deep_Break

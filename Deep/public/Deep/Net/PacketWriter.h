@@ -46,6 +46,8 @@ struct PacketWriter {
 	//
 
 private:
+	DEEP_PRIVATE_TESTABLE
+
 	//
 
 	std::vector<uint8> m_buffer;
