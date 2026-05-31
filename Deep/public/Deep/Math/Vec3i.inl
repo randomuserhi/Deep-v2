@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Deep/Math/Simd/Int32x4.h"
 #include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec3i.h"
 #include "Deep/Math/Vec4i.h"
@@ -7,13 +8,13 @@
 DEEP_NAMESPACE_BEGIN
 
 Vec3i::Vec3i(int32 in_x, int32 in_y, int32 in_z) :
-	xmmi{ in_x, in_y, in_z, in_z } {}
+	m_int32x4{ in_x, in_y, in_z, in_z } {}
 
 Vec3i::Vec3i(Arg_Vec4i in_vec) :
-	xmmi{ in_vec.xmmi } {}
+	m_int32x4{ in_vec.m_int32x4 } {}
 
-Vec3i::Vec3i(Xmmi in_xmmi) :
-	xmmi(in_xmmi) {}
+Vec3i::Vec3i(Int32x4 in_int32x4) :
+	m_int32x4(in_int32x4) {}
 
 float32 Vec3i::sqrdMagnitude() const {
 	return static_cast<Vec3>(*this).sqrdMagnitude();
@@ -29,16 +30,20 @@ int32 Vec3i::manhattanDistance() const {
 
 int32 Vec3i::Dot(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
-	Xmmi mul = _mm_mullo_epi32(in_a.xmmi, in_b.xmmi);
+	Int32x4 mul = _mm_mullo_epi32(in_a.m_int32x4, in_b.m_int32x4);
 	return mul.x + mul.y + mul.z;
 #else
 	return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z;
 #endif
 }
 
+Vec3i::operator Int32x4() const {
+	return m_int32x4;
+}
+
 Vec3i::operator Vec3() const {
 #ifdef DEEP_USE_SSE
-	return Vec3{ _mm_cvtepi32_ps(xmmi) };
+	return Vec3{ _mm_cvtepi32_ps(m_int32x4) };
 #else
 	return Vec3{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z) };
 #endif
@@ -46,7 +51,7 @@ Vec3i::operator Vec3() const {
 
 bool operator!=(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
-	return (Xmmi::Equals(in_a.xmmi, in_b.xmmi).ToBooleanBitMask() & 0b111) != 0b111;
+	return (Int32x4::Equals(in_a.m_int32x4, in_b.m_int32x4).ToBooleanBitMask() & 0b111) != 0b111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z;
 #endif
@@ -57,7 +62,7 @@ bool operator==(Arg_Vec3i a, Arg_Vec3i b) {
 
 Vec3i& Vec3i::operator+=(Arg_Vec3i in_other) {
 #ifdef DEEP_USE_SSE4_1
-	xmmi += in_other.xmmi;
+	m_int32x4 += in_other.m_int32x4;
 #else
 	x += in_other.x;
 	y += in_other.y;
@@ -69,7 +74,7 @@ Vec3i& Vec3i::operator+=(Arg_Vec3i in_other) {
 Vec3i operator+(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_a.xmmi + in_b.xmmi;
+	result.m_int32x4 = in_a.m_int32x4 + in_b.m_int32x4;
 	return result;
 #else
 	return Vec3i{ in_a.x + in_b.x, in_a.y + in_b.y, in_a.z + in_b.z };
@@ -78,7 +83,7 @@ Vec3i operator+(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 
 Vec3i& Vec3i::operator-=(Arg_Vec3i in_other) {
 #ifdef DEEP_USE_SSE4_1
-	xmmi -= in_other.xmmi;
+	m_int32x4 -= in_other.m_int32x4;
 #else
 	x -= in_other.x;
 	y -= in_other.y;
@@ -90,7 +95,7 @@ Vec3i& Vec3i::operator-=(Arg_Vec3i in_other) {
 Vec3i operator-(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_a.xmmi - in_b.xmmi;
+	result.m_int32x4 = in_a.m_int32x4 - in_b.m_int32x4;
 	return result;
 #else
 	return Vec3i{ in_a.x - in_b.x, in_a.y - in_b.y, in_a.z - in_b.z };
@@ -100,7 +105,7 @@ Vec3i operator-(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 Vec3i operator-(Arg_Vec3i in_a) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = -in_a.xmmi;
+	result.m_int32x4 = -in_a.m_int32x4;
 	return result;
 #else
 	// NOTE(randomuserhi): 0 - x to stay consistent with vectorised version
@@ -110,7 +115,7 @@ Vec3i operator-(Arg_Vec3i in_a) {
 
 Vec3i& Vec3i::operator*=(Arg_Vec3i in_other) {
 #ifdef DEEP_USE_SSE4_1
-	xmmi *= in_other.xmmi;
+	m_int32x4 *= in_other.m_int32x4;
 #else
 	x *= in_other.x;
 	y *= in_other.y;
@@ -121,7 +126,7 @@ Vec3i& Vec3i::operator*=(Arg_Vec3i in_other) {
 Vec3i operator*(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_a.xmmi * in_b.xmmi;
+	result.m_int32x4 = in_a.m_int32x4 * in_b.m_int32x4;
 	return result;
 #else
 	return Vec3i{ in_a.x * in_b.x, in_a.y * in_b.y, in_a.z * in_b.z };
@@ -130,7 +135,7 @@ Vec3i operator*(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 
 Vec3i& Vec3i::operator*=(int32 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	xmmi *= in_other;
+	m_int32x4 *= in_other;
 #else
 	x *= in_other;
 	y *= in_other;
@@ -142,7 +147,7 @@ Vec3i& Vec3i::operator*=(int32 in_other) {
 Vec3i operator*(Arg_Vec3i in_vec, int32 in_val) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_vec.xmmi * in_val;
+	result.m_int32x4 = in_vec.m_int32x4 * in_val;
 	return result;
 #else
 	return Vec3i{ in_vec.x * in_val, in_vec.y * in_val, in_vec.z * in_val };
@@ -152,7 +157,7 @@ Vec3i operator*(Arg_Vec3i in_vec, int32 in_val) {
 Vec3i operator*(int32 in_val, Arg_Vec3i in_vec) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_val * in_vec.xmmi;
+	result.m_int32x4 = in_val * in_vec.m_int32x4;
 	return result;
 #else
 	return Vec3i{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z };
@@ -161,7 +166,7 @@ Vec3i operator*(int32 in_val, Arg_Vec3i in_vec) {
 
 Vec3i& Vec3i::operator/=(Arg_Vec3i in_other) {
 #ifdef DEEP_USE_SSE4_1
-	xmmi /= in_other.xmmi;
+	m_int32x4 /= in_other.m_int32x4;
 #else
 	x /= in_other.x;
 	y /= in_other.y;
@@ -172,7 +177,7 @@ Vec3i& Vec3i::operator/=(Arg_Vec3i in_other) {
 Vec3i operator/(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_a.xmmi / in_b.xmmi;
+	result.m_int32x4 = in_a.m_int32x4 / in_b.m_int32x4;
 	return result;
 #else
 	return Vec3i{ in_a.x / in_b.x, in_a.y / in_b.y, in_a.z / in_b.z };
@@ -181,7 +186,7 @@ Vec3i operator/(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 
 Vec3i& Vec3i::operator/=(int32 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	xmmi /= in_other;
+	m_int32x4 /= in_other;
 #else
 	x /= in_other;
 	y /= in_other;
@@ -193,7 +198,7 @@ Vec3i& Vec3i::operator/=(int32 in_other) {
 Vec3i operator/(Arg_Vec3i in_vec, int32 in_val) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_vec.xmmi / in_val;
+	result.m_int32x4 = in_vec.m_int32x4 / in_val;
 	return result;
 #else
 	return Vec3i{ in_vec.x / in_val, in_vec.y / in_val, in_vec.z / in_val };
@@ -203,7 +208,7 @@ Vec3i operator/(Arg_Vec3i in_vec, int32 in_val) {
 Vec3i operator/(int32 in_val, Arg_Vec3i in_vec) {
 #ifdef DEEP_USE_SSE4_1
 	Vec3i result;
-	result.xmmi = in_val / in_vec.xmmi;
+	result.m_int32x4 = in_val / in_vec.m_int32x4;
 	return result;
 #else
 	return Vec3i{ in_val / in_vec.x, in_val / in_vec.y, in_val / in_vec.z };

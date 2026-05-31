@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Deep.h"
+#include "Deep/Math/Simd/Float32x4.h"
 #include "Deep/Math/VecArgs.h"
-#include "Deep/Math/Xmm.h"
+#include "Deep/Math/Simd.h"
 #include "Deep/Math/Vec4.h"
-#include "Deep/Math/XmmArgs.h"
 
 #include <type_traits>
 
@@ -14,13 +14,13 @@ DEEP_NAMESPACE_BEGIN
 // Notation is column followed by row, so m10 is column 1, row 0.
 //
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct [[nodiscard]] alignas(Xmm) Mat4 {
+struct [[nodiscard]] alignas(Float32x4) Mat4 {
 	//
 
 	Mat4() = default;
 	Mat4(const Mat4&) = default;
 	Mat4& operator=(const Mat4&) = default;
-	inline Mat4(const XmmArg in_col0, const XmmArg in_col1, const XmmArg in_col2, const XmmArg in_col3);
+	inline Mat4(Arg_Float32x4 in_col0, Arg_Float32x4 in_col1, Arg_Float32x4 in_col2, Arg_Float32x4 in_col3);
 	inline Mat4(                                                        //
 		float32 in_m00, float32 in_m01, float32 in_m02, float32 in_m03, //
 		float32 in_m10, float32 in_m11, float32 in_m12, float32 in_m13, //
@@ -74,7 +74,7 @@ struct [[nodiscard]] alignas(Xmm) Mat4 {
 	 * (30, 31, 32, 33)
 	 */
 	union {
-		Xmm m_cols[4];
+		Float32x4 m_cols[4];
 		Vec4 m_vcols[4];
 		float32 m_values[16];
 		// NOTE(randomuserhi): order of values matter for specific memory access patterns

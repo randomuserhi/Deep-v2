@@ -7,8 +7,8 @@ DEEP_NAMESPACE_BEGIN
 
 Quat::Quat(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
 	vec(in_x, in_y, in_z, in_w) {};
-Quat::Quat(Xmm in_xmm) :
-	xmm(in_xmm) {};
+Quat::Quat(Float32x4 in_float32x4) :
+	m_float32x4(in_float32x4) {};
 Quat::Quat(Vec4 in_vec) :
 	vec(in_vec) {};
 
@@ -25,7 +25,7 @@ Quat Quat::FromMat4(Arg_Mat4 in_mat) {
 	} else {
 		int i = 0;
 		if (in_mat.m11 > in_mat.m00) i = 1;
-		if (in_mat.m22 > in_mat.m_cols[i].values[i]) i = 2;
+		if (in_mat.m22 > in_mat.m_cols[i].m_values[i]) i = 2;
 
 		if (i == 0) {
 			float s = Sqrt(in_mat.m00 - (in_mat.m11 + in_mat.m22) + 1.0f);
@@ -67,7 +67,8 @@ Mat4 Quat::ToMat4() const {
 
 Quat& Quat::Conjugate() {
 	// https://stackoverflow.com/questions/56992811/is-there-a-way-to-flip-the-sign-bit-of-32-bit-float-with-xor
-	xmm = Xmm::Xor(xmm, Xmmi{ int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat());
+	m_float32x4 =
+		m_float32x4 ^ Int32x4{ int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat();
 	return *this;
 }
 Quat Quat::conjugated() const {
@@ -89,9 +90,9 @@ Quat::Quat(Vec3 in_axis, float32 in_angle) {
 	// { x,y,z } = axis * sin(0.5f * inAngle)
 	//   w       = cos(0.5f * inAngle)
 
-	Xmm s, c;
-	Xmm::Replicate(0.5f * in_angle).SinCos(s, c);
-	xmm = Xmm::Select(in_axis.xmm * s, c, Xmmi{ 0, 0, 0, int32(0xffffffff) });
+	Float32x4 s, c;
+	Float32x4::Replicate(0.5f * in_angle).SinCos(s, c);
+	m_float32x4 = Float32x4::Select(in_axis.m_float32x4 * s, c, Int32x4{ 0, 0, 0, int32(0xffffffff) });
 }
 
 bool operator!=(Arg_Quat in_a, Arg_Quat in_b) {
@@ -149,8 +150,8 @@ Quat operator/(float32 in_val, Arg_Quat in_quat) {
 Quat& Quat::operator*=(Arg_Quat in_other) {
 #ifdef DEEP_USE_SSE4_1
 	// Taken from: http://momchil-velikov.blogspot.nl/2013/10/fast-sse-quternion-multiplication.html
-	__m128 abcd = xmm;
-	__m128 xyzw = in_other.xmm;
+	__m128 abcd = m_float32x4;
+	__m128 xyzw = in_other.m_float32x4;
 
 	__m128 t0 = _mm_shuffle_ps(abcd, abcd, _MM_SHUFFLE(3, 3, 3, 3));
 	__m128 t1 = _mm_shuffle_ps(xyzw, xyzw, _MM_SHUFFLE(2, 3, 0, 1));
@@ -191,7 +192,7 @@ Quat& Quat::operator*=(Arg_Quat in_other) {
 	e = _mm_addsub_ps(e, m3);
 
 	// [dw-ax-by-cz,dz+ay-bx+cw,dy-az+bw+cx,dx+aw+bz-cy]
-	xmm = _mm_shuffle_ps(e, e, _MM_SHUFFLE(2, 3, 1, 0));
+	m_float32x4 = _mm_shuffle_ps(e, e, _MM_SHUFFLE(2, 3, 1, 0));
 #else
 	float lx = x;
 	float ly = y;
@@ -219,14 +220,14 @@ Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_vec) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
 	// Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)
-	return Vec3{ (in_quat * Vec4(in_vec, 0.0f) * in_quat.conjugated()).xmm };
+	return Vec3{ (in_quat * Vec4(in_vec, 0.0f) * in_quat.conjugated()).m_float32x4 };
 }
 
 Vec3 Quat::InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_vec) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
 	// Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)
-	return Vec3{ (in_quat.conjugated() * Vec4(in_vec, 0.0f) * in_quat).xmm };
+	return Vec3{ (in_quat.conjugated() * Vec4(in_vec, 0.0f) * in_quat).m_float32x4 };
 }
 
 DEEP_NAMESPACE_END

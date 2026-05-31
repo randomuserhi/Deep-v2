@@ -6,7 +6,7 @@
 
 #include "Deep.h"
 #include "Deep/Math/VecArgs.h"
-#include "Deep/Math/Xmm.h"
+#include "Deep/Math/Simd.h"
 #include "Deep/Math/Vec4.h"
 
 #include <type_traits>
@@ -14,14 +14,14 @@
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct [[nodiscard]] alignas(Xmm) Quat {
+struct [[nodiscard]] alignas(Float32x4) Quat {
 	//
 
 	Quat() = default;
 	Quat(const Quat&) = default;
 	Quat& operator=(const Quat&) = default;
 	inline Quat(Vec4 in_vec);
-	explicit inline Quat(Xmm in_Xmm);
+	explicit inline Quat(Float32x4 in_xmm);
 	explicit inline Quat(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
 	explicit inline Quat(Vec3 in_axis, float32 in_angle);
 
@@ -77,8 +77,8 @@ struct [[nodiscard]] alignas(Xmm) Quat {
 	//
 
 	union {
-		Xmm xmm;
-		Xmmi xmmi;
+		Float32x4 m_float32x4;
+		Int32x4 m_int32x4;
 		float32 val[4];
 		struct {
 			float32 x;

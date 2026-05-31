@@ -2,25 +2,26 @@
 
 #include "Deep.h"
 #include "Deep/Math/VecArgs.h" // IWYU pragma: export
-#include "Deep/Math/Xmmi.h"
+#include "Deep/Math/Simd.h"
 
 #include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
 // Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
-struct [[nodiscard]] alignas(Xmmi) Vec3i {
+struct [[nodiscard]] alignas(Int32x4) Vec3i {
 	//
 
 	Vec3i() = default;
 	Vec3i(const Vec3i&) = default;
 	Vec3i& operator=(const Vec3i&) = default;
 	inline Vec3i(int32 in_x, int32 in_y, int32 in_z);
-	explicit inline Vec3i(Xmmi in_xmmi);
+	explicit inline Vec3i(Int32x4 in_xmmi);
 	explicit inline Vec3i(Arg_Vec4i in_vec);
 
 	//
 
+	inline operator Int32x4() const;
 	explicit inline operator Vec3() const;
 
 	//
@@ -69,8 +70,8 @@ struct [[nodiscard]] alignas(Xmmi) Vec3i {
 
 	// NOTE(randomuserhi): The underlying type is a Vec4 for vectorisation
 	union {
-		Xmm xmm;
-		Xmmi xmmi;
+		Float32x4 m_float32x4;
+		Int32x4 m_int32x4;
 		int32 m_values[4];
 		struct {
 			int32 x;

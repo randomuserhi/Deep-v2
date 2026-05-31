@@ -5,7 +5,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-Mat4::Mat4(Xmm in_col0, Xmm in_col1, Xmm in_col2, Xmm in_col3) :
+Mat4::Mat4(Float32x4 in_col0, Float32x4 in_col1, Float32x4 in_col2, Float32x4 in_col3) :
 	m_cols{ in_col0, in_col1, in_col2, in_col3 } {}
 Mat4::Mat4(                                                         //
 	float32 in_m00, float32 in_m01, float32 in_m02, float32 in_m03, //
@@ -14,10 +14,10 @@ Mat4::Mat4(                                                         //
 	float32 in_m30, float32 in_m31, float32 in_m32, float32 in_m33  //
 	) :
 	m_cols{
-		Xmm(in_m00, in_m10, in_m20, in_m30), //
-		Xmm(in_m01, in_m11, in_m21, in_m31), //
-		Xmm(in_m02, in_m12, in_m22, in_m32), //
-		Xmm(in_m03, in_m13, in_m23, in_m33)  //
+		Float32x4(in_m00, in_m10, in_m20, in_m30), //
+		Float32x4(in_m01, in_m11, in_m21, in_m31), //
+		Float32x4(in_m02, in_m12, in_m22, in_m32), //
+		Float32x4(in_m03, in_m13, in_m23, in_m33)  //
 	} {}
 Mat4::Mat4(Vec4 in_col0, Vec4 in_col1, Vec4 in_col2, Vec4 in_col3) :
 	m_vcols{ in_col0, in_col1, in_col2, in_col3 } {}
@@ -55,7 +55,7 @@ Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
 	// See: https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation section 'Quaternion-derived rotation matrix'
 
 #ifdef DEEP_USE_SSE4_1
-	__m128 xyzw = in_quat.xmm;
+	__m128 xyzw = in_quat.m_float32x4;
 	__m128 two_xyzw = _mm_add_ps(xyzw, xyzw);
 	__m128 yzxw = _mm_shuffle_ps(xyzw, xyzw, _MM_SHUFFLE(3, 0, 2, 1));
 	__m128 two_yzxw = _mm_add_ps(yzxw, yzxw);
@@ -102,10 +102,10 @@ Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
 
 	// NOTE(randomuserhi): Brackets to stay consistent with vectorised version
 	return Mat4{
-		Xmm((1.0f - yy) - zz, xy + zw, xz - yw, 0.0f), //
-		Xmm(xy - zw, (1.0f - zz) - xx, yz + xw, 0.0f), //
-		Xmm(xz + yw, yz - xw, (1.0f - xx) - yy, 0.0f), //
-		Xmm(0.0f, 0.0f, 0.0f, 1.0f)                    //
+		Float32x4((1.0f - yy) - zz, xy + zw, xz - yw, 0.0f), //
+		Float32x4(xy - zw, (1.0f - zz) - xx, yz + xw, 0.0f), //
+		Float32x4(xz + yw, yz - xw, (1.0f - xx) - yy, 0.0f), //
+		Float32x4(0.0f, 0.0f, 0.0f, 1.0f)                    //
 	};
 #endif
 }
@@ -294,14 +294,18 @@ Mat4 Mat4::inversed() const {
 	float32 n22333223 = m22 * m33 - m32 * m23;
 
 	Mat4 result{
-		Xmm{ m11 * n22333223 - m21 * n12333213 + m31 * n12232213, -m01 * n22333223 + m21 * n02333203 - m31 * n02232203,
-		     m01 * n12333213 - m11 * n02333203 + m31 * n02131203, -m01 * n12232213 + m11 * n02232203 - m21 * n02131203 },
-		Xmm{ -m10 * n22333223 + m20 * n12333213 - m30 * n12232213, m00 * n22333223 - m20 * n02333203 + m30 * n02232203,
-		     -m00 * n12333213 + m10 * n02333203 - m30 * n02131203, m00 * n12232213 - m10 * n02232203 + m20 * n02131203 },
-		Xmm{ m10 * n21333123 - m20 * n11333113 + m30 * n11232113, -m00 * n21333123 + m20 * n01333103 - m30 * n01232103,
-		     m00 * n11333113 - m10 * n01333103 + m30 * n01131103, -m00 * n11232113 + m10 * n01232103 - m20 * n01131103 },
-		Xmm{ -m10 * n21323122 + m20 * n11323112 - m30 * n11222112, m00 * n21323122 - m20 * n01323102 + m30 * n01222102,
-		     -m00 * n11323112 + m10 * n01323102 - m30 * n01121102, m00 * n11222112 - m10 * n01222102 + m20 * n01121102 }
+		Float32x4{ m11 * n22333223 - m21 * n12333213 + m31 * n12232213, -m01 * n22333223 + m21 * n02333203 - m31 * n02232203,
+		           m01 * n12333213 - m11 * n02333203 + m31 * n02131203,
+		           -m01 * n12232213 + m11 * n02232203 - m21 * n02131203 },
+		Float32x4{ -m10 * n22333223 + m20 * n12333213 - m30 * n12232213, m00 * n22333223 - m20 * n02333203 + m30 * n02232203,
+		           -m00 * n12333213 + m10 * n02333203 - m30 * n02131203,
+		           m00 * n12232213 - m10 * n02232203 + m20 * n02131203 },
+		Float32x4{ m10 * n21333123 - m20 * n11333113 + m30 * n11232113, -m00 * n21333123 + m20 * n01333103 - m30 * n01232103,
+		           m00 * n11333113 - m10 * n01333103 + m30 * n01131103,
+		           -m00 * n11232113 + m10 * n01232103 - m20 * n01131103 },
+		Float32x4{ -m10 * n21323122 + m20 * n11323112 - m30 * n11222112, m00 * n21323122 - m20 * n01323102 + m30 * n01222102,
+		           -m00 * n11323112 + m10 * n01323102 - m30 * n01121102,
+		           m00 * n11222112 - m10 * n01222102 + m20 * n01121102 }
 	};
 
 	float det = m00 * result.m_cols[0].x + m10 * result.m_cols[0].y + m20 * result.m_cols[0].z + m30 * result.m_cols[0].w;
@@ -316,8 +320,8 @@ Mat4 Mat4::inversed() const {
 }
 
 bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
-	return Xmmi::And(Xmmi::And(Xmm::Equals(in_a.m_cols[0], in_b.m_cols[0]), Xmm::Equals(in_a.m_cols[1], in_b.m_cols[1])),
-	                 Xmmi::And(Xmm::Equals(in_a.m_cols[2], in_b.m_cols[2]), Xmm::Equals(in_a.m_cols[3], in_b.m_cols[3])))
+	return ((Float32x4::Equals(in_a.m_cols[0], in_b.m_cols[0]) & Float32x4::Equals(in_a.m_cols[1], in_b.m_cols[1]))
+	        & (Float32x4::Equals(in_a.m_cols[2], in_b.m_cols[2]) & Float32x4::Equals(in_a.m_cols[3], in_b.m_cols[3])))
 	           .ToBooleanBitMask()
 	       != 0b1111;
 }
@@ -388,12 +392,15 @@ Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b) {
 Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
 	Vec3 _v;
 #ifdef DEEP_USE_SSE4_1
-	_v.xmm = _mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(0, 0, 0, 0)));
-	_v.xmm =
-		_mm_add_ps(_v.xmm, _mm_mul_ps(in_mat.m_cols[1], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(1, 1, 1, 1))));
-	_v.xmm =
-		_mm_add_ps(_v.xmm, _mm_mul_ps(in_mat.m_cols[2], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(2, 2, 2, 2))));
-	_v.xmm = _mm_add_ps(_v.xmm, in_mat.m_cols[3]);
+	_v.m_float32x4 =
+		_mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(0, 0, 0, 0)));
+	_v.m_float32x4 = _mm_add_ps(
+		_v.m_float32x4,
+		_mm_mul_ps(in_mat.m_cols[1], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(1, 1, 1, 1))));
+	_v.m_float32x4 = _mm_add_ps(
+		_v.m_float32x4,
+		_mm_mul_ps(in_mat.m_cols[2], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(2, 2, 2, 2))));
+	_v.m_float32x4 = _mm_add_ps(_v.m_float32x4, in_mat.m_cols[3]);
 #else
 	float32 invW = 1.0f / (in_mat.m30 * in_vec.x + in_mat.m31 * in_vec.y + in_mat.m32 * in_vec.z + in_mat.m33);
 	_v.x = (in_mat.m00 * in_vec.x + in_mat.m01 * in_vec.y + in_mat.m02 * in_vec.z + in_mat.m03) * invW;
@@ -406,13 +413,17 @@ Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
 Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec) {
 	Vec4 _v;
 #ifdef DEEP_USE_SSE4_1
-	_v.xmm = _mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(0, 0, 0, 0)));
-	_v.xmm =
-		_mm_add_ps(_v.xmm, _mm_mul_ps(in_mat.m_cols[1], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(1, 1, 1, 1))));
-	_v.xmm =
-		_mm_add_ps(_v.xmm, _mm_mul_ps(in_mat.m_cols[2], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(2, 2, 2, 2))));
-	_v.xmm =
-		_mm_add_ps(_v.xmm, _mm_mul_ps(in_mat.m_cols[3], _mm_shuffle_ps(in_vec.xmm, in_vec.xmm, _MM_SHUFFLE(3, 3, 3, 3))));
+	_v.m_float32x4 =
+		_mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(0, 0, 0, 0)));
+	_v.m_float32x4 = _mm_add_ps(
+		_v.m_float32x4,
+		_mm_mul_ps(in_mat.m_cols[1], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(1, 1, 1, 1))));
+	_v.m_float32x4 = _mm_add_ps(
+		_v.m_float32x4,
+		_mm_mul_ps(in_mat.m_cols[2], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(2, 2, 2, 2))));
+	_v.m_float32x4 = _mm_add_ps(
+		_v.m_float32x4,
+		_mm_mul_ps(in_mat.m_cols[3], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(3, 3, 3, 3))));
 #else
 	_v.x = in_mat.m00 * in_vec.x + in_mat.m01 * in_vec.y + in_mat.m02 * in_vec.z + in_mat.m03 * in_vec.w;
 	_v.y = in_mat.m10 * in_vec.x + in_mat.m11 * in_vec.y + in_mat.m12 * in_vec.z + in_mat.m13 * in_vec.w;
