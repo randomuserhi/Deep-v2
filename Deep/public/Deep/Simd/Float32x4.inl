@@ -60,7 +60,7 @@ Float32x4 Float32x4::Replicate(float32 in_value) {
 #ifdef DEEP_USE_SSE
 	return _mm_set1_ps(in_value);
 #else
-	return Xmm{ in_value, in_value, in_value, in_value };
+	return Float32x4{ in_value, in_value, in_value, in_value };
 #endif
 }
 
@@ -68,7 +68,7 @@ Float32x4 Float32x4::Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_min_ps(in_a, in_b);
 #else
-	return Xmm{
+	return Float32x4{
 		Deep::Min(in_a.x, in_b.x), //
 		Deep::Min(in_a.y, in_b.y), //
 		Deep::Min(in_a.z, in_b.z), //
@@ -81,7 +81,7 @@ Float32x4 Float32x4::Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_max_ps(in_a, in_b);
 #else
-	return Xmm{
+	return Float32x4{
 		Deep::Max(in_a.x, in_b.x), //
 		Deep::Max(in_a.y, in_b.y), //
 		Deep::Max(in_a.z, in_b.z), //
@@ -191,7 +191,7 @@ Float32x4 operator-(Arg_Float32x4 in_other) {
 	return _mm_sub_ps(_mm_setzero_ps(), in_other);
 #else
 	// NOTE(randomuserhi): 0.0f - x to stay consistent with vectorised version
-	return Xmm{ 0.0f - in_other.x, 0.0f - in_other.y, 0.0f - in_other.z, 0.0f - in_other.w };
+	return Float32x4{ 0.0f - in_other.x, 0.0f - in_other.y, 0.0f - in_other.z, 0.0f - in_other.w };
 #endif
 }
 
@@ -230,7 +230,7 @@ Float32x4 operator*(float32 in_val, Arg_Float32x4 in_vec) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_mul_ps(_mm_set1_ps(in_val), in_vec);
 #else
-	return Xmm{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z, in_val * in_vec.w };
+	return Float32x4{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z, in_val * in_vec.w };
 #endif
 }
 
@@ -269,7 +269,7 @@ Float32x4 operator/(float32 in_val, Arg_Float32x4 in_vec) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_div_ps(_mm_set1_ps(in_val), in_vec);
 #else
-	return Xmm{ in_val / in_vec.x, in_val / in_vec.y, in_val / in_vec.z, in_val / in_vec.w };
+	return Float32x4{ in_val / in_vec.x, in_val / in_vec.y, in_val / in_vec.z, in_val / in_vec.w };
 #endif
 }
 
@@ -286,8 +286,8 @@ Float32x4 Float32x4::Select(Arg_Float32x4 in_a, Arg_Float32x4 in_b, Arg_Int32x4 
 #ifdef DEEP_USE_SSE4_1
 	return _mm_blendv_ps(in_a, in_b, _mm_castsi128_ps(in_control));
 #else
-	return Xmm{ in_control.x ? in_b.x : in_a.x, in_control.y ? in_b.y : in_a.y, in_control.z ? in_b.z : in_a.z,
-		        in_control.w ? in_b.w : in_a.w };
+	return Float32x4{ in_control.x ? in_b.x : in_a.x, in_control.y ? in_b.y : in_a.y, in_control.z ? in_b.z : in_a.z,
+		              in_control.w ? in_b.w : in_a.w };
 #endif
 }
 

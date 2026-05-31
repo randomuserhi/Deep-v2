@@ -59,7 +59,7 @@ bool operator!=(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return Int64x2::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
 #else
-	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
+	return in_a.x != in_b.x || in_a.y != in_b.y;
 #endif
 }
 bool operator==(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
@@ -94,7 +94,7 @@ Int64x2& Int64x2::operator|=(Arg_Int64x2 in_other) {
 #ifdef DEEP_USE_SSE
 	_internal = _mm_or_si128(_internal, in_other);
 #else
-	_internal = Int64x2{ x | in_other.x, y | in_other.y, z | in_other.z, w | in_other.w };
+	_internal = Int64x2{ x | in_other.x, y | in_other.y };
 #endif
 	return *this;
 }
@@ -106,7 +106,7 @@ Int64x2& Int64x2::operator&=(Arg_Int64x2 in_other) {
 #ifdef DEEP_USE_SSE
 	_internal = _mm_and_si128(_internal, in_other);
 #else
-	_internal = Int64x2{ x & in_other.x, y & in_other.y, z & in_other.z, w & in_other.w };
+	_internal = Int64x2{ x & in_other.x, y & in_other.y };
 #endif
 	return *this;
 }
@@ -118,7 +118,7 @@ Int64x2& Int64x2::operator^=(Arg_Int64x2 in_other) {
 #ifdef DEEP_USE_SSE
 	_internal = _mm_xor_si128(_internal, in_other);
 #else
-	_internal = Int64x2{ x ^ in_other.x, y ^ in_other.y, z ^ in_other.z, w ^ in_other.w };
+	_internal = Int64x2{ x ^ in_other.x, y ^ in_other.y };
 #endif
 	return *this;
 }

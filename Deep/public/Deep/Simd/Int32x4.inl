@@ -39,7 +39,7 @@ Float32x4 Int32x4::ToFloat() const {
 #ifdef DEEP_USE_SSE
 	return _mm_cvtepi32_ps(_internal);
 #else
-	return Xmm{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z), static_cast<float32>(w) };
+	return Float32x4{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z), static_cast<float32>(w) };
 #endif
 }
 constexpr Float32x4 Int32x4::Constexpr_ToFloat() const {
