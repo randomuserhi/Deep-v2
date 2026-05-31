@@ -346,8 +346,8 @@ void Float32x4::SinCos(Float32x4& out_sin, Float32x4& out_cos) {
 	// XXX11b	-cos(x')	 sin(x')
 	//
 	// So: sin_sign = bit2, cos_sign = bit1 ^ bit2, bit1 determines if we use sin or cos Taylor expansion
-	Int32x4 bit1 = quadrant.LogicalShiftLeft<31>();
-	Int32x4 bit2 = quadrant.LogicalShiftLeft<30>() & Int32x4::Replicate(int32(0x80000000));
+	Int32x4 bit1 = quadrant << 31;
+	Int32x4 bit2 = (quadrant << 30) & Int32x4::Replicate(int32(0x80000000));
 
 	// Select which one of the results is sin and which one is cos
 	Float32x4 s = Float32x4::Select(taylorSin, taylorCos, bit1);

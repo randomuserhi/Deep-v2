@@ -62,7 +62,7 @@ constexpr Float32x4 Int32x4::Constexpr_ReinterpretAsFloat() const {
 	return BitCast<Float32x4>(*this);
 }
 
-Int32x4 Int32x4::Replicate(int in_value) {
+Int32x4 Int32x4::Replicate(int32 in_value) {
 #ifdef DEEP_USE_SSE
 	return _mm_set1_epi32(in_value);
 #else
@@ -74,48 +74,8 @@ int32 Int32x4::ToBooleanBitMask() const {
 #ifdef DEEP_USE_SSE
 	return _mm_movemask_ps(_mm_castsi128_ps(_internal));
 #else
-	// NOTE(randomuserhi): Casting int32 to uint32 is well defined to be no-op as if implemented with twos-complement,
-	// https://stackoverflow.com/a/59601196
-	//                     So no need for a bitcast
-	return (static_cast<uint32>(x) >> 31u) | ((static_cast<uint32>(y) >> 31u) << 1) | ((static_cast<uint32>(z) >> 31u) << 2u)
-	       | ((static_cast<uint32>(w) >> 31u) << 3u);
+	return (x >> 31) | ((y >> 31) << 1) | ((z >> 31) << 2) | ((w >> 31) << 3);
 #endif
-}
-
-Int32x4& Int32x4::operator|=(Arg_Int32x4 in_other) {
-#ifdef DEEP_USE_SSE
-	_internal = _mm_or_si128(_internal, in_other);
-#else
-	_internal = Int32x4{ x | in_other.x, y | in_other.y, z | in_other.z, w | in_other.w };
-#endif
-	return *this;
-}
-Int32x4 operator|(Int32x4 in_a, Arg_Int32x4 in_b) {
-	return in_a |= in_b;
-}
-
-Int32x4& Int32x4::operator&=(Arg_Int32x4 in_other) {
-#ifdef DEEP_USE_SSE
-	_internal = _mm_and_si128(_internal, in_other);
-#else
-	_internal = Int32x4{ x & in_other.x, y & in_other.y, z & in_other.z, w & in_other.w };
-#endif
-	return *this;
-}
-Int32x4 operator&(Int32x4 in_a, Arg_Int32x4 in_b) {
-	return in_a &= in_b;
-}
-
-Int32x4& Int32x4::operator^=(Arg_Int32x4 in_other) {
-#ifdef DEEP_USE_SSE
-	_internal = _mm_xor_si128(_internal, in_other);
-#else
-	_internal = Int32x4{ x ^ in_other.x, y ^ in_other.y, z ^ in_other.z, w ^ in_other.w };
-#endif
-	return *this;
-}
-Int32x4 operator^(Int32x4 in_a, Arg_Int32x4 in_b) {
-	return in_a ^= in_b;
 }
 
 Int32x4 Int32x4::Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
@@ -159,28 +119,6 @@ constexpr Int32x4 Int32x4::Constexpr_Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) 
 	                          in_a.w == in_b.w ? int32(0xffffffff) : 0);
 }
 
-template<const uint32 Count>
-Int32x4 Int32x4::LogicalShiftLeft() const {
-	static_assert(Count <= 31, "Invalid shift");
-
-#ifdef DEEP_USE_SSE
-	return _mm_slli_epi32(_internal, Count);
-#else
-	return Int32x4{ x << Count, y << Count, z << Count, w << Count };
-#endif
-}
-
-template<const uint32 Count>
-Int32x4 Int32x4::LogicalShiftRight() const {
-	static_assert(Count <= 31, "Invalid shift");
-
-#ifdef DEEP_USE_SSE
-	return _mm_srli_epi32(_internal, Count);
-#else
-	return Int32x4{ x >> Count, y >> Count, z >> Count, w >> Count };
-#endif
-}
-
 Int32x4 Int32x4::Select(Arg_Int32x4 in_a, Arg_Int32x4 in_b, Arg_Int32x4 in_control) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_castps_si128(_mm_blendv_ps(_mm_castsi128_ps(in_a), _mm_castsi128_ps(in_b), _mm_castsi128_ps(in_control)));
@@ -199,6 +137,66 @@ bool operator!=(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 }
 bool operator==(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 	return !(in_a != in_b);
+}
+
+Int32x4& Int32x4::operator<<=(int32 in_count) {
+#ifdef DEEP_USE_SSE
+	_internal = _mm_slli_epi32(_internal, in_count);
+#else
+	_internal = Int32x4{ x << in_count, y << in_count, z << in_count, w << in_count };
+#endif
+	return *this;
+}
+Int32x4 operator<<(Int32x4 in_a, int32 in_count) {
+	return in_a <<= in_count;
+}
+
+Int32x4& Int32x4::operator>>=(int32 in_count) {
+#ifdef DEEP_USE_SSE
+	_internal = _mm_srli_epi32(_internal, in_count);
+#else
+	_internal = Int32x4{ x >> in_count, y >> in_count, z >> in_count, w >> in_count };
+#endif
+	return *this;
+}
+Int32x4 operator>>(Int32x4 in_a, int32 in_count) {
+	return in_a >>= in_count;
+}
+
+Int32x4& Int32x4::operator|=(Arg_Int32x4 in_other) {
+#ifdef DEEP_USE_SSE
+	_internal = _mm_or_si128(_internal, in_other);
+#else
+	_internal = Int32x4{ x | in_other.x, y | in_other.y, z | in_other.z, w | in_other.w };
+#endif
+	return *this;
+}
+Int32x4 operator|(Int32x4 in_a, Arg_Int32x4 in_b) {
+	return in_a |= in_b;
+}
+
+Int32x4& Int32x4::operator&=(Arg_Int32x4 in_other) {
+#ifdef DEEP_USE_SSE
+	_internal = _mm_and_si128(_internal, in_other);
+#else
+	_internal = Int32x4{ x & in_other.x, y & in_other.y, z & in_other.z, w & in_other.w };
+#endif
+	return *this;
+}
+Int32x4 operator&(Int32x4 in_a, Arg_Int32x4 in_b) {
+	return in_a &= in_b;
+}
+
+Int32x4& Int32x4::operator^=(Arg_Int32x4 in_other) {
+#ifdef DEEP_USE_SSE
+	_internal = _mm_xor_si128(_internal, in_other);
+#else
+	_internal = Int32x4{ x ^ in_other.x, y ^ in_other.y, z ^ in_other.z, w ^ in_other.w };
+#endif
+	return *this;
+}
+Int32x4 operator^(Int32x4 in_a, Arg_Int32x4 in_b) {
+	return in_a ^= in_b;
 }
 
 Int32x4& Int32x4::operator+=(Arg_Int32x4 in_other) {

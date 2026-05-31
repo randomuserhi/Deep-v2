@@ -34,7 +34,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	using Type = __m128i;
 #else
 	using Type = struct {
-		uint32 m_values[4];
+		int32 m_values[4];
 	};
 #endif
 
@@ -70,7 +70,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	inline int32 ToBooleanBitMask() const;
 
 	// Replicate the given value across all components
-	static inline Int32x4 Replicate(int in_value);
+	static inline Int32x4 Replicate(int32 in_value);
 
 	// Component wise min/max
 	static inline Int32x4 Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
@@ -83,14 +83,6 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	static inline Int32x4 Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
 	constexpr static inline Int32x4 Constexpr_Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
 
-	// Shift all components by `Count` bits to the left
-	template<const uint32 Count>
-	inline Int32x4 LogicalShiftLeft() const;
-
-	// Shift all components by `Count` bits to the right
-	template<const uint32 Count>
-	inline Int32x4 LogicalShiftRight() const;
-
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
 	static inline Int32x4 Select(Arg_Int32x4 in_a, Arg_Int32x4 in_b, Arg_Int32x4 in_control);
 
@@ -100,17 +92,25 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	friend inline bool operator!=(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
 	friend inline bool operator==(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
 
+	// Component wise logical shift right
+	inline Int32x4& operator>>=(int32 in_count);
+	friend inline Int32x4 operator>>(Int32x4 in_a, int32 in_count);
+
+	// Component wise logical shift left
+	inline Int32x4& operator<<=(int32 in_count);
+	friend inline Int32x4 operator<<(Int32x4 in_a, int32 in_count);
+
 	// Component wise logical OR
 	inline Int32x4& operator|=(Arg_Int32x4 in_other);
-	friend inline Int32x4 operator|(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
+	friend inline Int32x4 operator|(Int32x4 in_a, Arg_Int32x4 in_b);
 
 	// Component wise logical AND
 	inline Int32x4& operator&=(Arg_Int32x4 in_other);
-	friend inline Int32x4 operator&(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
+	friend inline Int32x4 operator&(Int32x4 in_a, Arg_Int32x4 in_b);
 
 	// Component wise logical XOR
 	inline Int32x4& operator^=(Arg_Int32x4 in_other);
-	friend inline Int32x4 operator^(Arg_Int32x4 in_a, Arg_Int32x4 in_b);
+	friend inline Int32x4 operator^(Int32x4 in_a, Arg_Int32x4 in_b);
 
 	// Component wise Add
 	inline Int32x4& operator+=(Arg_Int32x4 in_other);
