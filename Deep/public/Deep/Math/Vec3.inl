@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep/Math/Ops.h"
-#include "Deep/Math/Simd/Float32x4.h"
+#include "Deep/Simd/Float32x4.h"
 #include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec3i.h"
 #include "Deep/Math/Vec4.h"

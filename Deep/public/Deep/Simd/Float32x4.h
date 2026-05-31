@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Math/Simd/SimdArgs.h"
+#include "Deep/Simd/SimdArgs.h"
 
 #if defined(DEEP_USE_SSE)
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
@@ -155,4 +155,4 @@ DEEP_NAMESPACE_END
 
 #undef DEEP_VEC_ALIGNMENT
 
-#include "Deep/Math/Simd/Float32x4.inl" // IWYU pragma: export
+#include "Deep/Simd/Float32x4.inl" // IWYU pragma: export

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Simd/Int32x4.h"
-#include "Deep/Math/Simd/Float32x4.h"
+#include "Deep/Simd/Int32x4.h"
+#include "Deep/Simd/Float32x4.h"
 #include "Deep/Bit.h"
 #include <smmintrin.h>
 

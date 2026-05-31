@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Math/Simd/Float32x4.h"
+#include "Deep/Simd/Float32x4.h"
 #include "Deep/Math/VecArgs.h"
-#include "Deep/Math/Simd.h"
+#include "Deep/Simd.h"
 #include "Deep/Math/Vec4.h"
 
 #include <type_traits>

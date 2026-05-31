@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Deep/Math/Simd/Int32x4.h"
+#include "Deep/Simd/Int32x4.h"
 #include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec3i.h"
 #include "Deep/Math/Vec4i.h"

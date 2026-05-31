@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Math/VecArgs.h" // IWYU pragma: export
-#include "Deep/Math/Simd.h"
+#include "Deep/Simd.h"
 
 #include <type_traits>
 
