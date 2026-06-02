@@ -7,13 +7,13 @@
 DEEP_NAMESPACE_BEGIN
 
 Vec2i::Vec2i(int32 in_x, int32 in_y) :
-	x(in_x), y(in_y) {}
+	x{ in_x }, y{ in_y } {}
 
 Vec2i::Vec2i(Arg_Vec3i in_vec) :
-	x(in_vec.x), y(in_vec.y) {}
+	x{ in_vec.x }, y{ in_vec.y } {}
 
 Vec2i::Vec2i(Arg_Vec4i in_vec) :
-	x(in_vec.x), y(in_vec.y) {}
+	x{ in_vec.x }, y{ in_vec.y } {}
 
 float32 Vec2i::sqrdMagnitude() const {
 	return static_cast<Vec2>(*this).sqrdMagnitude();

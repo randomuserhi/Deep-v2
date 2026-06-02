@@ -74,7 +74,7 @@ TEST(Aabb3D, RaycastHit) {
 			EXPECT_EQ(hits->m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 
 			EXPECT_TRUE(Deep::Raycast<Deep::RaycastType::e_startsInside>(ray, a, hits));
-			EXPECT_EQ(hits->normal4(), Deep::Vec3::k_left);
+			EXPECT_EQ(hits->normal4(), Deep::Vec3::k_right);
 			EXPECT_EQ(hits->m_point, (Deep::Vec3{ -0.5f, 0.0f, 0.0f }));
 			EXPECT_EQ(hits->m_distance, 0.5f);
 

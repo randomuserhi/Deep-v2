@@ -1,4 +1,5 @@
 #include "Tests.h"
+#include <ostream>
 #include <sstream>
 
 TEST_SUPPRESS_WARNINGS_STD_BEGIN
@@ -8,35 +9,65 @@ TEST_SUPPRESS_WARNINGS_STD_BEGIN
 #include <cstring>
 TEST_SUPPRESS_WARNINGS_STD_END
 
+namespace {
+
+class ScopedCoutCapture {
+public:
+	ScopedCoutCapture(std::streambuf& in_buf) :
+		m_oldBuf{ std::cout.rdbuf(&in_buf) } {}
+
+	~ScopedCoutCapture() {
+		std::cout.rdbuf(m_oldBuf);
+	}
+
+private:
+	std::streambuf* m_oldBuf;
+};
+
+} // namespace
+
 namespace Test {
+
+IndentBuf::IndentBuf(std::streambuf* in_dest) :
+	m_dest{ in_dest }, m_depth{ 0 }, m_atLineStart{ true } {}
+
+int IndentBuf::overflow(int in_ch) {
+	if (in_ch == traits_type::eof()) return m_dest->sputc(in_ch);
+
+	if (m_atLineStart) {
+		for (size_t i = 0; i < m_depth; ++i) {
+			m_dest->sputc('\t');
+		}
+		m_atLineStart = false;
+	}
+
+	m_dest->sputc(in_ch);
+
+	if (in_ch == '\n') m_atLineStart = true;
+
+	return in_ch;
+}
 
 void TestBase::Init() {
 	m_failed = false;
-}
-
-std::ostringstream& TestBase::Indent(bool in_newLine) {
-	if (in_newLine) {
-		*m_out << "\n";
-	}
-	for (size_t i = 0; i < m_depth; ++i) {
-		*m_out << '\t';
-	}
-	return *m_out;
+	m_out.m_depth = 2;
 }
 
 TestCase::TestCase(const char* in_caseName, TestBase& in_testObj) :
-	m_caseName{ in_caseName }, m_testObj{ in_testObj }, m_out{ m_testObj.m_out } {
-
-	// Increment depth in test object to display nested cases properly
-	++m_testObj.m_depth;
-	m_testObj.Indent();
+	m_caseName{ in_caseName },
+	m_testObj{ in_testObj },
+	m_parentBuf{ m_testObj.m_out.m_dest },
+	m_parentDepth{ m_testObj.m_out.m_depth } {
 
 	// Write case name
-	*m_testObj.m_out << '[' << in_caseName;
+	m_testObj.m_out.m_atLineStart = true;
+	std::cout << "[" << in_caseName;
 
 	// Swap out write buffer to this test case object's one
 	// All writes that occure will now be under this test case
-	m_testObj.m_out = &m_buf;
+	m_testObj.m_out.m_dest = m_buf.rdbuf();
+	m_testObj.m_out.m_depth = 1;
+	std::cout << '\n';
 
 	m_start = std::chrono::high_resolution_clock::now();
 }
@@ -45,24 +76,23 @@ TestCase::~TestCase() {
 	m_end = std::chrono::high_resolution_clock::now();
 
 	// Restore the write buffer to what it was before entering this test case
-	m_testObj.m_out = m_out;
-
-	// Decrement depth as we exit the test case
-	--m_testObj.m_depth;
+	m_testObj.m_out.m_dest = m_parentBuf;
+	m_testObj.m_out.m_depth = m_parentDepth;
 
 	// Write duration to the test output
-	*m_testObj.m_out << " - ";
+	m_testObj.m_out.m_atLineStart = false;
+	std::cout << " - ";
 
 	auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(m_end - m_start);
 	if (duration_us.count() < 1000) {
-		*m_testObj.m_out << duration_us.count() << " microseconds]";
+		std::cout << duration_us.count() << " microseconds]";
 	} else {
 		auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(m_end - m_start);
-		*m_testObj.m_out << duration_ms.count() << " milliseconds]";
+		std::cout << duration_ms.count() << " milliseconds]";
 	}
 
 	// Write the test case output to test output if there was any
-	*m_testObj.m_out << m_buf.str();
+	std::cout << m_buf.str();
 }
 
 struct CStrHash {
@@ -124,7 +154,10 @@ int RunAllTests() {
 			//                     messages etc...) Ideally should collect messages into a `std::ostream` then print at the
 			//                     end
 			auto start = std::chrono::high_resolution_clock::now();
-			testObj.TestBody();
+			{
+				ScopedCoutCapture capture{ testObj.m_out };
+				testObj.TestBody();
+			}
 			auto end = std::chrono::high_resolution_clock::now();
 
 			std::cout << " - ";
@@ -137,7 +170,7 @@ int RunAllTests() {
 				std::cout << duration_ms.count() << " milliseconds]";
 			}
 
-			std::cout << testObj.m_out->str() << '\n';
+			std::cout << '\n' << testObj.m_buf.str();
 
 			if (testObj.m_failed == true) {
 				++testFailCount;

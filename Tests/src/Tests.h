@@ -139,30 +139,25 @@ TEST_SUPPRESS_WARNINGS
 
 #define TEST_CASENAME_(in_caseName) TEST_CASE_##in_caseName
 
-#define PRINT (*this->m_out)
-#define PRINTLN (this->Indent()) << '\t'
 #define EXPECT_EQ(a, b)                                                                                                     \
 	do {                                                                                                                    \
 		auto&& _a = (a);                                                                                                    \
 		auto&& _b = (b);                                                                                                    \
 		if (!Test::Equality(_a, _b)) {                                                                                      \
 			this->m_failed = true;                                                                                          \
-			PRINTLN << "Equality between " #a " and " #b " failed";                                                         \
-			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
+			std::cout << "Equality between " #a " and " #b " failed\n";                                                     \
+			std::cout << "- " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")\n";                       \
 			if constexpr (Test::OstreamWritable<decltype(_a)>) {                                                            \
-				PRINT << "\n";                                                                                              \
-				PRINTLN << "   " #a " = \n";                                                                                \
-				PRINTLN << "\t";                                                                                            \
-				Test::PrintValueIfPossible(PRINT, _a);                                                                      \
-				PRINT << "\n";                                                                                              \
+				std::cout << "\n" #a " = \n";                                                                               \
+				Test::PrintValueIfPossible(std::cout, _a);                                                                  \
+				std::cout << "\n";                                                                                          \
 			}                                                                                                               \
 			if constexpr (Test::OstreamWritable<decltype(_b)>) {                                                            \
-				PRINT << "\n";                                                                                              \
-				PRINTLN << "   " #b " = \n";                                                                                \
-				PRINTLN << "\t";                                                                                            \
-				Test::PrintValueIfPossible(PRINT, _b);                                                                      \
-				PRINT << "\n";                                                                                              \
+				std::cout << "\n" #b " = \n";                                                                               \
+				Test::PrintValueIfPossible(std::cout, _b);                                                                  \
+				std::cout << "\n";                                                                                          \
 			}                                                                                                               \
+			std::cout << "\n";                                                                                              \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_NE(a, b)                                                                                                     \
@@ -171,22 +166,19 @@ TEST_SUPPRESS_WARNINGS
 		auto&& _b = (b);                                                                                                    \
 		if (Test::Equality(_a, _b)) {                                                                                       \
 			this->m_failed = true;                                                                                          \
-			PRINTLN << "Inequality between " #a " and " #b " failed";                                                       \
-			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
+			std::cout << "Inequality between " #a " and " #b " failed\n";                                                   \
+			std::cout << "- " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")\n";                       \
 			if constexpr (Test::OstreamWritable<decltype(_a)>) {                                                            \
-				PRINT << "\n";                                                                                              \
-				PRINTLN << "   " #a " = \n";                                                                                \
-				PRINTLN << "\t";                                                                                            \
-				Test::PrintValueIfPossible(PRINT, _a);                                                                      \
-				PRINT << "\n";                                                                                              \
+				std::cout << "\n" #a " = \n";                                                                               \
+				Test::PrintValueIfPossible(std::cout, _a);                                                                  \
+				std::cout << "\n";                                                                                          \
 			}                                                                                                               \
 			if constexpr (Test::OstreamWritable<decltype(_b)>) {                                                            \
-				PRINT << "\n";                                                                                              \
-				PRINTLN << "   " #b " = \n";                                                                                \
-				PRINTLN << "\t";                                                                                            \
-				Test::PrintValueIfPossible(PRINT, _b);                                                                      \
-				PRINT << "\n";                                                                                              \
+				std::cout << "\n" #b " = \n";                                                                               \
+				Test::PrintValueIfPossible(std::cout, _b);                                                                  \
+				std::cout << "\n";                                                                                          \
 			}                                                                                                               \
+			std::cout << "\n";                                                                                              \
 		}                                                                                                                   \
 	} while (0)
 
@@ -194,20 +186,31 @@ TEST_SUPPRESS_WARNINGS
 	do {                                                                                                                    \
 		if (!(condition)) {                                                                                                 \
 			this->m_failed = true;                                                                                          \
-			PRINTLN << "Condition '" #condition "' was false, but expected true";                                           \
-			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
+			std::cout << "Condition '" #condition "' was false, but expected true\n";                                       \
+			std::cout << "- " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")\n\n";                     \
 		}                                                                                                                   \
 	} while (0)
 #define EXPECT_FALSE(condition)                                                                                             \
 	do {                                                                                                                    \
 		if ((condition)) {                                                                                                  \
 			this->m_failed = true;                                                                                          \
-			PRINTLN << "Condition '" #condition "' was true, but expected false";                                           \
-			PRINTLN << " - " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")";                          \
+			std::cout << "Condition '" #condition "' was true, but expected false\n";                                       \
+			std::cout << "- " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")\n\n";                     \
 		}                                                                                                                   \
 	} while (0)
 
 namespace Test {
+
+class IndentBuf : public std::streambuf {
+public:
+	IndentBuf(std::streambuf* in_dest);
+	std::streambuf* m_dest;
+	size_t m_depth;
+	bool m_atLineStart;
+
+protected:
+	int overflow(int in_ch) override;
+};
 
 template<typename T>
 concept OstreamWritable = requires(std::ostream& in_os, const T& in_value) {
@@ -236,19 +239,16 @@ class TestBase {
 public:
 	virtual void TestBody() = 0;
 
-	TestBase() = default;
+	inline TestBase() :
+		m_out(m_buf.rdbuf()) {}
 	TestBase(const TestBase&) = delete;
 
 	// Initializes the test
 	void Init();
 
-	// Writes indentation to the output string based on `m_depth`
-	// Returns the `std::ostringstream` used for writing
-	std::ostringstream& Indent(bool in_newLine = true);
-
 	std::ostringstream m_buf;
-	std::ostringstream* m_out = &m_buf;
-	size_t m_depth = 1;
+	IndentBuf m_out;
+
 	bool m_failed = false;
 
 protected:
@@ -266,11 +266,9 @@ public:
 	// Owning Test Object
 	TestBase& m_testObj;
 
-	// Previous out buffer to write messages to
-	std::ostringstream* m_out;
-
-	// Current out buffer messages get written to whilst within this case
 	std::ostringstream m_buf;
+	std::streambuf* m_parentBuf;
+	size_t m_parentDepth;
 
 	bool m_hasRun = false;
 

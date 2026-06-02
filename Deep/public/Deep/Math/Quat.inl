@@ -6,11 +6,11 @@
 DEEP_NAMESPACE_BEGIN
 
 Quat::Quat(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
-	vec(in_x, in_y, in_z, in_w) {};
+	vec{ in_x, in_y, in_z, in_w } {};
 Quat::Quat(Float32x4 in_float32x4) :
-	m_float32x4(in_float32x4) {};
+	m_float32x4{ in_float32x4 } {};
 Quat::Quat(Vec4 in_vec) :
-	vec(in_vec) {};
+	vec{ in_vec } {};
 
 Quat Quat::FromMat4(Arg_Mat4 in_mat) {
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
@@ -68,7 +68,7 @@ Mat4 Quat::ToMat4() const {
 Quat& Quat::Conjugate() {
 	// https://stackoverflow.com/questions/56992811/is-there-a-way-to-flip-the-sign-bit-of-32-bit-float-with-xor
 	m_float32x4 =
-		m_float32x4 ^ Int32x4{ int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat();
+		m_float32x4 ^ Int32x4 { int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat();
 	return *this;
 }
 Quat Quat::conjugated() const {

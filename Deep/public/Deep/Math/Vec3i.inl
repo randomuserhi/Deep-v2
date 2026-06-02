@@ -14,7 +14,7 @@ Vec3i::Vec3i(Arg_Vec4i in_vec) :
 	m_int32x4{ in_vec.m_int32x4 } {}
 
 Vec3i::Vec3i(Int32x4 in_int32x4) :
-	m_int32x4(in_int32x4) {}
+	m_int32x4{ in_int32x4 } {}
 
 float32 Vec3i::sqrdMagnitude() const {
 	return static_cast<Vec3>(*this).sqrdMagnitude();

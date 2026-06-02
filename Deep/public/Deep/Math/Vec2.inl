@@ -10,13 +10,13 @@
 DEEP_NAMESPACE_BEGIN
 
 Vec2::Vec2(float32 in_x, float32 in_y) :
-	x(in_x), y(in_y) {}
+	x{ in_x }, y{ in_y } {}
 
 Vec2::Vec2(Arg_Vec3 in_vec) :
-	x(in_vec.x), y(in_vec.y) {}
+	x{ in_vec.x }, y{ in_vec.y } {}
 
 Vec2::Vec2(Arg_Vec4 in_vec) :
-	x(in_vec.x), y(in_vec.y) {}
+	x{ in_vec.x }, y{ in_vec.y } {}
 
 Vec2& Vec2::Normalize() {
 	float32 magnitudeSqrd = sqrdMagnitude();
