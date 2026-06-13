@@ -15,4 +15,11 @@ Float4::operator Vec4() const {
 	return Vec4{ x, y, z, w };
 }
 
+constexpr float32& Float4::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Float4::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 DEEP_NAMESPACE_END

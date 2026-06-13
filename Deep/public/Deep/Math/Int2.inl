@@ -15,4 +15,11 @@ Int2::operator Vec2i() const {
 	return Vec2i{ x, y };
 }
 
+constexpr int32& Int2::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const int32& Int2::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 DEEP_NAMESPACE_END

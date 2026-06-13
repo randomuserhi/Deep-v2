@@ -107,6 +107,13 @@ constexpr Int32x4 Float32x4::Constexpr_Equals(Arg_Float32x4 in_a, Arg_Float32x4 
 	                          in_a.w == in_b.w ? int32(0xffffffff) : 0);
 }
 
+constexpr float32& Float32x4::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Float32x4::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 bool operator!=(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return Float32x4::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;

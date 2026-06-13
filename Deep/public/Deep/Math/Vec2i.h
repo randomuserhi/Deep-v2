@@ -33,6 +33,9 @@ struct [[nodiscard]] alignas(int64) Vec2i {
 
 	//
 
+	Deep_ForceInline constexpr int32& operator[](size_t);
+	Deep_ForceInline constexpr const int32& operator[](size_t) const;
+
 	// Equality
 	friend inline bool operator!=(Arg_Vec2i in_a, Arg_Vec2i in_b);
 	friend inline bool operator==(Arg_Vec2i in_a, Arg_Vec2i in_b);

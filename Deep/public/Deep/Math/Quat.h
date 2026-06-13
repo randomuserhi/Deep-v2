@@ -42,6 +42,9 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 
 	//
 
+	Deep_ForceInline constexpr float32& operator[](size_t);
+	Deep_ForceInline constexpr const float32& operator[](size_t) const;
+
 	// Equality
 	friend inline bool operator!=(Arg_Quat in_a, Arg_Quat in_b);
 	friend inline bool operator==(Arg_Quat in_a, Arg_Quat in_b);
@@ -79,7 +82,7 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 	union {
 		Float32x4 m_float32x4;
 		Int32x4 m_int32x4;
-		float32 val[4];
+		float32 m_values[4];
 		struct {
 			float32 x;
 			float32 y;

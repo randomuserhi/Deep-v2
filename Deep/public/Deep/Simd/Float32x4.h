@@ -87,6 +87,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Float32x4 {
 
 	//
 
+	Deep_ForceInline constexpr float32& operator[](size_t);
+	Deep_ForceInline constexpr const float32& operator[](size_t) const;
+
 	// Equality
 	friend inline bool operator!=(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
 	friend inline bool operator==(Arg_Float32x4 in_a, Arg_Float32x4 in_b);

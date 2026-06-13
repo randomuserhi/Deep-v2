@@ -42,6 +42,9 @@ struct [[nodiscard]] alignas(int64) Vec2 {
 
 	//
 
+	Deep_ForceInline constexpr float32& operator[](size_t);
+	Deep_ForceInline constexpr const float32& operator[](size_t) const;
+
 	// Equality
 	friend inline bool operator!=(Arg_Vec2 in_a, Arg_Vec2 in_b);
 	friend inline bool operator==(Arg_Vec2 in_a, Arg_Vec2 in_b);

@@ -68,7 +68,7 @@ Mat4 Quat::ToMat4() const {
 Quat& Quat::Conjugate() {
 	// https://stackoverflow.com/questions/56992811/is-there-a-way-to-flip-the-sign-bit-of-32-bit-float-with-xor
 	m_float32x4 =
-		m_float32x4 ^ Int32x4 { int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat();
+		m_float32x4 ^ Int32x4{ int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat();
 	return *this;
 }
 Quat Quat::conjugated() const {
@@ -93,6 +93,13 @@ Quat::Quat(Vec3 in_axis, float32 in_angle) {
 	Float32x4 s, c;
 	Float32x4::Replicate(0.5f * in_angle).SinCos(s, c);
 	m_float32x4 = Float32x4::Select(in_axis.m_float32x4 * s, c, Int32x4{ 0, 0, 0, int32(0xffffffff) });
+}
+
+constexpr float32& Quat::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Quat::operator[](size_t in_index) const {
+	return m_values[in_index];
 }
 
 bool operator!=(Arg_Quat in_a, Arg_Quat in_b) {

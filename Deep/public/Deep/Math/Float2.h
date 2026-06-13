@@ -23,6 +23,11 @@ struct [[nodiscard]] Float2 {
 
 	//
 
+	Deep_ForceInline constexpr float32& operator[](size_t);
+	Deep_ForceInline constexpr const float32& operator[](size_t) const;
+
+	//
+
 	union {
 		float32 m_values[2];
 		struct {

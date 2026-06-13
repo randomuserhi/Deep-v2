@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Deep.h"
 #include "Deep/Simd/Int64x2.h"
 #include <smmintrin.h>
 
@@ -53,6 +54,13 @@ Int64x2 Int64x2::Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #else
 	return Int64x2{ in_a.x == in_b.x ? int32(0xffffffff) : 0, in_a.y == in_b.y ? int32(0xffffffff) : 0 };
 #endif
+}
+
+constexpr int64& Int64x2::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const int64& Int64x2::operator[](size_t in_index) const {
+	return m_values[in_index];
 }
 
 bool operator!=(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {

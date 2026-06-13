@@ -15,4 +15,11 @@ Int4::operator Vec4i() const {
 	return Vec4i{ x, y, z, w };
 }
 
+constexpr int32& Int4::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const int32& Int4::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 DEEP_NAMESPACE_END

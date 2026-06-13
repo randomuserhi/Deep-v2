@@ -35,6 +35,13 @@ Vec2i::operator Vec2() const {
 	return Vec2{ static_cast<float>(x), static_cast<float>(y) };
 }
 
+constexpr int32& Vec2i::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const int32& Vec2i::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 bool operator!=(Arg_Vec2i in_a, Arg_Vec2i in_b) {
 	return in_a.x != in_b.x || in_a.y != in_b.y;
 }

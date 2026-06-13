@@ -72,6 +72,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 
 	//
 
+	Deep_ForceInline constexpr int64& operator[](size_t);
+	Deep_ForceInline constexpr const int64& operator[](size_t) const;
+
 	// Equality
 	friend inline bool operator!=(Arg_Int64x2 in_a, Arg_Int64x2 in_b);
 	friend inline bool operator==(Arg_Int64x2 in_a, Arg_Int64x2 in_b);

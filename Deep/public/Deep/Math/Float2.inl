@@ -15,4 +15,11 @@ Float2::operator Vec2() const {
 	return Vec2{ x, y };
 }
 
+constexpr float32& Float2::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Float2::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 DEEP_NAMESPACE_END

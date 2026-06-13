@@ -128,6 +128,13 @@ Int32x4 Int32x4::Select(Arg_Int32x4 in_a, Arg_Int32x4 in_b, Arg_Int32x4 in_contr
 #endif
 }
 
+constexpr int32& Int32x4::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const int32& Int32x4::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 bool operator!=(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return Int32x4::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;

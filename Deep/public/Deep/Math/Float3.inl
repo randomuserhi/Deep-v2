@@ -15,4 +15,11 @@ Float3::operator Vec3() const {
 	return Vec3{ x, y, z };
 }
 
+constexpr float32& Float3::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Float3::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 DEEP_NAMESPACE_END

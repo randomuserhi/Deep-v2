@@ -23,6 +23,11 @@ struct [[nodiscard]] Int3 {
 
 	//
 
+	Deep_ForceInline constexpr int32& operator[](size_t);
+	Deep_ForceInline constexpr const int32& operator[](size_t) const;
+
+	//
+
 	union {
 		int32 m_values[3];
 		struct {

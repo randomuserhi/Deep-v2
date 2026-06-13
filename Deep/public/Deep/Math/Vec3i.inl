@@ -49,6 +49,13 @@ Vec3i::operator Vec3() const {
 #endif
 }
 
+constexpr int32& Vec3i::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const int32& Vec3i::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 bool operator!=(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return (Int32x4::Equals(in_a.m_int32x4, in_b.m_int32x4).ToBooleanBitMask() & 0b111) != 0b111;

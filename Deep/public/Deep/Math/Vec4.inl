@@ -80,6 +80,13 @@ Vec4::operator Vec4i() const {
 #endif
 }
 
+constexpr float32& Vec4::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Vec4::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 bool operator!=(Arg_Vec4 in_a, Arg_Vec4 in_b) {
 	return in_a.m_float32x4 != in_b.m_float32x4;
 }

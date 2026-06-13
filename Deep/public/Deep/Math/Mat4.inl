@@ -319,6 +319,13 @@ Mat4 Mat4::inversed() const {
 #endif
 }
 
+constexpr float32& Mat4::operator[](size_t in_index) {
+	return m_values[in_index];
+}
+constexpr const float32& Mat4::operator[](size_t in_index) const {
+	return m_values[in_index];
+}
+
 bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
 	return ((Float32x4::Equals(in_a.m_cols[0], in_b.m_cols[0]) & Float32x4::Equals(in_a.m_cols[1], in_b.m_cols[1]))
 	        & (Float32x4::Equals(in_a.m_cols[2], in_b.m_cols[2]) & Float32x4::Equals(in_a.m_cols[3], in_b.m_cols[3])))
