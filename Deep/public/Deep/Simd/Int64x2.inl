@@ -49,10 +49,11 @@ int64 Int64x2::ToBooleanBitMask() const {
 }
 
 Int64x2 Int64x2::Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE4_1
 	return _mm_cmpeq_epi64(in_a, in_b);
 #else
-	return Int64x2{ in_a.x == in_b.x ? int64(0xffffffff) : 0, in_a.y == in_b.y ? int64(0xffffffff) : 0 };
+	return Int64x2{ in_a.x == in_b.x ? int64(0xffffffffffffffffull) : 0,
+		            in_a.y == in_b.y ? int64(0xffffffffffffffffull) : 0 };
 #endif
 }
 
@@ -65,7 +66,7 @@ constexpr const int64& Int64x2::operator[](size_t in_index) const {
 
 bool operator!=(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
-	return Int64x2::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
+	return Int64x2::Equals(in_a, in_b).ToBooleanBitMask() != 0b11;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y;
 #endif
