@@ -40,11 +40,11 @@ Int64x2 Int64x2::Replicate(int64 in_value) {
 #endif
 }
 
-int32 Int64x2::ToBooleanBitMask() const {
+int64 Int64x2::ToBooleanBitMask() const {
 #ifdef DEEP_USE_SSE
 	return _mm_movemask_pd(_mm_castsi128_pd(_internal));
 #else
-	return (x >> 31) | ((y >> 31) << 1);
+	return (x >> 63) | ((y >> 63) << 1);
 #endif
 }
 
@@ -52,7 +52,7 @@ Int64x2 Int64x2::Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_cmpeq_epi64(in_a, in_b);
 #else
-	return Int64x2{ in_a.x == in_b.x ? int32(0xffffffff) : 0, in_a.y == in_b.y ? int32(0xffffffff) : 0 };
+	return Int64x2{ in_a.x == in_b.x ? int64(0xffffffff) : 0, in_a.y == in_b.y ? int64(0xffffffff) : 0 };
 #endif
 }
 

@@ -62,7 +62,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	// and returns it as a bit mask.
 	//
 	// Bit 0 is set if X is true, Bit 1 is set if Y is true.
-	inline int32 ToBooleanBitMask() const;
+	inline int64 ToBooleanBitMask() const;
 
 	// Returns a 2 component integer value representing the equality of each component
 	// in `a` or `b`.
