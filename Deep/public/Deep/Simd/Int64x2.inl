@@ -40,7 +40,7 @@ Int64x2 Int64x2::Replicate(int64 in_value) {
 #endif
 }
 
-int64 Int64x2::ToBooleanBitMask() const {
+int32 Int64x2::ToBooleanBitMask() const {
 #ifdef DEEP_USE_SSE
 	return _mm_movemask_pd(_mm_castsi128_pd(_internal));
 #else
