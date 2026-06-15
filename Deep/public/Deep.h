@@ -266,6 +266,7 @@
  * Tests
  */
 #if defined(DEEP_TESTABLE)
+	// exposes private members for testing
 	#define DEEP_PRIVATE_TESTABLE public:
 #else
 	#define DEEP_PRIVATE_TESTABLE
