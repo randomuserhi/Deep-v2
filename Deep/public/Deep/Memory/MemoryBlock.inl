@@ -63,7 +63,7 @@ template<typename T, Ownership in_ownership, typename in_allocator>
 MemoryBlock<T, in_ownership, in_allocator>& MemoryBlock<T, in_ownership, in_allocator>::operator=(MemoryBlock&& in_other) {
 	Deep_Assert(m_ptr != in_other.m_ptr, "Cannot move self into self.");
 
-	~MemoryBlock();
+	this->~MemoryBlock();
 
 	m_ptr = in_other.m_ptr;
 	m_size = in_other.m_size;
