@@ -67,7 +67,7 @@ template<typename T>
 inline bool IsAligned(T in_pointer, uint64 in_alignment) {
 	static_assert(std::is_pointer<T>(), "Expected type T to be a pointer.");
 	Deep_Assert(IsPowerOf2(in_alignment), "Alignment should be a power of 2.");
-	return (static_cast<uint64>(in_pointer) & (in_alignment - 1)) == 0;
+	return (BitCast<std::uintptr_t>(in_pointer) & (in_alignment - 1)) == 0;
 }
 
 // Compute number of trailing zero bits (how many low bits are zero)
