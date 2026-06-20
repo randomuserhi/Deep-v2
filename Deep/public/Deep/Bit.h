@@ -14,8 +14,8 @@ DEEP_SUPPRESS_WARNINGS_STD_END
 
 DEEP_NAMESPACE_BEGIN
 
-template<typename T>
-constexpr inline T* AssumeAligned(T* in_ptr, size_t in_alignment) noexcept {
+template<typename T, size_t in_alignment>
+constexpr inline T* AssumeAligned(T* in_ptr) noexcept {
 #if defined(DEEP_COMPILER_CLANG) || defined(DEEP_COMPILER_GCC)
 	return static_cast<T*>(__builtin_assume_aligned(in_ptr, in_alignment));
 #else
