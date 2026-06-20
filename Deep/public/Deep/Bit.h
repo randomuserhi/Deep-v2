@@ -2,6 +2,8 @@
 
 #include "Deep.h"
 
+// TODO(randomuserhi): Create `Bit.inl` for consistency
+
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
 	#include <immintrin.h>
@@ -11,6 +13,15 @@ DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 DEEP_SUPPRESS_WARNINGS_STD_END
 
 DEEP_NAMESPACE_BEGIN
+
+template<typename T>
+constexpr inline T* AssumeAligned(T* in_ptr, size_t in_alignment) noexcept {
+#if defined(DEEP_COMPILER_CLANG) || defined(DEEP_COMPILER_GCC)
+	return static_cast<T*>(__builtin_assume_aligned(in_ptr, in_alignment));
+#else
+	return in_ptr;
+#endif
+}
 
 template<class To, class From>
 constexpr inline To BitCast(const From& in_value) {
