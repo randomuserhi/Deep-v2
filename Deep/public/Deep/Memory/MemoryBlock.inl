@@ -1,36 +1,33 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Memory.h"
 #include "Deep/Memory/MemoryBlock.h"
-#include <concepts>
-#include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock() :
+MemoryBlock<T, in_allocator>::MemoryBlock() :
 	m_ptr{ nullptr }, m_size{ 0 } {}
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(size_t in_size) :
+MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) :
 	m_size{ in_size } {
 	m_ptr = in_allocator::Malloc(m_size);
 	new (m_ptr) T[m_size];
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(T* in_ptr, size_t in_size) :
+MemoryBlock<T, in_allocator>::MemoryBlock(T* in_ptr, size_t in_size) :
 	m_ptr{ in_ptr }, m_size{ in_size } {
 	Deep_Assert(m_ptr != nullptr || m_size == 0, "Invalid memory block state.");
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(const MemoryBlock& in_other) :
+MemoryBlock<T, in_allocator>::MemoryBlock(const MemoryBlock& in_other) :
 	m_size{ in_other.m_size } {
 	m_ptr = in_allocator::Malloc(m_size);
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
@@ -42,25 +39,23 @@ MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(const MemoryBlock& in_ot
 	}
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(MemoryBlock&& in_other) :
+MemoryBlock<T, in_allocator>::MemoryBlock(MemoryBlock&& in_other) :
 	m_ptr{ in_other.m_ptr }, m_size{ in_other.m_size } {
-	if constexpr (in_ownership == Ownership::Owned) {
-		in_other.m_ptr = nullptr;
-		in_other.m_size = 0;
-	}
+	in_other.m_ptr = nullptr;
+	in_other.m_size = 0;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::operator T*() const {
+MemoryBlock<T, in_allocator>::operator T*() const {
 	return m_ptr;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>& MemoryBlock<T, in_ownership, in_allocator>::operator=(MemoryBlock&& in_other) {
+MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(MemoryBlock&& in_other) {
 	Deep_Assert(m_ptr != in_other.m_ptr, "Cannot move self into self.");
 
 	this->~MemoryBlock();
@@ -68,18 +63,15 @@ MemoryBlock<T, in_ownership, in_allocator>& MemoryBlock<T, in_ownership, in_allo
 	m_ptr = in_other.m_ptr;
 	m_size = in_other.m_size;
 
-	if constexpr (in_ownership == Ownership::Owned) {
-		in_other.m_ptr = nullptr;
-		in_other.m_size = 0;
-	}
+	in_other.m_ptr = nullptr;
+	in_other.m_size = 0;
 
 	return *this;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>&
-MemoryBlock<T, in_ownership, in_allocator>::operator=(const MemoryBlock& in_other) {
+MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const MemoryBlock& in_other) {
 	Deep_Assert(m_ptr != in_other.m_ptr, "Cannot copy self into self.");
 
 	~MemoryBlock();
@@ -97,95 +89,93 @@ MemoryBlock<T, in_ownership, in_allocator>::operator=(const MemoryBlock& in_othe
 	return *this;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-MemoryBlock<T, in_ownership, in_allocator>::~MemoryBlock() {
-	if constexpr (in_ownership == Ownership::Owned) {
-		if constexpr (!std::is_trivially_destructible_v<T>) {
-			Deep_Assert(m_ptr != nullptr || m_size == 0, "Invalid memory block state.");
-			for (size_t i = 0; i < m_size; ++i) {
-				m_ptr[i].~T();
-			}
+MemoryBlock<T, in_allocator>::~MemoryBlock() {
+	if constexpr (!std::is_trivially_destructible_v<T>) {
+		Deep_Assert(m_ptr != nullptr || m_size == 0, "Invalid memory block state.");
+		for (size_t i = 0; i < m_size; ++i) {
+			m_ptr[i].~T();
 		}
-		in_allocator::Free(m_ptr);
 	}
+	in_allocator::Free(m_ptr);
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T& MemoryBlock<T, in_ownership, in_allocator>::operator[](size_t in_index) {
+T& MemoryBlock<T, in_allocator>::operator[](size_t in_index) {
 	Deep_Assert(m_ptr != nullptr && in_index < m_size, "Out of range.");
 	return m_ptr[in_index];
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-const T& MemoryBlock<T, in_ownership, in_allocator>::operator[](size_t in_index) const {
+const T& MemoryBlock<T, in_allocator>::operator[](size_t in_index) const {
 	Deep_Assert(m_ptr != nullptr && in_index < m_size, "Out of range.");
 	return m_ptr[in_index];
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-size_t MemoryBlock<T, in_ownership, in_allocator>::size() const {
+size_t MemoryBlock<T, in_allocator>::size() const {
 	return m_size;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T* MemoryBlock<T, in_ownership, in_allocator>::ptr() const {
+T* MemoryBlock<T, in_allocator>::ptr() const {
 	return m_ptr;
 }
 
 //
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator!=(Arg_MemoryBlock<T, in_ownership, in_allocator> in_a, void* in_b) {
+bool operator!=(Arg_MemoryBlock<T, in_allocator> in_a, void* in_b) {
 	return in_a.m_ptr != in_b;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator==(Arg_MemoryBlock<T, in_ownership, in_allocator> in_a, void* in_b) {
+bool operator==(Arg_MemoryBlock<T, in_allocator> in_a, void* in_b) {
 	return in_a.m_ptr == in_b;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator!=(void* in_a, Arg_MemoryBlock<T, in_ownership, in_allocator> in_b) {
+bool operator!=(void* in_a, Arg_MemoryBlock<T, in_allocator> in_b) {
 	return in_a == in_b.m_ptr;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator==(void* in_a, Arg_MemoryBlock<T, in_ownership, in_allocator> in_b) {
+bool operator==(void* in_a, Arg_MemoryBlock<T, in_allocator> in_b) {
 	return in_a == in_b.m_ptr;
 }
 
 //
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T* operator+(Arg_MemoryBlock<T, in_ownership, in_allocator> in_block, size_t in_value) {
+T* operator+(Arg_MemoryBlock<T, in_allocator> in_block, size_t in_value) {
 	return in_block.m_ptr + in_value;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T* operator+(size_t in_value, Arg_MemoryBlock<T, in_ownership, in_allocator> in_block) {
+T* operator+(size_t in_value, Arg_MemoryBlock<T, in_allocator> in_block) {
 	return in_value + in_block.m_ptr;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T* operator-(Arg_MemoryBlock<T, in_ownership, in_allocator> in_block, size_t in_value) {
+T* operator-(Arg_MemoryBlock<T, in_allocator> in_block, size_t in_value) {
 	return in_block.m_ptr - in_value;
 }
 
-template<typename T, Ownership in_ownership, typename in_allocator>
+template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T* operator-(size_t in_value, Arg_MemoryBlock<T, in_ownership, in_allocator> in_block) {
+T* operator-(size_t in_value, Arg_MemoryBlock<T, in_allocator> in_block) {
 	return in_value - in_block.m_ptr;
 }
 
