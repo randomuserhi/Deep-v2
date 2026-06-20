@@ -26,7 +26,7 @@ void Free(void* in_ptr) {
 }
 
 template<typename T>
-T* Malloc(size_t in_size) {
+T* TMalloc(size_t in_size) {
 	constexpr size_t alignment = Deep_AlignOf(T);
 	constexpr size_t defaultAlignment = Deep_AlignOf(std::max_align_t);
 
@@ -41,13 +41,13 @@ T* Malloc(size_t in_size) {
 }
 
 template<typename T>
-T* Realloc(T* in_old, size_t in_size) {
+T* TRealloc(T* in_old, size_t in_size) {
 	static_assert(Deep_AlignOf(T) <= Deep_AlignOf(std::max_align_t), "Realloc is not supported for the given type 'T'.");
 	return static_cast<T*>(Realloc(in_old, in_size * sizeof(T)));
 }
 
 template<typename T>
-void Free(T* in_ptr) {
+void TFree(T* in_ptr) {
 	constexpr size_t alignment = Deep_AlignOf(T);
 	constexpr size_t defaultAlignment = Deep_AlignOf(std::max_align_t);
 
@@ -92,12 +92,12 @@ void* Memset(void* in_dest, int32 in_value, size_t in_size) {
 }
 
 template<typename T>
-T* Memcpy(T* Deep_Restrict in_dest, const T* Deep_Restrict in_src, size_t in_size) {
+T* TMemcpy(T* Deep_Restrict in_dest, const T* Deep_Restrict in_src, size_t in_size) {
 	return static_cast<T*>(std::memcpy(in_dest, in_src, in_size * sizeof(T)));
 }
 
 template<typename T>
-T* Memset(T* in_dest, int32 in_value, size_t in_size) {
+T* TMemset(T* in_dest, int32 in_value, size_t in_size) {
 	return static_cast<T*>(std::memset(in_dest, in_value, in_size * sizeof(T)));
 }
 
