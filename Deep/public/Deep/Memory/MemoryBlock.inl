@@ -54,6 +54,12 @@ MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(MemoryBlock&& in_other) 
 
 template<typename T, Ownership in_ownership, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+MemoryBlock<T, in_ownership, in_allocator>::operator T*() const {
+	return m_ptr;
+}
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
 MemoryBlock<T, in_ownership, in_allocator>& MemoryBlock<T, in_ownership, in_allocator>::operator=(MemoryBlock&& in_other) {
 	Deep_Assert(m_ptr != in_other.m_ptr, "Cannot move self into self.");
 
