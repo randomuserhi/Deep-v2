@@ -15,6 +15,38 @@ template<typename T, Ownership in_ownership = Ownership::Owned, typename in_allo
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
 using Arg_MemoryBlock = const MemoryBlock<T, in_ownership, in_allocator>;
 
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline bool operator==(Arg_MemoryBlock<T, in_ownership, in_allocator>, void*);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline bool operator!=(Arg_MemoryBlock<T, in_ownership, in_allocator>, void*);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline bool operator==(void*, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline bool operator!=(void*, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator+(Arg_MemoryBlock<T, in_ownership, in_allocator>, size_t);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator+(size_t, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator-(Arg_MemoryBlock<T, in_ownership, in_allocator>, size_t);
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator-(size_t, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+
 // NOTE(randomuserhi): Is not compatible with memory allocated by `new` operator
 template<typename T, Ownership in_ownership, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
@@ -41,15 +73,15 @@ public:
 	Deep_ForceInline T& operator[](size_t);
 	Deep_ForceInline const T& operator[](size_t) const;
 
-	friend Deep_ForceInline bool operator==(Arg_MemoryBlock<T, in_ownership, in_allocator>, void*);
-	friend Deep_ForceInline bool operator!=(Arg_MemoryBlock<T, in_ownership, in_allocator>, void*);
-	friend Deep_ForceInline bool operator==(void*, Arg_MemoryBlock<T, in_ownership, in_allocator>);
-	friend Deep_ForceInline bool operator!=(void*, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+	friend bool operator== <>(Arg_MemoryBlock<T, in_ownership, in_allocator>, void*);
+	friend bool operator!= <>(Arg_MemoryBlock<T, in_ownership, in_allocator>, void*);
+	friend bool operator== <>(void*, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+	friend bool operator!= <>(void*, Arg_MemoryBlock<T, in_ownership, in_allocator>);
 
-	friend Deep_ForceInline T* operator+(Arg_MemoryBlock<T, in_ownership, in_allocator>, size_t);
-	friend Deep_ForceInline T* operator+(size_t, Arg_MemoryBlock<T, in_ownership, in_allocator>);
-	friend Deep_ForceInline T* operator-(Arg_MemoryBlock<T, in_ownership, in_allocator>, size_t);
-	friend Deep_ForceInline T* operator-(size_t, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+	friend T* operator+ <>(Arg_MemoryBlock<T, in_ownership, in_allocator>, size_t);
+	friend T* operator+ <>(size_t, Arg_MemoryBlock<T, in_ownership, in_allocator>);
+	friend T* operator- <>(Arg_MemoryBlock<T, in_ownership, in_allocator>, size_t);
+	friend T* operator- <>(size_t, Arg_MemoryBlock<T, in_ownership, in_allocator>);
 
 	//
 
