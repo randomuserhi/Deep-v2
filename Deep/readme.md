@@ -14,6 +14,7 @@ cmake --build build
 `s_camelCase` for static
 `CamelCase` for functions
 `CamelCase` for types
+`_CamelCase` for concepts
 `Arg_CamelCase` for types specific to `const in_` arguments
 `Constexpr_CamelCase` for functions that overload another function to provide a `constexpr` version of it
 `Constexpr` as a member function to provide a `constexpr` constructor overload
