@@ -34,7 +34,7 @@ MemoryBlock<T, in_ownership, in_allocator>::MemoryBlock(const MemoryBlock& in_ot
 	m_size{ in_other.m_size } {
 	m_ptr = in_allocator::Malloc(m_size);
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
-		Memcpy<T>(m_ptr, in_other.m_ptr, m_size);
+		TMemcpy<T>(m_ptr, in_other.m_ptr, m_size);
 	} else {
 		for (size_t i = 0; i < m_size; ++i) {
 			new (m_ptr + i) T{ in_other[i] };
@@ -87,7 +87,7 @@ MemoryBlock<T, in_ownership, in_allocator>::operator=(const MemoryBlock& in_othe
 	m_ptr = in_allocator::Malloc(m_size);
 	m_size = in_other.m_size;
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
-		Memcpy<T>(m_ptr, in_other.m_ptr, m_size);
+		TMemcpy<T>(m_ptr, in_other.m_ptr, m_size);
 	} else {
 		for (size_t i = 0; i < m_size; ++i) {
 			new (m_ptr + i) T{ in_other[i] };
