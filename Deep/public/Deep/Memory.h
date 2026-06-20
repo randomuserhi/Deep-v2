@@ -34,7 +34,7 @@ template<typename T>
 Deep_ForceInline T* Memset(T* in_dest, int32 in_value, size_t in_size);
 
 template<typename A, typename B = A>
-constexpr bool DoBuffersOverlap(A* in_a, size_t in_sizeA, B* in_b, size_t in_sizeB);
+constexpr inline bool DoBuffersOverlap(A* in_a, size_t in_sizeA, B* in_b, size_t in_sizeB);
 
 template<typename T, typename Type>
 concept _RawAllocator = requires {
