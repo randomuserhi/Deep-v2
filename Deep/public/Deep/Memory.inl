@@ -101,4 +101,20 @@ T* Memset(T* in_dest, int32 in_value, size_t in_size) {
 	return static_cast<T*>(std::memset(in_dest, in_value, in_size * sizeof(T)));
 }
 
+template<typename A, typename B>
+constexpr bool DoBuffersOverlap(A* in_a, size_t in_sizeA, B* in_b, size_t in_sizeB) {
+	if (!in_a || !in_b) return false;
+
+	auto* a_begin = reinterpret_cast<std::byte*>(in_a);
+	auto* b_begin = reinterpret_cast<std::byte*>(in_b);
+
+	size_t a_bytes = in_sizeA * sizeof(A);
+	size_t b_bytes = in_sizeB * sizeof(B);
+
+	auto* a_end = a_begin + a_bytes;
+	auto* b_end = b_begin + b_bytes;
+
+	return (a_begin < b_end) && (b_begin < a_end);
+}
+
 DEEP_NAMESPACE_END
