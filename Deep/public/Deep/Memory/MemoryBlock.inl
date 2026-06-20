@@ -131,28 +131,56 @@ T* MemoryBlock<T, in_ownership, in_allocator>::ptr() const {
 	return m_ptr;
 }
 
+//
+
 template<typename T, Ownership in_ownership, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator!=(Arg_ByteBlock<T, in_ownership, in_allocator> in_a, void* in_b) {
+bool operator!=(Arg_MemoryBlock<T, in_ownership, in_allocator> in_a, void* in_b) {
 	return in_a.m_ptr != in_b;
 }
 
 template<typename T, Ownership in_ownership, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator==(Arg_ByteBlock<T, in_ownership, in_allocator> in_a, void* in_b) {
+bool operator==(Arg_MemoryBlock<T, in_ownership, in_allocator> in_a, void* in_b) {
 	return in_a.m_ptr == in_b;
 }
 
 template<typename T, Ownership in_ownership, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator!=(void* in_a, Arg_ByteBlock<T, in_ownership, in_allocator> in_b) {
+bool operator!=(void* in_a, Arg_MemoryBlock<T, in_ownership, in_allocator> in_b) {
 	return in_a == in_b.m_ptr;
 }
 
 template<typename T, Ownership in_ownership, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-bool operator==(void* in_a, Arg_ByteBlock<T, in_ownership, in_allocator> in_b) {
+bool operator==(void* in_a, Arg_MemoryBlock<T, in_ownership, in_allocator> in_b) {
 	return in_a == in_b.m_ptr;
+}
+
+//
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+T* operator+(Arg_MemoryBlock<T, in_ownership, in_allocator> in_block, size_t in_value) {
+	return in_block.m_ptr + in_value;
+}
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+T* operator+(size_t in_value, Arg_MemoryBlock<T, in_ownership, in_allocator> in_block) {
+	return in_value + in_block.m_ptr;
+}
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+T* operator-(Arg_MemoryBlock<T, in_ownership, in_allocator> in_block, size_t in_value) {
+	return in_block.m_ptr - in_value;
+}
+
+template<typename T, Ownership in_ownership, typename in_allocator>
+	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
+T* operator-(size_t in_value, Arg_MemoryBlock<T, in_ownership, in_allocator> in_block) {
+	return in_value - in_block.m_ptr;
 }
 
 DEEP_NAMESPACE_END
