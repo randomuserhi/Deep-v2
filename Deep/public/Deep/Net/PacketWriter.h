@@ -22,8 +22,8 @@ struct PacketWriter {
 	//
 
 	// TODO(randomuserhi): https://stackoverflow.com/a/51615364/9642458
-	Deep_ForceInline const uint8* data() const;
-	Deep_ForceInline size_t size() const;
+	Deep_ForceInline const uint8* m_Data() const;
+	Deep_ForceInline size_t m_Size() const;
 
 	inline void WriteUInt8(uint8 in_byte);
 	inline void WriteBytes(const uint8* in_bytes, size_t in_numBytes);

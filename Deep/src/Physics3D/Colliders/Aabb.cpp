@@ -22,7 +22,7 @@ int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_conta
 	float32 dx1 = maxB.x - minA.x;
 	float32 dx2 = maxA.x - minB.x;
 	contactInfo.m_penetrationDistance = Min(dx1, dx2);
-	contactInfo.normal4() = { dx1 < dx2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+	contactInfo.m_Normal4() = { dx1 < dx2 ? -1.0f : 1.0f, 0.0f, 0.0f };
 
 	if (contactInfo.m_penetrationDistance <= 0) return 0;
 
@@ -31,7 +31,7 @@ int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_conta
 	float32 py = Min(dy1, dy2);
 	if (py <= 0) return 0;
 	if (py < contactInfo.m_penetrationDistance) {
-		contactInfo.normal4() = { dy1 < dy2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+		contactInfo.m_Normal4() = { dy1 < dy2 ? -1.0f : 1.0f, 0.0f, 0.0f };
 		contactInfo.m_penetrationDistance = py;
 	}
 
@@ -40,7 +40,7 @@ int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_conta
 	float32 pz = Min(dz1, dz2);
 	if (pz <= 0) return 0;
 	if (pz < contactInfo.m_penetrationDistance) {
-		contactInfo.normal4() = { dz1 < dz2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+		contactInfo.m_Normal4() = { dz1 < dz2 ? -1.0f : 1.0f, 0.0f, 0.0f };
 		contactInfo.m_penetrationDistance = pz;
 	}
 
@@ -128,7 +128,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 		const float32 distance = tEnter;
 		const float32 multiplier = -1.0f;
 		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * distance;
-		out_hit->normal4() = Vec3::k_zero;
+		out_hit->m_Normal4() = Vec3::k_zero;
 		out_hit->m_normal.m_values[axis] = Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 		out_hit->m_distance = distance;
 	} else {
@@ -138,7 +138,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 		const float32 distance = outside ? tEnter : tExit;
 		const float32 multiplier = outside ? -1.0f : 1.0f;
 		out_hit->m_point = in_ray.m_origin + in_ray.m_direction * distance;
-		out_hit->normal4() = Vec3::k_zero;
+		out_hit->m_Normal4() = Vec3::k_zero;
 		out_hit->m_normal.m_values[axis] = Sign(in_ray.m_direction.m_values[axis]) * multiplier;
 		out_hit->m_distance = distance;
 	}
@@ -196,7 +196,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	if (tEnter >= 0.0f) {
 		float32 distance = tEnter;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
-		out_hits[hitCount].normal4() = Vec3::k_zero;
+		out_hits[hitCount].m_Normal4() = Vec3::k_zero;
 		out_hits[hitCount].m_normal.m_values[enterAxis] = Sign(in_ray.m_direction.m_values[enterAxis]) * -1.0f;
 		out_hits[hitCount].m_distance = distance;
 		++hitCount;
@@ -206,7 +206,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	{
 		float32 distance = tExit;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * distance;
-		out_hits[hitCount].normal4() = Vec3::k_zero;
+		out_hits[hitCount].m_Normal4() = Vec3::k_zero;
 		out_hits[hitCount].m_normal.m_values[exitAxis] = Sign(in_ray.m_direction.m_values[exitAxis]);
 		out_hits[hitCount].m_distance = distance;
 		++hitCount;

@@ -11,10 +11,10 @@ PacketWriter::PacketWriter(size_t in_size) {
 	m_buffer.reserve(in_size);
 }
 
-const uint8* PacketWriter::data() const {
+const uint8* PacketWriter::m_Data() const {
 	return m_buffer.data();
 }
-size_t PacketWriter::size() const {
+size_t PacketWriter::m_Size() const {
 	return m_buffer.size();
 }
 

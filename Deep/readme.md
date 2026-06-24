@@ -7,20 +7,28 @@ cmake --build build
 
 # Naming convention shizzle
 
-`g_camelCase` for globals
-`m_camelCase` for members
-`k_camelCase` for constants
-`e_camelCase` for enum values
-`s_camelCase` for static
-`CamelCase` for functions
-`CamelCase` for types
-`_CamelCase` for concepts
-`Arg_CamelCase` for types specific to `const in_` arguments
-`Constexpr_CamelCase` for functions that overload another function to provide a `constexpr` version of it
-`Constexpr` as a member function to provide a `constexpr` constructor overload
-`in_camelCase` for in arguments
-`out_camelCase` for out arguments
-`io_camelCase` for in-out arguments
+- Prefer `{}` initializers (e.g `A a{ ... }`)
+  - Just be careful with initializer lists `std::vector v{ ... }` vs `std::vector v(...)`
+
+- `g_camelCase` for globals
+- `m_camelCase` for members
+- `k_camelCase` for constants
+- `e_camelCase` for enum values
+- `s_camelCase` for static
+- `CamelCase` for functions
+- `m_CamelCase` for getter/setter functions
+- `CamelCase` for types
+- `Constexpr_CamelCase` for functions that overload another function to provide a `constexpr` version of it
+- `Constexpr` as a member function to provide a `constexpr` constructor overload
+- `in_camelCase` for in arguments
+- `out_camelCase` for out arguments
+- `io_camelCase` for in-out arguments
+
+- `Arg_CamelCase` for argument types
+  - These types provide the fastest way to pass an object as a const parameter.
+  - This typically follows the rule, if the type is < 32 bytes pass by value (`const T`) otherwise pass by reference (`const T&`).
+
+- `// TODO(<name>): ...` todo comments should be marked with author
 
 Avoid class / struct level dll export:
 ```cpp

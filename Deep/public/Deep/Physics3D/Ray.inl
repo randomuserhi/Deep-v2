@@ -5,11 +5,11 @@
 
 DEEP_NAMESPACE_BEGIN
 
-Vec3& RayHit3D::normal4() {
+Vec3& RayHit3D::m_Normal4() {
 	return *reinterpret_cast<Vec3*>(&m_normal);
 }
 
-const Vec3& RayHit3D::normal4() const {
+const Vec3& RayHit3D::m_Normal4() const {
 	return *reinterpret_cast<const Vec3*>(&m_normal);
 }
 
