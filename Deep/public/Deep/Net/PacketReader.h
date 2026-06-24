@@ -18,6 +18,8 @@ struct PacketReader {
 
 	//
 
+	inline bool HasBytesRemaining(size_t in_count);
+
 	inline uint8 ReadUInt8();
 
 	inline uint16 ReadUInt16();
