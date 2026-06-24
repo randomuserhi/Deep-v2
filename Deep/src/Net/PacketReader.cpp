@@ -8,6 +8,8 @@
 DEEP_NAMESPACE_BEGIN
 
 Quat PacketReader::ReadQuaternion() {
+	Deep_Assert((m_head + sizeof(uint8) + sizeof(float32) * 3) <= m_tail, "Reached end of byte buffer.");
+
 	uint8 i = ReadUInt8();
 	Quat q{};
 	switch (i) {
@@ -40,6 +42,8 @@ Quat PacketReader::ReadQuaternion() {
 }
 
 Quat PacketReader::ReadHalfQuaternion() {
+	Deep_Assert((m_head + sizeof(uint8) + sizeof(float16) * 3) <= m_tail, "Reached end of byte buffer.");
+
 	uint8 i = ReadUInt8();
 	Quat q{};
 	switch (i) {
