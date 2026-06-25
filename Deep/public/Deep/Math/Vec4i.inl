@@ -85,9 +85,7 @@ Vec4i& Vec4i::operator+=(Arg_Vec4i in_other) {
 }
 
 Vec4i operator+(Arg_Vec4i in_a, Arg_Vec4i in_b) {
-	Vec4i result;
-	result.m_int32x4 = in_a.m_int32x4 + in_b.m_int32x4;
-	return result;
+	return Vec4i{ in_a.m_int32x4 + in_b.m_int32x4 };
 }
 
 Vec4i& Vec4i::operator-=(Arg_Vec4i in_other) {
@@ -96,15 +94,11 @@ Vec4i& Vec4i::operator-=(Arg_Vec4i in_other) {
 }
 
 Vec4i operator-(Arg_Vec4i in_a, Arg_Vec4i in_b) {
-	Vec4i result;
-	result.m_int32x4 = in_a.m_int32x4 - in_b.m_int32x4;
-	return result;
+	return Vec4i{ in_a.m_int32x4 - in_b.m_int32x4 };
 }
 
 Vec4i operator-(Arg_Vec4i in_a) {
-	Vec4i result;
-	result.m_int32x4 = -in_a.m_int32x4;
-	return result;
+	return Vec4i{ -in_a.m_int32x4 };
 }
 
 Vec4i& Vec4i::operator*=(Arg_Vec4i in_other) {
@@ -112,9 +106,7 @@ Vec4i& Vec4i::operator*=(Arg_Vec4i in_other) {
 	return *this;
 }
 Vec4i operator*(Arg_Vec4i in_a, Arg_Vec4i in_b) {
-	Vec4i result;
-	result.m_int32x4 = in_a.m_int32x4 * in_b.m_int32x4;
-	return result;
+	return Vec4i{ in_a.m_int32x4 * in_b.m_int32x4 };
 }
 
 Vec4i& Vec4i::operator*=(int32 in_other) {
@@ -123,15 +115,11 @@ Vec4i& Vec4i::operator*=(int32 in_other) {
 }
 
 Vec4i operator*(Arg_Vec4i in_vec, int32 in_val) {
-	Vec4i result;
-	result.m_int32x4 = in_vec.m_int32x4 * in_val;
-	return result;
+	return Vec4i{ in_vec.m_int32x4 * in_val };
 }
 
 Vec4i operator*(int32 in_val, Arg_Vec4i in_vec) {
-	Vec4i result;
-	result.m_int32x4 = in_val * in_vec.m_int32x4;
-	return result;
+	return Vec4i{ in_val * in_vec.m_int32x4 };
 }
 
 Vec4i& Vec4i::operator/=(Arg_Vec4i in_other) {
@@ -139,9 +127,7 @@ Vec4i& Vec4i::operator/=(Arg_Vec4i in_other) {
 	return *this;
 }
 Vec4i operator/(Arg_Vec4i in_a, Arg_Vec4i in_b) {
-	Vec4i result;
-	result.m_int32x4 = in_a.m_int32x4 / in_b.m_int32x4;
-	return result;
+	return Vec4i{ in_a.m_int32x4 / in_b.m_int32x4 };
 }
 
 Vec4i& Vec4i::operator/=(int32 in_other) {
@@ -150,15 +136,11 @@ Vec4i& Vec4i::operator/=(int32 in_other) {
 }
 
 Vec4i operator/(Arg_Vec4i in_vec, int32 in_val) {
-	Vec4i result;
-	result.m_int32x4 = in_vec.m_int32x4 / in_val;
-	return result;
+	return Vec4i{ in_vec.m_int32x4 / in_val };
 }
 
 Vec4i operator/(int32 in_val, Arg_Vec4i in_vec) {
-	Vec4i result;
-	result.m_int32x4 = in_val / in_vec.m_int32x4;
-	return result;
+	return Vec4i{ in_val / in_vec.m_int32x4 };
 }
 
 DEEP_NAMESPACE_END

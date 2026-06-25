@@ -10,13 +10,16 @@
 DEEP_NAMESPACE_BEGIN
 
 Vec2::Vec2(float32 in_x, float32 in_y) :
-	x{ in_x }, y{ in_y } {}
+	m_float32x2{ in_x, in_y } {}
+
+Vec2::Vec2(Float32x2 in_float32x2) :
+	m_float32x2{ in_float32x2 } {}
 
 Vec2::Vec2(Arg_Vec3 in_vec) :
-	x{ in_vec.x }, y{ in_vec.y } {}
+	m_float32x2{ in_vec.m_float32x4 } {}
 
 Vec2::Vec2(Arg_Vec4 in_vec) :
-	x{ in_vec.x }, y{ in_vec.y } {}
+	m_float32x2{ in_vec.m_float32x4 } {}
 
 Vec2& Vec2::Normalize() {
 	float32 magnitudeSqrd = sqrdMagnitude();
@@ -32,7 +35,7 @@ bool Vec2::IsNormalized(float tolerance) const {
 }
 
 float32 Vec2::sqrdMagnitude() const {
-	return x * x + y * y;
+	return Dot(*this, *this);
 }
 float32 Vec2::magnitude() const {
 	return Sqrt(sqrdMagnitude());
@@ -40,6 +43,10 @@ float32 Vec2::magnitude() const {
 
 float32 Vec2::Dot(Arg_Vec2 in_a, Arg_Vec2 in_b) {
 	return in_a.x * in_b.x + in_a.y * in_b.y;
+}
+
+Vec2::operator Float32x2() const {
+	return m_float32x2;
 }
 
 float32 Vec2::Cross(Arg_Vec2 in_a, Arg_Vec2 in_b) {
@@ -74,7 +81,7 @@ constexpr const float32& Vec2::operator[](size_t in_index) const {
 }
 
 bool operator!=(Arg_Vec2 in_a, Arg_Vec2 in_b) {
-	return in_a.x != in_b.x || in_a.y != in_b.y;
+	return in_a.m_float32x2 != in_b.m_float32x2;
 }
 
 bool operator==(Arg_Vec2 a, Arg_Vec2 b) {
@@ -82,74 +89,67 @@ bool operator==(Arg_Vec2 a, Arg_Vec2 b) {
 }
 
 Vec2& Vec2::operator+=(Arg_Vec2 in_other) {
-	x += in_other.x;
-	y += in_other.y;
+	m_float32x2 += in_other.m_float32x2;
 	return *this;
 }
 
 Vec2 operator+(Arg_Vec2 in_a, Arg_Vec2 in_b) {
-	return Vec2{ in_a.x + in_b.x, in_a.y + in_b.y };
+	return Vec2{ in_a.m_float32x2 + in_b.m_float32x2 };
 }
 
 Vec2& Vec2::operator-=(Arg_Vec2 in_other) {
-	x -= in_other.x;
-	y -= in_other.y;
+	m_float32x2 -= in_other.m_float32x2;
 	return *this;
 }
 
 Vec2 operator-(Arg_Vec2 in_a, Arg_Vec2 in_b) {
-	return Vec2{ in_a.x - in_b.x, in_a.y - in_b.y };
+	return Vec2{ in_a.m_float32x2 - in_b.m_float32x2 };
 }
 
 Vec2 operator-(Arg_Vec2 in_a) {
-	// NOTE(randomuserhi): 0.0f - x to stay consistent with vectorised version
-	return Vec2{ 0.0f - in_a.x, 0.0f - in_a.y };
+	return Vec2{ -in_a.m_float32x2 };
 }
 
 Vec2& Vec2::operator*=(Arg_Vec2 in_other) {
-	x *= in_other.x;
-	y *= in_other.y;
+	m_float32x2 *= in_other.m_float32x2;
 	return *this;
 }
 Vec2 operator*(Arg_Vec2 in_a, Arg_Vec2 in_b) {
-	return Vec2{ in_a.x * in_b.x, in_a.y * in_b.y };
+	return Vec2{ in_a.m_float32x2 * in_b.m_float32x2 };
 }
 
 Vec2& Vec2::operator*=(float32 in_other) {
-	x *= in_other;
-	y *= in_other;
+	m_float32x2 *= in_other;
 	return *this;
 }
 
 Vec2 operator*(Arg_Vec2 in_vec, float32 in_val) {
-	return Vec2{ in_vec.x * in_val, in_vec.y * in_val };
+	return Vec2{ in_vec.m_float32x2 * in_val };
 }
 
 Vec2 operator*(float32 in_val, Arg_Vec2 in_vec) {
-	return Vec2{ in_val * in_vec.x, in_val * in_vec.y };
+	return Vec2{ in_val * in_vec.m_float32x2 };
 }
 
 Vec2& Vec2::operator/=(Arg_Vec2 in_other) {
-	x /= in_other.x;
-	y /= in_other.y;
+	m_float32x2 /= in_other.m_float32x2;
 	return *this;
 }
 Vec2 operator/(Arg_Vec2 in_a, Arg_Vec2 in_b) {
-	return Vec2{ in_a.x / in_b.x, in_a.y / in_b.y };
+	return Vec2{ in_a.m_float32x2 / in_b.m_float32x2 };
 }
 
 Vec2& Vec2::operator/=(float32 in_other) {
-	x /= in_other;
-	y /= in_other;
+	m_float32x2 /= in_other;
 	return *this;
 }
 
 Vec2 operator/(Arg_Vec2 in_vec, float32 in_val) {
-	return Vec2{ in_vec.x / in_val, in_vec.y / in_val };
+	return Vec2{ in_vec.m_float32x2 / in_val };
 }
 
 Vec2 operator/(float32 in_val, Arg_Vec2 in_vec) {
-	return Vec2{ in_val / in_vec.x, in_val / in_vec.y };
+	return Vec2{ in_val / in_vec.m_float32x2 };
 }
 
 std::ostream& operator<<(std::ostream& in_os, const Vec2& in_vec) {

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Deep/Simd/Float32x4.h"
 #include "Deep/Simd/Int32x4.h"
+#include "Deep/Simd/Float32x4.h"
+#include "Deep/Simd/Float32x2.h"
 #include "Deep/Bit.h"
 
 #if !defined(DEEP_USE_SSE)
@@ -13,12 +14,20 @@ DEEP_NAMESPACE_BEGIN
 #ifdef DEEP_USE_SSE4_1
 Float32x4::Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
 	_internal{ _mm_set_ps(in_w, in_z, in_y, in_x) } {}
+Float32x4::Float32x4(Float32x2 in_low) :
+	_internal{ _mm_set_ps(0, 0, in_low.y, in_low.x) } {}
+Float32x4::Float32x4(Float32x2 in_low, Float32x2 in_high) :
+	_internal{ _mm_set_ps(in_high.y, in_high.x, in_low.y, in_low.x) } {}
 #else
 Float32x4::Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
 	x{ in_x }, y{ in_y }, z{ in_z }, w{ in_w } {}
+Float32x4::Float32x4(Float32x2 in_low) :
+	x{ in_low.x }, y{ in_low.y }, z{ 0 }, w{ 0 } {}
+Float32x4::Float32x4(Float32x2 in_low, Float32x2 in_high) :
+	x{ in_low.x }, y{ in_low.y }, z{ in_high.x }, w{ in_high.y } {}
 #endif
 
-constexpr Float32x4::Float32x4(Type in_internal) :
+Float32x4::Float32x4(Type in_internal) :
 	_internal(in_internal) {}
 
 constexpr Float32x4 Float32x4::Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {

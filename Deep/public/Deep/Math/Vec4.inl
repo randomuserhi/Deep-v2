@@ -41,12 +41,7 @@ bool Vec4::IsNormalized(float tolerance) const {
 }
 
 float32 Vec4::sqrdMagnitude() const {
-#ifdef DEEP_USE_SSE4_1
-	return _mm_cvtss_f32(_mm_dp_ps(m_float32x4, m_float32x4, 0xff));
-#else
-	// NOTE(randomuserhi): brackets to keep consistent with vectorised version
-	return (x * x + y * y) + (z * z + w * w);
-#endif
+	return Dot(*this, *this);
 }
 float32 Vec4::magnitude() const {
 #ifdef DEEP_USE_SSE4_1
@@ -100,9 +95,7 @@ Vec4& Vec4::operator+=(Arg_Vec4 in_other) {
 }
 
 Vec4 operator+(Arg_Vec4 in_a, Arg_Vec4 in_b) {
-	Vec4 result;
-	result.m_float32x4 = in_a.m_float32x4 + in_b.m_float32x4;
-	return result;
+	return Vec4{ in_a.m_float32x4 + in_b.m_float32x4 };
 }
 
 Vec4& Vec4::operator-=(Arg_Vec4 in_other) {
@@ -111,15 +104,11 @@ Vec4& Vec4::operator-=(Arg_Vec4 in_other) {
 }
 
 Vec4 operator-(Arg_Vec4 in_a, Arg_Vec4 in_b) {
-	Vec4 result;
-	result.m_float32x4 = in_a.m_float32x4 - in_b.m_float32x4;
-	return result;
+	return Vec4{ in_a.m_float32x4 - in_b.m_float32x4 };
 }
 
 Vec4 operator-(Arg_Vec4 in_a) {
-	Vec4 result;
-	result.m_float32x4 = -in_a.m_float32x4;
-	return result;
+	return Vec4{ -in_a.m_float32x4 };
 }
 
 Vec4& Vec4::operator*=(Arg_Vec4 in_other) {
@@ -127,9 +116,7 @@ Vec4& Vec4::operator*=(Arg_Vec4 in_other) {
 	return *this;
 }
 Vec4 operator*(Arg_Vec4 in_a, Arg_Vec4 in_b) {
-	Vec4 result;
-	result.m_float32x4 = in_a.m_float32x4 * in_b.m_float32x4;
-	return result;
+	return Vec4{ in_a.m_float32x4 * in_b.m_float32x4 };
 }
 
 Vec4& Vec4::operator*=(float32 in_other) {
@@ -138,15 +125,11 @@ Vec4& Vec4::operator*=(float32 in_other) {
 }
 
 Vec4 operator*(Arg_Vec4 in_vec, float32 in_val) {
-	Vec4 result;
-	result.m_float32x4 = in_vec.m_float32x4 * in_val;
-	return result;
+	return Vec4{ in_vec.m_float32x4 * in_val };
 }
 
 Vec4 operator*(float32 in_val, Arg_Vec4 in_vec) {
-	Vec4 result;
-	result.m_float32x4 = in_val * in_vec.m_float32x4;
-	return result;
+	return Vec4{ in_val * in_vec.m_float32x4 };
 }
 
 Vec4& Vec4::operator/=(Arg_Vec4 in_other) {
@@ -154,9 +137,7 @@ Vec4& Vec4::operator/=(Arg_Vec4 in_other) {
 	return *this;
 }
 Vec4 operator/(Arg_Vec4 in_a, Arg_Vec4 in_b) {
-	Vec4 result;
-	result.m_float32x4 = in_a.m_float32x4 / in_b.m_float32x4;
-	return result;
+	return Vec4{ in_a.m_float32x4 / in_b.m_float32x4 };
 }
 
 Vec4& Vec4::operator/=(float32 in_other) {
@@ -165,15 +146,11 @@ Vec4& Vec4::operator/=(float32 in_other) {
 }
 
 Vec4 operator/(Arg_Vec4 in_vec, float32 in_val) {
-	Vec4 result;
-	result.m_float32x4 = in_vec.m_float32x4 / in_val;
-	return result;
+	return Vec4{ in_vec.m_float32x4 / in_val };
 }
 
 Vec4 operator/(float32 in_val, Arg_Vec4 in_vec) {
-	Vec4 result;
-	result.m_float32x4 = in_val / in_vec.m_float32x4;
-	return result;
+	return Vec4{ in_val / in_vec.m_float32x4 };
 }
 
 std::ostream& operator<<(std::ostream& in_os, const Vec4& in_vec) {

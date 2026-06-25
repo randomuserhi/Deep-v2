@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Deep/Simd/Int32x2.h"
 #include "Deep/Simd/Int32x4.h"
 #include "Deep/Simd/Float32x4.h"
 #include "Deep/Bit.h"
@@ -14,12 +15,20 @@ DEEP_NAMESPACE_BEGIN
 #ifdef DEEP_USE_SSE4_1
 Int32x4::Int32x4(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
 	_internal{ _mm_set_epi32(in_w, in_z, in_y, in_x) } {}
+Int32x4::Int32x4(Int32x2 in_low) :
+	_internal{ _mm_set_epi32(0, 0, in_low.y, in_low.x) } {}
+Int32x4::Int32x4(Int32x2 in_low, Int32x2 in_high) :
+	_internal{ _mm_set_epi32(in_high.y, in_high.x, in_low.y, in_low.x) } {}
 #else
 Int32x4::Int32x4(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
 	x{ in_x }, y{ in_y }, z{ in_z }, w{ in_w } {}
+Int32x4::Int32x4(Int32x2 in_low) :
+	x{ in_low.x }, y{ in_low.y }, z{ 0 }, w{ 0 } {}
+Int32x4::Int32x4(Int32x2 in_low, Int32x2 in_high) :
+	x{ in_low.x }, y{ in_low.y }, z{ in_high.x }, w{ in_high.y } {}
 #endif
 
-constexpr Int32x4::Int32x4(Type in_internal) :
+Int32x4::Int32x4(Type in_internal) :
 	_internal(in_internal) {}
 
 constexpr Int32x4 Int32x4::Constexpr(int32 in_x, int32 in_y, int32 in_z, int32 in_w) {

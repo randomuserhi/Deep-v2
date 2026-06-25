@@ -46,7 +46,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Float32x4 {
 	constexpr Float32x4(const Float32x4&) = default;
 	constexpr Float32x4& operator=(const Float32x4&) = default;
 	inline Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
-	constexpr inline Float32x4(Type in_internal);
+	inline Float32x4(Type in_internal);
+	inline Float32x4(Float32x2 in_low);
+	inline Float32x4(Float32x2 in_low, Float32x2 in_high);
 
 	constexpr static inline Float32x4 Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w);
 

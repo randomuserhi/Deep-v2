@@ -18,7 +18,7 @@ Int64x2::Int64x2(int64 in_x, int64 in_y) :
 	x{ in_x }, y{ in_y } {}
 #endif
 
-constexpr Int64x2::Int64x2(Type in_internal) :
+Int64x2::Int64x2(Type in_internal) :
 	_internal(in_internal) {}
 
 constexpr Int64x2 Int64x2::Constexpr(int64 in_x, int64 in_y) {

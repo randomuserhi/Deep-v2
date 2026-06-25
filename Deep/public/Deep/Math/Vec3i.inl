@@ -30,8 +30,10 @@ int32 Vec3i::manhattanDistance() const {
 
 int32 Vec3i::Dot(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
-	Int32x4 mul = _mm_mullo_epi32(in_a.m_int32x4, in_b.m_int32x4);
-	return mul.x + mul.y + mul.z;
+	__m128i mul = _mm_mullo_epi32(in_a.m_int32x4, in_b.m_int32x4);
+	__m128i sum = _mm_add_epi32(mul, _mm_srli_si128(mul, 4));
+	sum = _mm_add_epi32(sum, _mm_srli_si128(mul, 8));
+	return _mm_cvtsi128_si32(sum);
 #else
 	return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z;
 #endif

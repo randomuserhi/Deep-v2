@@ -37,23 +37,29 @@ bool Vec3::IsNormalized(float tolerance) const {
 }
 
 float32 Vec3::sqrdMagnitude() const {
-#ifdef DEEP_USE_SSE4_1
-	return _mm_cvtss_f32(_mm_dp_ps(m_float32x4, m_float32x4, 0x7f));
-#else
-	return x * x + y * y + z * z;
-#endif
+	return Dot(*this, *this);
 }
 float32 Vec3::magnitude() const {
-#ifdef DEEP_USE_SSE4_1
-	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(m_float32x4, m_float32x4, 0x7f)));
+#ifdef DEEP_USE_SSE
+	__m128 t = _mm_mul_ps(m_float32x4, m_float32x4);
+	__m128 y = _mm_shuffle_ps(t, t, _MM_SHUFFLE(1, 1, 1, 1));
+	__m128 z = _mm_shuffle_ps(t, t, _MM_SHUFFLE(2, 2, 2, 2));
+	t = _mm_add_ss(t, y);
+	t = _mm_add_ss(t, z);
+	return _mm_cvtss_f32(_mm_sqrt_ss(t));
 #else
 	return Sqrt(sqrdMagnitude());
 #endif
 }
 
 float32 Vec3::Dot(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE4_1
-	return _mm_cvtss_f32(_mm_dp_ps(in_a.m_float32x4, in_b.m_float32x4, 0x7f));
+#ifdef DEEP_USE_SSE
+	__m128 t = _mm_mul_ps(in_a.m_float32x4, in_b.m_float32x4);
+	__m128 y = _mm_shuffle_ps(t, t, _MM_SHUFFLE(1, 1, 1, 1));
+	__m128 z = _mm_shuffle_ps(t, t, _MM_SHUFFLE(2, 2, 2, 2));
+	t = _mm_add_ss(t, y);
+	t = _mm_add_ss(t, z);
+	return _mm_cvtss_f32(t);
 #else
 	return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z;
 #endif
@@ -111,158 +117,67 @@ bool operator==(Arg_Vec3 a, Arg_Vec3 b) {
 }
 
 Vec3& Vec3::operator+=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE4_1
 	m_float32x4 += in_other.m_float32x4;
-#else
-	x += in_other.x;
-	y += in_other.y;
-	z += in_other.z;
-#endif
 	return *this;
 }
 
 Vec3 operator+(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_a.m_float32x4 + in_b.m_float32x4;
-	return result;
-#else
-	return Vec3{ in_a.x + in_b.x, in_a.y + in_b.y, in_a.z + in_b.z };
-#endif
+	return Vec3{ in_a.m_float32x4 + in_b.m_float32x4 };
 }
 
 Vec3& Vec3::operator-=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE4_1
 	m_float32x4 -= in_other.m_float32x4;
-#else
-	x -= in_other.x;
-	y -= in_other.y;
-	z -= in_other.z;
-#endif
 	return *this;
 }
 
 Vec3 operator-(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_a.m_float32x4 - in_b.m_float32x4;
-	return result;
-#else
-	return Vec3{ in_a.x - in_b.x, in_a.y - in_b.y, in_a.z - in_b.z };
-#endif
+	return Vec3{ in_a.m_float32x4 - in_b.m_float32x4 };
 }
 
 Vec3 operator-(Arg_Vec3 in_a) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = -in_a.m_float32x4;
-	return result;
-#else
-	// NOTE(randomuserhi): 0.0f - x to stay consistent with vectorised version
-	return Vec3{ 0.0f - in_a.x, 0.0f - in_a.y, 0.0f - in_a.z };
-#endif
+	return Vec3{ -in_a.m_float32x4 };
 }
 
 Vec3& Vec3::operator*=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE4_1
 	m_float32x4 *= in_other.m_float32x4;
-#else
-	x *= in_other.x;
-	y *= in_other.y;
-	z *= in_other.z;
-#endif
 	return *this;
 }
 Vec3 operator*(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_a.m_float32x4 * in_b.m_float32x4;
-	return result;
-#else
-	return Vec3{ in_a.x * in_b.x, in_a.y * in_b.y, in_a.z * in_b.z };
-#endif
+	return Vec3{ in_a.m_float32x4 * in_b.m_float32x4 };
 }
 
 Vec3& Vec3::operator*=(float32 in_other) {
-#ifdef DEEP_USE_SSE4_1
 	m_float32x4 *= in_other;
-#else
-	x *= in_other;
-	y *= in_other;
-	z *= in_other;
-#endif
 	return *this;
 }
 
 Vec3 operator*(Arg_Vec3 in_vec, float32 in_val) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_vec.m_float32x4 * in_val;
-	return result;
-#else
-	return Vec3{ in_vec.x * in_val, in_vec.y * in_val, in_vec.z * in_val };
-#endif
+	return Vec3{ in_vec.m_float32x4 * in_val };
 }
 
 Vec3 operator*(float32 in_val, Arg_Vec3 in_vec) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_val * in_vec.m_float32x4;
-	return result;
-#else
-	return Vec3{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z };
-#endif
+	return Vec3{ in_val * in_vec.m_float32x4 };
 }
 
 Vec3& Vec3::operator/=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE4_1
 	m_float32x4 /= in_other.m_float32x4;
-#else
-	x /= in_other.x;
-	y /= in_other.y;
-	z /= in_other.z;
-#endif
 	return *this;
 }
 Vec3 operator/(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_a.m_float32x4 / in_b.m_float32x4;
-	return result;
-#else
-	return Vec3{ in_a.x / in_b.x, in_a.y / in_b.y, in_a.z / in_b.z };
-#endif
+	return Vec3{ in_a.m_float32x4 / in_b.m_float32x4 };
 }
 
 Vec3& Vec3::operator/=(float32 in_other) {
-#ifdef DEEP_USE_SSE4_1
 	m_float32x4 /= in_other;
-#else
-	x /= in_other;
-	y /= in_other;
-	z /= in_other;
-#endif
 	return *this;
 }
 
 Vec3 operator/(Arg_Vec3 in_vec, float32 in_val) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_vec.m_float32x4 / in_val;
-	return result;
-#else
-	return Vec3{ in_vec.x / in_val, in_vec.y / in_val, in_vec.z / in_val };
-#endif
+	return Vec3{ in_vec.m_float32x4 / in_val };
 }
 
 Vec3 operator/(float32 in_val, Arg_Vec3 in_vec) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3 result;
-	result.m_float32x4 = in_val / in_vec.m_float32x4;
-	return result;
-#else
-	return Vec3{ in_val / in_vec.x, in_val / in_vec.y, in_val / in_vec.z };
-#endif
+	return Vec3{ in_val / in_vec.m_float32x4 };
 }
 
 std::ostream& operator<<(std::ostream& in_os, const Vec3& in_vec) {

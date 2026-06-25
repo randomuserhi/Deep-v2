@@ -32,6 +32,8 @@ DEEP_NAMESPACE_BEGIN
 struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 #if defined(DEEP_USE_SSE)
 	using Type = __m128i;
+#elif defined(DEEP_USE_NEON)
+	using Type = int64x2_t;
 #else
 	using Type = struct {
 		int64 m_values[2];
@@ -44,7 +46,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	constexpr Int64x2(const Int64x2&) = default;
 	constexpr Int64x2& operator=(const Int64x2&) = default;
 	inline Int64x2(int64 in_x, int64 in_y);
-	constexpr inline Int64x2(Type in_internal);
+	inline Int64x2(Type in_internal);
 
 	constexpr static inline Int64x2 Constexpr(int64 in_x, int64 in_y);
 

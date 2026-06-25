@@ -5,12 +5,12 @@
 TEST(MemoryBlock, Trivial) {
 	TEST_CASE(Move) {
 		Deep::MemoryBlock<int> a{ 10 };
-		int* ptr = a.ptr();
+		int* ptr = a.m_Ptr();
 
 		Deep::MemoryBlock<int> b = std::move(a);
 
-		EXPECT_EQ(a.ptr(), nullptr);
-		EXPECT_EQ(b.ptr(), ptr);
+		EXPECT_EQ(a.m_Ptr(), nullptr);
+		EXPECT_EQ(b.m_Ptr(), ptr);
 	}
 
 	TEST_CASE(Copy) {
@@ -24,7 +24,7 @@ TEST(MemoryBlock, Trivial) {
 			EXPECT_EQ(a[i], b[i]);
 		}
 
-		EXPECT_NE(a.ptr(), b.ptr());
+		EXPECT_NE(a.m_Ptr(), b.m_Ptr());
 	}
 }
 
@@ -48,12 +48,12 @@ TEST(MemoryBlock, NonTrivial) {
 		NonTrivialType::s_numDestructorCalls = 0;
 		{
 			Deep::MemoryBlock<NonTrivialType> a{ 10 };
-			NonTrivialType* ptr = a.ptr();
+			NonTrivialType* ptr = a.m_Ptr();
 
 			Deep::MemoryBlock<NonTrivialType> b = std::move(a);
 
-			EXPECT_EQ(a.ptr(), nullptr);
-			EXPECT_EQ(b.ptr(), ptr);
+			EXPECT_EQ(a.m_Ptr(), nullptr);
+			EXPECT_EQ(b.m_Ptr(), ptr);
 			EXPECT_EQ(NonTrivialType::s_numDestructorCalls, 0);
 		}
 		EXPECT_EQ(NonTrivialType::s_numDestructorCalls, 10);
@@ -72,7 +72,7 @@ TEST(MemoryBlock, NonTrivial) {
 				EXPECT_EQ(a[i].m_value, b[i].m_value);
 			}
 
-			EXPECT_NE(a.ptr(), b.ptr());
+			EXPECT_NE(a.m_Ptr(), b.m_Ptr());
 			EXPECT_EQ(NonTrivialType::s_numDestructorCalls, 0);
 		}
 		EXPECT_EQ(NonTrivialType::s_numDestructorCalls, 20);
