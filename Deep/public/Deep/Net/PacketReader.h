@@ -14,9 +14,11 @@ DEEP_NAMESPACE_BEGIN
 struct PacketReader {
 	//
 
-	inline PacketReader(const uint8* in_data);
+	inline PacketReader(const uint8* in_data, size_t in_size);
 
 	//
+
+	inline bool HasBytesRemaining(size_t in_count);
 
 	inline uint8 ReadUInt8();
 
@@ -40,6 +42,7 @@ struct PacketReader {
 	//
 
 	const uint8* m_head;
+	const uint8* m_tail;
 
 	//
 
@@ -49,6 +52,7 @@ private:
 	//
 
 	const uint8* const m_data;
+	const size_t m_size;
 
 	//
 };
