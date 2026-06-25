@@ -14,7 +14,7 @@ class MemoryBlock;
 
 template<typename T, typename in_allocator = RawAllocator<T>>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-using Arg_MemoryBlock = const MemoryBlock<T, in_allocator>;
+using Arg_MemoryBlock = const MemoryBlock<T, in_allocator>&;
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
