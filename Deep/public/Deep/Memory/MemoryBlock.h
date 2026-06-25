@@ -94,8 +94,8 @@ public:
 
 	//
 
-	Deep_ForceInline size_t size() const;
-	Deep_ForceInline T* ptr() const;
+	Deep_ForceInline size_t m_Size() const;
+	Deep_ForceInline T* m_Ptr() const;
 
 private:
 	DEEP_PRIVATE_TESTABLE

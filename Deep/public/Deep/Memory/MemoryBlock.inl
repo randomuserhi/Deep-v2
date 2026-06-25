@@ -117,13 +117,13 @@ const T& MemoryBlock<T, in_allocator>::operator[](size_t in_index) const {
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-size_t MemoryBlock<T, in_allocator>::size() const {
+size_t MemoryBlock<T, in_allocator>::m_Size() const {
 	return m_size;
 }
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
-T* MemoryBlock<T, in_allocator>::ptr() const {
+T* MemoryBlock<T, in_allocator>::m_Ptr() const {
 	return m_ptr;
 }
 
