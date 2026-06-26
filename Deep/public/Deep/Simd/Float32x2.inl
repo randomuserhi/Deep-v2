@@ -13,7 +13,7 @@ Float32x2::Float32x2(float32 in_x, float32 in_y) :
 	x{ in_x }, y{ in_y } {}
 
 Float32x2::Float32x2(Type in_internal) :
-	_internal(in_internal) {}
+	m_internal(in_internal) {}
 
 Float32x2::Float32x2(Float32x4 in_float32x4) :
 	x{ in_float32x4.x }, y{ in_float32x4.y } {}
@@ -26,7 +26,7 @@ constexpr Float32x2 Float32x2::Constexpr(float32 in_x, float32 in_y) {
 }
 
 constexpr Float32x2::operator Type() const {
-	return _internal;
+	return m_internal;
 }
 
 Int32x2 Float32x2::ToInt() const {
@@ -85,7 +85,7 @@ bool operator==(Arg_Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator|=(Arg_Float32x2 in_other) {
-	_internal = (ReinterpretAsInt() | in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+	m_internal = (ReinterpretAsInt() | in_other.ReinterpretAsInt()).ReinterpretAsFloat();
 	return *this;
 }
 Float32x2 operator|(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -93,7 +93,7 @@ Float32x2 operator|(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator&=(Arg_Float32x2 in_other) {
-	_internal = (ReinterpretAsInt() & in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+	m_internal = (ReinterpretAsInt() & in_other.ReinterpretAsInt()).ReinterpretAsFloat();
 	return *this;
 }
 Float32x2 operator&(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -101,7 +101,7 @@ Float32x2 operator&(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator^=(Arg_Float32x2 in_other) {
-	_internal = (ReinterpretAsInt() ^ in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+	m_internal = (ReinterpretAsInt() ^ in_other.ReinterpretAsInt()).ReinterpretAsFloat();
 	return *this;
 }
 Float32x2 operator^(Float32x2 in_a, Arg_Float32x2 in_b) {

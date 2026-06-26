@@ -104,7 +104,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	//
 
 	union {
-		Type _internal;
+		Type m_internal;
 		int64 m_values[2];
 		struct {
 			int64 x;

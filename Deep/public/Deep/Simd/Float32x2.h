@@ -140,7 +140,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Float32x2 {
 	//
 
 	union {
-		Type _internal;
+		Type m_internal;
 		float32 m_values[2];
 		struct {
 			float32 x;

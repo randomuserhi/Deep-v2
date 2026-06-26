@@ -12,7 +12,7 @@ Int32x2::Int32x2(int32 in_x, int32 in_y) :
 	x{ in_x }, y{ in_y } {}
 
 Int32x2::Int32x2(Type in_internal) :
-	_internal(in_internal) {}
+	m_internal(in_internal) {}
 
 Int32x2::Int32x2(Int32x4 in_int32x4) :
 	x{ in_int32x4.x }, y{ in_int32x4.y } {}
@@ -25,7 +25,7 @@ constexpr Int32x2 Int32x2::Constexpr(int32 in_x, int32 in_y) {
 }
 
 Int32x2::operator Type() const {
-	return _internal;
+	return m_internal;
 }
 
 Float32x2 Int32x2::ToFloat() const {
@@ -87,14 +87,14 @@ constexpr const int32& Int32x2::operator[](size_t in_index) const {
 }
 
 bool operator!=(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
-	return in_a.x != in_b.x || in_a.y != in_b.y;
+	return in_a.m_swar64 != in_b.m_swar64;
 }
 bool operator==(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 	return !(in_a != in_b);
 }
 
 Int32x2& Int32x2::operator<<=(int32 in_count) {
-	_internal = Int32x2{ x << in_count, y << in_count };
+	m_internal = Int32x2{ x << in_count, y << in_count };
 	return *this;
 }
 Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
@@ -102,7 +102,7 @@ Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
 }
 
 Int32x2& Int32x2::operator>>=(int32 in_count) {
-	_internal = Int32x2{ x >> in_count, y >> in_count };
+	m_internal = Int32x2{ x >> in_count, y >> in_count };
 	return *this;
 }
 Int32x2 operator>>(Int32x2 in_a, int32 in_count) {
@@ -110,7 +110,7 @@ Int32x2 operator>>(Int32x2 in_a, int32 in_count) {
 }
 
 Int32x2& Int32x2::operator|=(Arg_Int32x2 in_other) {
-	_internal = Int32x2{ x | in_other.x, y | in_other.y };
+	m_swar64 |= in_other.m_swar64;
 	return *this;
 }
 Int32x2 operator|(Int32x2 in_a, Arg_Int32x2 in_b) {
@@ -118,7 +118,7 @@ Int32x2 operator|(Int32x2 in_a, Arg_Int32x2 in_b) {
 }
 
 Int32x2& Int32x2::operator&=(Arg_Int32x2 in_other) {
-	_internal = Int32x2{ x & in_other.x, y & in_other.y };
+	m_swar64 &= in_other.m_swar64;
 	return *this;
 }
 Int32x2 operator&(Int32x2 in_a, Arg_Int32x2 in_b) {
@@ -126,7 +126,7 @@ Int32x2 operator&(Int32x2 in_a, Arg_Int32x2 in_b) {
 }
 
 Int32x2& Int32x2::operator^=(Arg_Int32x2 in_other) {
-	_internal = Int32x2{ x ^ in_other.x, y ^ in_other.y };
+	m_swar64 ^= in_other.m_swar64;
 	return *this;
 }
 Int32x2 operator^(Int32x2 in_a, Arg_Int32x2 in_b) {

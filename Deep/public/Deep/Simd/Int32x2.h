@@ -147,7 +147,8 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 	//
 
 	union {
-		Type _internal;
+		Type m_internal;
+		int64 m_swar64; // 64 bit register representation for SWAR (simd with a register)
 		int32 m_values[2];
 		struct {
 			int32 x;

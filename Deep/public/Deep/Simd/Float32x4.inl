@@ -13,11 +13,11 @@ DEEP_NAMESPACE_BEGIN
 
 #ifdef DEEP_USE_SSE4_1
 Float32x4::Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
-	_internal{ _mm_set_ps(in_w, in_z, in_y, in_x) } {}
+	m_internal{ _mm_set_ps(in_w, in_z, in_y, in_x) } {}
 Float32x4::Float32x4(Float32x2 in_low) :
-	_internal{ _mm_set_ps(0, 0, in_low.y, in_low.x) } {}
+	m_internal{ _mm_set_ps(0, 0, in_low.y, in_low.x) } {}
 Float32x4::Float32x4(Float32x2 in_low, Float32x2 in_high) :
-	_internal{ _mm_set_ps(in_high.y, in_high.x, in_low.y, in_low.x) } {}
+	m_internal{ _mm_set_ps(in_high.y, in_high.x, in_low.y, in_low.x) } {}
 #else
 Float32x4::Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
 	x{ in_x }, y{ in_y }, z{ in_z }, w{ in_w } {}
@@ -28,7 +28,7 @@ Float32x4::Float32x4(Float32x2 in_low, Float32x2 in_high) :
 #endif
 
 Float32x4::Float32x4(Type in_internal) :
-	_internal(in_internal) {}
+	m_internal(in_internal) {}
 
 constexpr Float32x4 Float32x4::Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {
 	Float32x4 xmm;
@@ -40,12 +40,12 @@ constexpr Float32x4 Float32x4::Constexpr(float32 in_x, float32 in_y, float32 in_
 }
 
 constexpr Float32x4::operator Type() const {
-	return _internal;
+	return m_internal;
 }
 
 Int32x4 Float32x4::ToInt() const {
 #ifdef DEEP_USE_SSE
-	return _mm_cvttps_epi32(_internal);
+	return _mm_cvttps_epi32(m_internal);
 #else
 	return Int32x4{ static_cast<int32>(x), static_cast<int32>(y), static_cast<int32>(z), static_cast<int32>(w) };
 #endif
@@ -56,7 +56,7 @@ constexpr Int32x4 Float32x4::Constexpr_ToInt() const {
 
 Int32x4 Float32x4::ReinterpretAsInt() const {
 #ifdef DEEP_USE_SSE
-	return _mm_castps_si128(_internal);
+	return _mm_castps_si128(m_internal);
 #else
 	return BitCast<Int32x4>(*this);
 #endif
@@ -136,9 +136,9 @@ bool operator==(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator|=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE
-	_internal = _mm_or_ps(_internal, in_other);
+	m_internal = _mm_or_ps(m_internal, in_other);
 #else
-	_internal = (ReinterpretAsInt() | in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+	m_internal = (ReinterpretAsInt() | in_other.ReinterpretAsInt()).ReinterpretAsFloat();
 #endif
 	return *this;
 }
@@ -148,9 +148,9 @@ Float32x4 operator|(Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator&=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE
-	_internal = _mm_and_ps(_internal, in_other);
+	m_internal = _mm_and_ps(m_internal, in_other);
 #else
-	_internal = (ReinterpretAsInt() & in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+	m_internal = (ReinterpretAsInt() & in_other.ReinterpretAsInt()).ReinterpretAsFloat();
 #endif
 	return *this;
 }
@@ -160,9 +160,9 @@ Float32x4 operator&(Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator^=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE
-	_internal = _mm_xor_ps(_internal, in_other);
+	m_internal = _mm_xor_ps(m_internal, in_other);
 #else
-	_internal = (ReinterpretAsInt() ^ in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+	m_internal = (ReinterpretAsInt() ^ in_other.ReinterpretAsInt()).ReinterpretAsFloat();
 #endif
 	return *this;
 }
@@ -172,7 +172,7 @@ Float32x4 operator^(Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator+=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_add_ps(_internal, in_other);
+	m_internal = _mm_add_ps(m_internal, in_other);
 #else
 	x += in_other.x;
 	y += in_other.y;
@@ -188,7 +188,7 @@ Float32x4 operator+(Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator-=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_sub_ps(_internal, in_other);
+	m_internal = _mm_sub_ps(m_internal, in_other);
 #else
 	x -= in_other.x;
 	y -= in_other.y;
@@ -213,7 +213,7 @@ Float32x4 operator-(Arg_Float32x4 in_other) {
 
 Float32x4& Float32x4::operator*=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_mul_ps(_internal, in_other);
+	m_internal = _mm_mul_ps(m_internal, in_other);
 #else
 	x *= in_other.x;
 	y *= in_other.y;
@@ -228,7 +228,7 @@ Float32x4 operator*(Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator*=(float32 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_mul_ps(_internal, _mm_set1_ps(in_other));
+	m_internal = _mm_mul_ps(m_internal, _mm_set1_ps(in_other));
 #else
 	x *= in_other;
 	y *= in_other;
@@ -252,7 +252,7 @@ Float32x4 operator*(float32 in_val, Arg_Float32x4 in_vec) {
 
 Float32x4& Float32x4::operator/=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_div_ps(_internal, in_other);
+	m_internal = _mm_div_ps(m_internal, in_other);
 #else
 	x /= in_other.x;
 	y /= in_other.y;
@@ -267,7 +267,7 @@ Float32x4 operator/(Float32x4 in_a, Arg_Float32x4 in_b) {
 
 Float32x4& Float32x4::operator/=(float32 in_other) {
 #ifdef DEEP_USE_SSE4_1
-	_internal = _mm_div_ps(_internal, _mm_set1_ps(in_other));
+	m_internal = _mm_div_ps(m_internal, _mm_set1_ps(in_other));
 #else
 	x /= in_other;
 	y /= in_other;
