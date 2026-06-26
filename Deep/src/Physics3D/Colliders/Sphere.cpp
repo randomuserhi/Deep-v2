@@ -11,7 +11,7 @@ int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out
 	Deep_Assert(in_sphereB.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
 
-	Vec3 delta = in_sphereB.m_center - in_sphereA.m_center;
+	Vec3 delta = in_sphereB.m_Center4() - in_sphereA.m_Center4();
 	float32 distanceSqrd = delta.sqrdMagnitude();
 
 	float32 radiusSum = in_sphereA.m_radius + in_sphereB.m_radius;
@@ -43,7 +43,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 	Deep_Assert(in_sphere.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
 
-	Vec3 delta = in_ray.m_origin - in_sphere.m_center;
+	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
 
 	float32 dot = Vec3::Dot(delta, in_ray.m_direction);
 	float32 distance = delta.sqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
@@ -85,7 +85,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 
 	// TODO(randomuserhi): Fairly sure logic here is wrong, needs testing
 
-	Vec3 delta = in_ray.m_origin - in_sphere.m_center;
+	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
 
 	float32 dot = Vec3::Dot(delta, in_ray.m_direction);
 	float32 distance = delta.sqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
@@ -113,7 +113,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 			float32 t = -dot - discriminant;
 			out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * t;
 			out_hits[hitCount].m_Normal4() =
-				(out_hits[hitCount].m_point - in_sphere.m_center) * invRadius; // normalize via division
+				(out_hits[hitCount].m_point - in_sphere.m_Center4()) * invRadius; // normalize via division
 			++hitCount;
 		}
 	}
@@ -127,7 +127,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 		float32 t = -dot + discriminant;
 		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * t;
 		out_hits[hitCount].m_Normal4() =
-			(out_hits[hitCount].m_point - in_sphere.m_center) * invRadius; // normalize via division
+			(out_hits[hitCount].m_point - in_sphere.m_Center4()) * invRadius; // normalize via division
 		++hitCount;
 	}
 

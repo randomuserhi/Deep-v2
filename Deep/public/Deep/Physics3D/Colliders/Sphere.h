@@ -8,8 +8,14 @@
 DEEP_NAMESPACE_BEGIN
 
 struct DEEP_EXPORT Sphere {
-	Vec3 m_center;
+	alignas(Deep_AlignOf(Vec3)) Float3 m_center;
 	float32 m_radius;
+
+	// Returns `m_center` and `m_radius` as a packed Vec3.
+	// NOTE(randomuserhi): Writing to this may effect `m_penetrationDistance` which is stored in the `._w` component, use
+	//                     with caution.
+	inline Vec3& m_Center4();
+	inline const Vec3& m_Center4() const;
 };
 
 using Arg_Sphere = const Sphere&;
