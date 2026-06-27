@@ -16,6 +16,8 @@ struct DEEP_EXPORT Sphere {
 	//                     with caution.
 	inline Vec3& m_Center4();
 	inline const Vec3& m_Center4() const;
+
+	inline Vec3 m_Center() const;
 };
 
 using Arg_Sphere = const Sphere&;

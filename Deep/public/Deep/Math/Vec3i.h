@@ -26,17 +26,23 @@ struct [[nodiscard]] alignas(Int32x4) Vec3i {
 
 	//
 
-	[[nodiscard]] inline int32 manhattanDistance() const;
+	[[nodiscard]] inline int32 m_ManhattanDistance() const;
 
-	[[nodiscard]] inline float32 sqrdMagnitude() const;
-	[[nodiscard]] inline float32 magnitude() const;
+	[[nodiscard]] inline float32 m_SqrdMagnitude() const;
+	[[nodiscard]] inline float32 m_Magnitude() const;
 
-	[[nodiscard]] static inline int32 Dot(Arg_Vec3i in_a, Arg_Vec3i in_b);
+	[[nodiscard]] static inline int32 s_Dot(Arg_Vec3i in_a, Arg_Vec3i in_b);
+
+	static inline Vec3i s_FixW(Arg_Vec3i in_vec);
+	static Deep_ForceInline void s_CheckW(Arg_Vec3i in_vec);
 
 	//
 
 	Deep_ForceInline constexpr int32& operator[](size_t);
 	Deep_ForceInline constexpr const int32& operator[](size_t) const;
+
+	// Copy only the xyz components, retaining the current _w value
+	inline void XYZ(Arg_Vec3i in_vec);
 
 	// Equality
 	friend inline bool operator!=(Arg_Vec3i in_a, Arg_Vec3i in_b);
@@ -80,7 +86,7 @@ struct [[nodiscard]] alignas(Int32x4) Vec3i {
 			int32 x;
 			int32 y;
 			int32 z;
-			// int32 w;
+			int32 _w;
 		};
 	};
 

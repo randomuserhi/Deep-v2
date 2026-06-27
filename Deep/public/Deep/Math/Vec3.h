@@ -28,21 +28,27 @@ struct [[nodiscard]] alignas(Float32x4) Vec3 {
 	//
 
 	inline Vec3& Normalize();
-	[[nodiscard]] inline Vec3 normalized() const;
+	[[nodiscard]] inline Vec3 m_Normalized() const;
 	[[nodiscard]] inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
 
-	[[nodiscard]] inline float32 sqrdMagnitude() const;
-	[[nodiscard]] inline float32 magnitude() const;
+	[[nodiscard]] inline float32 m_SqrdMagnitude() const;
+	[[nodiscard]] inline float32 m_Magnitude() const;
 
-	[[nodiscard]] static inline float32 Dot(Arg_Vec3 in_a, Arg_Vec3 in_b);
-	[[nodiscard]] static inline Vec3 Cross(Arg_Vec3 in_a, Arg_Vec3 in_b);
+	[[nodiscard]] static inline float32 s_Dot(Arg_Vec3 in_a, Arg_Vec3 in_b);
+	[[nodiscard]] static inline Vec3 s_Cross(Arg_Vec3 in_a, Arg_Vec3 in_b);
 
-	[[nodiscard]] static inline Vec3 Lerp(Arg_Vec3 in_a, Arg_Vec3 in_b, float32 in_t);
+	[[nodiscard]] static inline Vec3 s_Lerp(Arg_Vec3 in_a, Arg_Vec3 in_b, float32 in_t);
+
+	static inline Vec3 s_FixW(Arg_Vec3 in_vec);
+	static Deep_ForceInline void s_CheckW(Arg_Vec3 in_vec);
 
 	//
 
 	Deep_ForceInline constexpr float32& operator[](size_t);
 	Deep_ForceInline constexpr const float32& operator[](size_t) const;
+
+	// Copy only the xyz components, retaining the current _w value
+	inline void XYZ(Arg_Vec3 in_vec);
 
 	// Equality
 	friend inline bool operator!=(Arg_Vec3 in_a, Arg_Vec3 in_b);

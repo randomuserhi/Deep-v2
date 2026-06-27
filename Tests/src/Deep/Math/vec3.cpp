@@ -2,6 +2,16 @@
 
 #include "Deep/Math/Vec3.h"
 
+TEST(Vec3, XYZ) {
+	Deep::Vec3 a{ 1, 2, 3 };
+	const Deep::Vec3 b{ 1, 1, 7 };
+
+	a.XYZ(b);
+
+	EXPECT_EQ(a._w, 3);
+	EXPECT_EQ(a, b);
+}
+
 TEST(Vec3, Equality) {
 	const Deep::Vec3 a{ 1, 2, 3 };
 	const Deep::Vec3 b{ 1, 2, 3 };
@@ -68,8 +78,8 @@ TEST(Vec3, Scale) {
 TEST(Vec3, Dot) {
 	Deep::Vec3 a{ 1, 2, 3 };
 	Deep::Vec3 b{ 3, 2, 1 };
-	float32 c = Deep::Vec3::Dot(a, b);
-	float32 d = Deep::Vec3::Dot(b, a);
+	float32 c = Deep::Vec3::s_Dot(a, b);
+	float32 d = Deep::Vec3::s_Dot(b, a);
 	EXPECT_EQ(c, 10);
 	EXPECT_EQ(d, 10);
 }

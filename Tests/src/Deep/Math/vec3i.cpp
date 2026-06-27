@@ -2,6 +2,16 @@
 
 #include "Deep/Math/Vec3i.h"
 
+TEST(Vec3i, XYZ) {
+	Deep::Vec3i a{ 1, 2, 3 };
+	const Deep::Vec3i b{ 1, 1, 7 };
+
+	a.XYZ(b);
+
+	EXPECT_EQ(a._w, 3);
+	EXPECT_EQ(a, b);
+}
+
 TEST(Vec3i, Equality) {
 	Deep::Vec3i a{ 1, 2, 3 };
 	Deep::Vec3i b{ 1, 2, 3 };
@@ -68,8 +78,8 @@ TEST(Vec3i, Scale) {
 TEST(Vec3i, Dot) {
 	Deep::Vec3i a{ 1, 2, 3 };
 	Deep::Vec3i b{ 4, 3, 2 };
-	int32 c = Deep::Vec3i::Dot(a, b);
-	int32 d = Deep::Vec3i::Dot(b, a);
+	int32 c = Deep::Vec3i::s_Dot(a, b);
+	int32 d = Deep::Vec3i::s_Dot(b, a);
 	EXPECT_EQ(c, 16);
 	EXPECT_EQ(d, 16);
 }
@@ -104,5 +114,5 @@ TEST(Vec3i, Div) {
 
 TEST(Vec3i, ManhattanDistance) {
 	Deep::Vec3i a{ 1, 2, 3 };
-	EXPECT_EQ(a.manhattanDistance(), 6);
+	EXPECT_EQ(a.m_ManhattanDistance(), 6);
 }

@@ -65,7 +65,7 @@ constexpr Int32x4 Float32x4::Constexpr_ReinterpretAsInt() const {
 	return BitCast<Int32x4>(*this);
 }
 
-Float32x4 Float32x4::Replicate(float32 in_value) {
+Float32x4 Float32x4::s_Replicate(float32 in_value) {
 #ifdef DEEP_USE_SSE
 	return _mm_set1_ps(in_value);
 #else
@@ -73,7 +73,7 @@ Float32x4 Float32x4::Replicate(float32 in_value) {
 #endif
 }
 
-Float32x4 Float32x4::Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
+Float32x4 Float32x4::s_Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_min_ps(in_a, in_b);
 #else
@@ -86,7 +86,7 @@ Float32x4 Float32x4::Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #endif
 }
 
-Float32x4 Float32x4::Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
+Float32x4 Float32x4::s_Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_max_ps(in_a, in_b);
 #else
@@ -99,7 +99,7 @@ Float32x4 Float32x4::Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #endif
 }
 
-Int32x4 Float32x4::Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
+Int32x4 Float32x4::s_Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_castps_si128(_mm_cmpeq_ps(in_a, in_b));
 #else
@@ -108,12 +108,6 @@ Int32x4 Float32x4::Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 		            in_a.z == in_b.z ? int32(0xffffffff) : 0, //
 		            in_a.w == in_b.w ? int32(0xffffffff) : 0 };
 #endif
-}
-constexpr Int32x4 Float32x4::Constexpr_Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
-	return Int32x4::Constexpr(in_a.x == in_b.x ? int32(0xffffffff) : 0, //
-	                          in_a.y == in_b.y ? int32(0xffffffff) : 0, //
-	                          in_a.z == in_b.z ? int32(0xffffffff) : 0, //
-	                          in_a.w == in_b.w ? int32(0xffffffff) : 0);
 }
 
 constexpr float32& Float32x4::operator[](size_t in_index) {
@@ -125,7 +119,7 @@ constexpr const float32& Float32x4::operator[](size_t in_index) const {
 
 bool operator!=(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE4_1
-	return Float32x4::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
+	return Float32x4::s_Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
 #endif
@@ -289,7 +283,7 @@ Float32x4 operator/(float32 in_val, Arg_Float32x4 in_vec) {
 #endif
 }
 
-Int32x4 Float32x4::IsNegative(Arg_Float32x4 in_value) {
+Int32x4 Float32x4::s_IsNegative(Arg_Float32x4 in_value) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_castps_si128(_mm_cmplt_ps(in_value, _mm_setzero_ps()));
 #else
@@ -298,7 +292,7 @@ Int32x4 Float32x4::IsNegative(Arg_Float32x4 in_value) {
 #endif
 }
 
-Float32x4 Float32x4::Select(Arg_Float32x4 in_a, Arg_Float32x4 in_b, Arg_Int32x4 in_control) {
+Float32x4 Float32x4::s_Select(Arg_Float32x4 in_a, Arg_Float32x4 in_b, Arg_Int32x4 in_control) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_blendv_ps(in_a, in_b, _mm_castsi128_ps(in_control));
 #else
@@ -314,11 +308,11 @@ void Float32x4::SinCos(Float32x4& out_sin, Float32x4& out_cos) {
 
 	// Make argument positive and remember sign for sin only since cos is symmetric around x (highest bit of a float is
 	// the sign bit)
-	Int32x4 sinSign = ReinterpretAsInt() & Int32x4::Replicate(int32(0x80000000));
+	Int32x4 sinSign = ReinterpretAsInt() & Int32x4::s_Replicate(int32(0x80000000));
 	Float32x4 _x = *this ^ sinSign.ReinterpretAsFloat();
 
 	// x / (PI / 2) rounded to nearest int gives us the quadrant closest to x
-	Int32x4 quadrant = (0.6366197723675814f * _x + Float32x4::Replicate(0.5f)).ToInt();
+	Int32x4 quadrant = (0.6366197723675814f * _x + Float32x4::s_Replicate(0.5f)).ToInt();
 
 	// Make x relative to the closest quadrant.
 	// This does x = x - quadrant * PI / 2 using a two step Cody-Waite argument reduction.
@@ -340,13 +334,13 @@ void Float32x4::SinCos(Float32x4& out_sin, Float32x4& out_cos) {
 
 	// Taylor expansion:
 	// Cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! + x^8/8! + ... = (((x2/8!- 1/6!) * x2 + 1/4!) * x2 - 1/2!) * x2 + 1
-	Float32x4 taylorCos = ((2.443315711809948e-5f * x2 - Float32x4::Replicate(1.388731625493765e-3f)) * x2
-	                       + Float32x4::Replicate(4.166664568298827e-2f))
+	Float32x4 taylorCos = ((2.443315711809948e-5f * x2 - Float32x4::s_Replicate(1.388731625493765e-3f)) * x2
+	                       + Float32x4::s_Replicate(4.166664568298827e-2f))
 	                          * x2 * x2
-	                      - 0.5f * x2 + Float32x4::Replicate(1.0f);
+	                      - 0.5f * x2 + Float32x4::s_Replicate(1.0f);
 	// Sin(x) = x - x^3/3! + x^5/5! - x^7/7! + ... = ((-x2/7! + 1/5!) * x2 - 1/3!) * x2 * x + x
 	Float32x4 taylorSin =
-		((-1.9515295891e-4f * x2 + Float32x4::Replicate(8.3321608736e-3f)) * x2 - Float32x4::Replicate(1.6666654611e-1f))
+		((-1.9515295891e-4f * x2 + Float32x4::s_Replicate(8.3321608736e-3f)) * x2 - Float32x4::s_Replicate(1.6666654611e-1f))
 			* x2 * _x
 		+ _x;
 
@@ -363,11 +357,11 @@ void Float32x4::SinCos(Float32x4& out_sin, Float32x4& out_cos) {
 	//
 	// So: sin_sign = bit2, cos_sign = bit1 ^ bit2, bit1 determines if we use sin or cos Taylor expansion
 	Int32x4 bit1 = quadrant << 31;
-	Int32x4 bit2 = (quadrant << 30) & Int32x4::Replicate(int32(0x80000000));
+	Int32x4 bit2 = (quadrant << 30) & Int32x4::s_Replicate(int32(0x80000000));
 
 	// Select which one of the results is sin and which one is cos
-	Float32x4 s = Float32x4::Select(taylorSin, taylorCos, bit1);
-	Float32x4 c = Float32x4::Select(taylorCos, taylorSin, bit1);
+	Float32x4 s = Float32x4::s_Select(taylorSin, taylorCos, bit1);
+	Float32x4 c = Float32x4::s_Select(taylorCos, taylorSin, bit1);
 
 	// Update the signs
 	sinSign = sinSign ^ bit2;

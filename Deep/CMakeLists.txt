@@ -46,6 +46,9 @@ option(DEEP_NO_SIMD_INTRINSICS "Disable SIMD intrinsics" OFF)
 # memcpy or bitcast to avoid strict aliasing issues.
 option(DEEP_USE_STRICT_ALIASING "Abide by strict aliasing rules" OFF)
 
+# When turned on, the library will use floating point exceptions
+option(DEEP_USE_FLOATING_POINT_EXCEPTIONS "Enable floating point exceptions" OFF)
+
 # When turned on, the library will be compiled with RTTI
 option(DEEP_USE_RTTI "Enable RTTI" OFF)
 
@@ -184,7 +187,9 @@ if (MSVC)
 	message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
 elseif (CLANG)
 	# Disable floating point exceptions
-	target_compile_options(Deep PRIVATE -fno-trapping-math)
+	if (DEEP_USE_FLOATING_POINT_EXCEPTIONS)
+		target_compile_options(Deep PRIVATE -fno-trapping-math)
+	endif()
 
 	# Enable warnings
 	target_compile_options(Deep PRIVATE -Wall -Wextra -Werror)
@@ -243,6 +248,11 @@ elseif (CLANG)
 	)
 else()
 	message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
+endif()
+
+# Emit floating point exceptions
+if (DEEP_USE_FLOATING_POINT_EXCEPTIONS)
+	target_compile_definitions(Deep PUBLIC DEEP_USE_FLOATING_POINT_EXCEPTIONS)
 endif()
 
 # Emit Strict Aliasing

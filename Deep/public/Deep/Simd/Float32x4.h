@@ -68,24 +68,23 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Float32x4 {
 	constexpr inline Int32x4 Constexpr_ReinterpretAsInt() const;
 
 	// Replicate the given value across all components
-	static inline Float32x4 Replicate(float32 in_value);
+	static inline Float32x4 s_Replicate(float32 in_value);
 
 	// Component wise min/max
-	static inline Float32x4 Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
-	static inline Float32x4 Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
+	static inline Float32x4 s_Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
+	static inline Float32x4 s_Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
 
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static inline Int32x4 Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
-	constexpr static inline Int32x4 Constexpr_Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
+	static inline Int32x4 s_Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
 
 	// Returns 0xFFFFFFFF for each lane where val < 0.0f
-	static inline Int32x4 IsNegative(Arg_Float32x4 in_value);
+	static inline Int32x4 s_IsNegative(Arg_Float32x4 in_value);
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
-	static inline Float32x4 Select(Arg_Float32x4 in_a, Arg_Float32x4 in_b, const Arg_Int32x4 in_control);
+	static inline Float32x4 s_Select(Arg_Float32x4 in_a, Arg_Float32x4 in_b, const Arg_Int32x4 in_control);
 
 	//
 

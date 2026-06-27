@@ -71,7 +71,7 @@ constexpr Float32x4 Int32x4::Constexpr_ReinterpretAsFloat() const {
 	return BitCast<Float32x4>(*this);
 }
 
-Int32x4 Int32x4::Replicate(int32 in_value) {
+Int32x4 Int32x4::s_Replicate(int32 in_value) {
 #ifdef DEEP_USE_SSE
 	return _mm_set1_epi32(in_value);
 #else
@@ -87,7 +87,7 @@ int32 Int32x4::ToBooleanBitMask() const {
 #endif
 }
 
-Int32x4 Int32x4::Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
+Int32x4 Int32x4::s_Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_min_epi32(in_a, in_b);
 #else
@@ -100,7 +100,7 @@ Int32x4 Int32x4::Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #endif
 }
 
-Int32x4 Int32x4::Max(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
+Int32x4 Int32x4::s_Max(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_max_epi32(in_a, in_b);
 #else
@@ -113,7 +113,7 @@ Int32x4 Int32x4::Max(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #endif
 }
 
-Int32x4 Int32x4::Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
+Int32x4 Int32x4::s_Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE
 	return _mm_cmpeq_epi32(in_a, in_b);
 #else
@@ -121,14 +121,8 @@ Int32x4 Int32x4::Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 		            in_a.z == in_b.z ? int32(0xffffffff) : 0, in_a.w == in_b.w ? int32(0xffffffff) : 0 };
 #endif
 }
-constexpr Int32x4 Int32x4::Constexpr_Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
-	return Int32x4::Constexpr(in_a.x == in_b.x ? int32(0xffffffff) : 0, //
-	                          in_a.y == in_b.y ? int32(0xffffffff) : 0, //
-	                          in_a.z == in_b.z ? int32(0xffffffff) : 0, //
-	                          in_a.w == in_b.w ? int32(0xffffffff) : 0);
-}
 
-Int32x4 Int32x4::Select(Arg_Int32x4 in_a, Arg_Int32x4 in_b, Arg_Int32x4 in_control) {
+Int32x4 Int32x4::s_Select(Arg_Int32x4 in_a, Arg_Int32x4 in_b, Arg_Int32x4 in_control) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_castps_si128(_mm_blendv_ps(_mm_castsi128_ps(in_a), _mm_castsi128_ps(in_b), _mm_castsi128_ps(in_control)));
 #else
@@ -146,7 +140,7 @@ constexpr const int32& Int32x4::operator[](size_t in_index) const {
 
 bool operator!=(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE4_1
-	return Int32x4::Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
+	return Int32x4::s_Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
 #endif

@@ -19,15 +19,15 @@ Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
 	x{ in_xyz.x }, y{ in_xyz.y }, z{ in_xyz.z }, w{ in_w } {}
 #endif
 
-float32 Vec4i::sqrdMagnitude() const {
-	return static_cast<Vec4>(*this).sqrdMagnitude();
+float32 Vec4i::m_SqrdMagnitude() const {
+	return static_cast<Vec4>(*this).m_SqrdMagnitude();
 }
 
-float32 Vec4i::magnitude() const {
-	return static_cast<Vec4>(*this).magnitude();
+float32 Vec4i::m_Magnitude() const {
+	return static_cast<Vec4>(*this).m_Magnitude();
 }
 
-int32 Vec4i::manhattanDistance() const {
+int32 Vec4i::m_ManhattanDistance() const {
 #ifdef DEEP_USE_SSE4_1
 	// NOTE(randomuserhi): Not even sure if SIMD horizontal sum here is worth. Might be better off without
 	//                     Profiling required.
@@ -39,7 +39,7 @@ int32 Vec4i::manhattanDistance() const {
 #endif
 }
 
-int32 Vec4i::Dot(Arg_Vec4i in_a, Arg_Vec4i in_b) {
+int32 Vec4i::s_Dot(Arg_Vec4i in_a, Arg_Vec4i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	Int32x4 sum = _mm_mullo_epi32(in_a.m_int32x4, in_b.m_int32x4);
 

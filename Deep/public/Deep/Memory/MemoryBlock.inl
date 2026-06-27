@@ -14,7 +14,7 @@ template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
 MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) :
 	m_size{ in_size } {
-	m_ptr = in_allocator::Malloc(m_size);
+	m_ptr = in_allocator::s_Malloc(m_size);
 	new (m_ptr) T[m_size];
 }
 
@@ -29,7 +29,7 @@ template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && _RawAllocator<in_allocator, T>
 MemoryBlock<T, in_allocator>::MemoryBlock(const MemoryBlock& in_other) :
 	m_size{ in_other.m_size } {
-	m_ptr = in_allocator::Malloc(m_size);
+	m_ptr = in_allocator::s_Malloc(m_size);
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
 		TMemcpy<T>(m_ptr, in_other.m_ptr, m_size);
 	} else {
@@ -76,7 +76,7 @@ MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const Memo
 
 	~MemoryBlock();
 
-	m_ptr = in_allocator::Malloc(m_size);
+	m_ptr = in_allocator::s_Malloc(m_size);
 	m_size = in_other.m_size;
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
 		TMemcpy<T>(m_ptr, in_other.m_ptr, m_size);
@@ -98,7 +98,7 @@ MemoryBlock<T, in_allocator>::~MemoryBlock() {
 			m_ptr[i].~T();
 		}
 	}
-	in_allocator::Free(m_ptr);
+	in_allocator::s_Free(m_ptr);
 }
 
 template<typename T, typename in_allocator>

@@ -4,6 +4,8 @@
 #include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec3i.h"
 #include "Deep/Math/Vec4i.h"
+#include <emmintrin.h>
+#include <immintrin.h>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -16,19 +18,19 @@ Vec3i::Vec3i(Arg_Vec4i in_vec) :
 Vec3i::Vec3i(Int32x4 in_int32x4) :
 	m_int32x4{ in_int32x4 } {}
 
-float32 Vec3i::sqrdMagnitude() const {
-	return static_cast<Vec3>(*this).sqrdMagnitude();
+float32 Vec3i::m_SqrdMagnitude() const {
+	return static_cast<Vec3>(*this).m_SqrdMagnitude();
 }
 
-float32 Vec3i::magnitude() const {
-	return static_cast<Vec3>(*this).magnitude();
+float32 Vec3i::m_Magnitude() const {
+	return static_cast<Vec3>(*this).m_Magnitude();
 }
 
-int32 Vec3i::manhattanDistance() const {
+int32 Vec3i::m_ManhattanDistance() const {
 	return x + y + z;
 }
 
-int32 Vec3i::Dot(Arg_Vec3i in_a, Arg_Vec3i in_b) {
+int32 Vec3i::s_Dot(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
 	__m128i mul = _mm_mullo_epi32(in_a.m_int32x4, in_b.m_int32x4);
 	__m128i sum = _mm_add_epi32(mul, _mm_srli_si128(mul, 4));
@@ -36,6 +38,18 @@ int32 Vec3i::Dot(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 	return _mm_cvtsi128_si32(sum);
 #else
 	return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z;
+#endif
+}
+
+void Vec3i::s_CheckW(Arg_Vec3i in_vec) {
+	Deep_Assert(in_vec.z == in_vec._w, "W component does not match.");
+}
+
+Vec3i Vec3i::s_FixW(Arg_Vec3i in_vec) {
+#ifdef DEEP_USE_SSE
+	return Vec3i{ _mm_shuffle_epi32(in_vec.m_int32x4, _MM_SHUFFLE(2, 2, 1, 0)) };
+#else
+	return Vec3i{ in_vec.x, in_vec.y, in_vec.z, in_vec.z };
 #endif
 }
 
@@ -47,7 +61,7 @@ Vec3i::operator Vec3() const {
 #ifdef DEEP_USE_SSE
 	return Vec3{ _mm_cvtepi32_ps(m_int32x4) };
 #else
-	return Vec3{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z) };
+	return Vec3{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z), static_cast<float32>(w) };
 #endif
 }
 
@@ -58,9 +72,19 @@ constexpr const int32& Vec3i::operator[](size_t in_index) const {
 	return m_values[in_index];
 }
 
+void Vec3i::XYZ(Arg_Vec3i in_vec) {
+#ifdef DEEP_USE_SSE4_1
+	m_int32x4 = _mm_blend_epi32(in_vec.m_int32x4, m_int32x4, 0x08);
+#else
+	x = in_vec.x;
+	y = in_vec.y;
+	z = in_vec.z;
+#endif
+}
+
 bool operator!=(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 #ifdef DEEP_USE_SSE4_1
-	return (Int32x4::Equals(in_a.m_int32x4, in_b.m_int32x4).ToBooleanBitMask() & 0b111) != 0b111;
+	return (Int32x4::s_Equals(in_a.m_int32x4, in_b.m_int32x4).ToBooleanBitMask() & 0b111) != 0b111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z;
 #endif
@@ -70,7 +94,7 @@ bool operator==(Arg_Vec3i a, Arg_Vec3i b) {
 }
 
 Vec3i& Vec3i::operator+=(Arg_Vec3i in_other) {
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	m_int32x4 += in_other.m_int32x4;
 #else
 	x += in_other.x;
@@ -81,17 +105,15 @@ Vec3i& Vec3i::operator+=(Arg_Vec3i in_other) {
 }
 
 Vec3i operator+(Arg_Vec3i in_a, Arg_Vec3i in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_a.m_int32x4 + in_b.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ in_a.m_int32x4 + in_b.m_int32x4 };
 #else
 	return Vec3i{ in_a.x + in_b.x, in_a.y + in_b.y, in_a.z + in_b.z };
 #endif
 }
 
 Vec3i& Vec3i::operator-=(Arg_Vec3i in_other) {
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	m_int32x4 -= in_other.m_int32x4;
 #else
 	x -= in_other.x;
@@ -102,28 +124,24 @@ Vec3i& Vec3i::operator-=(Arg_Vec3i in_other) {
 }
 
 Vec3i operator-(Arg_Vec3i in_a, Arg_Vec3i in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_a.m_int32x4 - in_b.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ in_a.m_int32x4 - in_b.m_int32x4 };
 #else
 	return Vec3i{ in_a.x - in_b.x, in_a.y - in_b.y, in_a.z - in_b.z };
 #endif
 }
 
 Vec3i operator-(Arg_Vec3i in_a) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = -in_a.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ -in_a.m_int32x4 };
 #else
-	// NOTE(randomuserhi): 0 - x to stay consistent with vectorised version
+	// 0-x to mimic SIMD version
 	return Vec3i{ 0 - in_a.x, 0 - in_a.y, 0 - in_a.z };
 #endif
 }
 
 Vec3i& Vec3i::operator*=(Arg_Vec3i in_other) {
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	m_int32x4 *= in_other.m_int32x4;
 #else
 	x *= in_other.x;
@@ -133,17 +151,15 @@ Vec3i& Vec3i::operator*=(Arg_Vec3i in_other) {
 	return *this;
 }
 Vec3i operator*(Arg_Vec3i in_a, Arg_Vec3i in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_a.m_int32x4 * in_b.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ in_a.m_int32x4 * in_b.m_int32x4 };
 #else
 	return Vec3i{ in_a.x * in_b.x, in_a.y * in_b.y, in_a.z * in_b.z };
 #endif
 }
 
 Vec3i& Vec3i::operator*=(int32 in_other) {
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	m_int32x4 *= in_other;
 #else
 	x *= in_other;
@@ -154,27 +170,24 @@ Vec3i& Vec3i::operator*=(int32 in_other) {
 }
 
 Vec3i operator*(Arg_Vec3i in_vec, int32 in_val) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_vec.m_int32x4 * in_val;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ in_vec.m_int32x4 * in_val };
 #else
-	return Vec3i{ in_vec.x * in_val, in_vec.y * in_val, in_vec.z * in_val };
+	return Vec3i{ in_a.x * in_val, in_a.y * in_val, in_a.z * in_val };
 #endif
 }
 
 Vec3i operator*(int32 in_val, Arg_Vec3i in_vec) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_val * in_vec.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ in_val * in_vec.m_int32x4 };
 #else
-	return Vec3i{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z };
+	return Vec3i{ in_val * in_a.x, in_val * in_a.y, in_val * in_a.z };
 #endif
 }
 
 Vec3i& Vec3i::operator/=(Arg_Vec3i in_other) {
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
+	Vec3i::s_CheckW(in_other);
 	m_int32x4 /= in_other.m_int32x4;
 #else
 	x /= in_other.x;
@@ -184,17 +197,16 @@ Vec3i& Vec3i::operator/=(Arg_Vec3i in_other) {
 	return *this;
 }
 Vec3i operator/(Arg_Vec3i in_a, Arg_Vec3i in_b) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_a.m_int32x4 / in_b.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	Vec3i::s_CheckW(in_b);
+	return Vec3i{ in_a.m_int32x4 / in_b.m_int32x4 };
 #else
 	return Vec3i{ in_a.x / in_b.x, in_a.y / in_b.y, in_a.z / in_b.z };
 #endif
 }
 
 Vec3i& Vec3i::operator/=(int32 in_other) {
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	m_int32x4 /= in_other;
 #else
 	x /= in_other;
@@ -205,20 +217,17 @@ Vec3i& Vec3i::operator/=(int32 in_other) {
 }
 
 Vec3i operator/(Arg_Vec3i in_vec, int32 in_val) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_vec.m_int32x4 / in_val;
-	return result;
+#ifdef DEEP_USE_SSE
+	return Vec3i{ in_vec.m_int32x4 / in_val };
 #else
 	return Vec3i{ in_vec.x / in_val, in_vec.y / in_val, in_vec.z / in_val };
 #endif
 }
 
 Vec3i operator/(int32 in_val, Arg_Vec3i in_vec) {
-#ifdef DEEP_USE_SSE4_1
-	Vec3i result;
-	result.m_int32x4 = in_val / in_vec.m_int32x4;
-	return result;
+#ifdef DEEP_USE_SSE
+	Vec3i::s_CheckW(in_vec);
+	return Vec3i{ in_val / in_vec.m_int32x4 };
 #else
 	return Vec3i{ in_val / in_vec.x, in_val / in_vec.y, in_val / in_vec.z };
 #endif

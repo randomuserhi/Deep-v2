@@ -12,7 +12,7 @@ int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
 
 	Vec3 delta = in_sphereB.m_Center4() - in_sphereA.m_Center4();
-	float32 distanceSqrd = delta.sqrdMagnitude();
+	float32 distanceSqrd = delta.m_SqrdMagnitude();
 
 	float32 radiusSum = in_sphereA.m_radius + in_sphereB.m_radius;
 	float32 radiusSumSqrd = radiusSum * radiusSum;
@@ -45,8 +45,8 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 
 	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
 
-	float32 dot = Vec3::Dot(delta, in_ray.m_direction);
-	float32 distance = delta.sqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
+	float32 dot = Vec3::s_Dot(delta, in_ray.m_direction);
+	float32 distance = delta.m_SqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
 
 	if constexpr (in_queryType == RaycastType::e_startsOutside) {
 		if (distance < 0.0f) return false;
@@ -87,8 +87,8 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 
 	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
 
-	float32 dot = Vec3::Dot(delta, in_ray.m_direction);
-	float32 distance = delta.sqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
+	float32 dot = Vec3::s_Dot(delta, in_ray.m_direction);
+	float32 distance = delta.m_SqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
 
 	float32 discriminant = dot * dot - distance;
 

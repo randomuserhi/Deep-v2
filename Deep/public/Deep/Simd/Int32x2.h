@@ -72,21 +72,21 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 	inline int32 ToBooleanBitMask() const;
 
 	// Replicate the given value across all components
-	static inline Int32x2 Replicate(int32 in_value);
+	static inline Int32x2 s_Replicate(int32 in_value);
 
 	// Component wise min/max
-	static inline Int32x2 Min(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
-	static inline Int32x2 Max(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
+	static inline Int32x2 s_Min(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
+	static inline Int32x2 s_Max(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
 
 	// Returns a 4 component integer value representing the equality of each component
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static inline Int32x2 Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
-	constexpr static inline Int32x2 Constexpr_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
+	static inline Int32x2 s_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
+	constexpr static inline Int32x2 Constexpr_s_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
-	static inline Int32x2 Select(Arg_Int32x2 in_a, Arg_Int32x2 in_b, Arg_Int32x2 in_control);
+	static inline Int32x2 s_Select(Arg_Int32x2 in_a, Arg_Int32x2 in_b, Arg_Int32x2 in_control);
 
 	//
 

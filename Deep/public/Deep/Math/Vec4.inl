@@ -27,31 +27,31 @@ Vec4& Vec4::Normalize() {
 	if (_mm_cvtss_f32(magnitudeSqrd) != 0.0f) m_float32x4 = _mm_div_ps(m_float32x4, _mm_sqrt_ps(magnitudeSqrd));
 	return *this;
 #else
-	float32 magnitudeSqrd = sqrdMagnitude();
+	float32 magnitudeSqrd = m_SqrdMagnitude();
 	if (magnitudeSqrd != 0.0f) *this /= Sqrt(magnitudeSqrd);
 	return *this;
 #endif
 }
-Vec4 Vec4::normalized() const {
+Vec4 Vec4::m_Normalized() const {
 	Vec4 v = *this;
 	return v.Normalize();
 }
 bool Vec4::IsNormalized(float tolerance) const {
-	return Abs(sqrdMagnitude() - 1.0f) <= tolerance;
+	return Abs(m_SqrdMagnitude() - 1.0f) <= tolerance;
 }
 
-float32 Vec4::sqrdMagnitude() const {
-	return Dot(*this, *this);
+float32 Vec4::m_SqrdMagnitude() const {
+	return s_Dot(*this, *this);
 }
-float32 Vec4::magnitude() const {
+float32 Vec4::m_Magnitude() const {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(m_float32x4, m_float32x4, 0xff)));
 #else
-	return Sqrt(sqrdMagnitude());
+	return Sqrt(m_SqrdMagnitude());
 #endif
 }
 
-float32 Vec4::Dot(Arg_Vec4 in_a, Arg_Vec4 in_b) {
+float32 Vec4::s_Dot(Arg_Vec4 in_a, Arg_Vec4 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cvtss_f32(_mm_dp_ps(in_a.m_float32x4, in_b.m_float32x4, 0xff));
 #else
@@ -59,7 +59,7 @@ float32 Vec4::Dot(Arg_Vec4 in_a, Arg_Vec4 in_b) {
 #endif
 }
 
-Vec4 Vec4::Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t) {
+Vec4 Vec4::s_Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t) {
 	return (in_b - in_a) * in_t + in_a;
 }
 

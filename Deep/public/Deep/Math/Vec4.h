@@ -28,15 +28,15 @@ struct [[nodiscard]] alignas(Float32x4) Vec4 {
 	//
 
 	inline Vec4& Normalize();
-	[[nodiscard]] inline Vec4 normalized() const;
+	[[nodiscard]] inline Vec4 m_Normalized() const;
 	[[nodiscard]] inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
 
-	[[nodiscard]] inline float32 sqrdMagnitude() const;
-	[[nodiscard]] inline float32 magnitude() const;
+	[[nodiscard]] inline float32 m_SqrdMagnitude() const;
+	[[nodiscard]] inline float32 m_Magnitude() const;
 
-	[[nodiscard]] static inline float32 Dot(Arg_Vec4 in_a, Arg_Vec4 in_b);
+	[[nodiscard]] static inline float32 s_Dot(Arg_Vec4 in_a, Arg_Vec4 in_b);
 
-	[[nodiscard]] static inline Vec4 Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t);
+	[[nodiscard]] static inline Vec4 s_Lerp(Arg_Vec4 in_a, Arg_Vec4 in_b, float32 in_t);
 
 	//
 

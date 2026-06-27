@@ -61,8 +61,8 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	Vec3 t1 = (min - in_ray.m_origin) * invDir;
 	Vec3 t2 = (max - in_ray.m_origin) * invDir;
 
-	Float32x4 tmin = Float32x4::Min(t1, t2);
-	Float32x4 tmax = Float32x4::Max(t1, t2);
+	Float32x4 tmin = Float32x4::s_Min(t1, t2);
+	Float32x4 tmax = Float32x4::s_Max(t1, t2);
 
 	// NOTE(randomuserhi): Order of max/min comparisons matches that of Raycast(Arg_Ray3D, Arg_Aabb3D, RayHit3D*)
 	//                     This is necessary to keep behaviour of nan and inf values consistent.
@@ -98,8 +98,8 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 	Vec3 t1 = (min - in_ray.m_origin) * invDir;
 	Vec3 t2 = (max - in_ray.m_origin) * invDir;
 
-	Float32x4 tmin = Float32x4::Min(t1, t2);
-	Float32x4 tmax = Float32x4::Max(t1, t2);
+	Float32x4 tmin = Float32x4::s_Min(t1, t2);
+	Float32x4 tmax = Float32x4::s_Max(t1, t2);
 
 	// NOTE(randomuserhi): Order of max/min comparisons matches that of Raycast(Arg_Ray3D, Arg_Aabb3D)
 	//                     This is necessary to keep behaviour of nan and inf values consistent.
@@ -162,8 +162,8 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	Vec3 t1 = (min - in_ray.m_origin) * invDir;
 	Vec3 t2 = (max - in_ray.m_origin) * invDir;
 
-	Float32x4 tmin = Float32x4::Min(t1, t2);
-	Float32x4 tmax = Float32x4::Max(t1, t2);
+	Float32x4 tmin = Float32x4::s_Min(t1, t2);
+	Float32x4 tmax = Float32x4::s_Max(t1, t2);
 
 	// NOTE(randomuserhi): Order of max/min comparisons matches that of Raycast(Arg_Ray3D, Arg_Aabb3D)
 	//                     This is necessary to keep behaviour of nan and inf values consistent.

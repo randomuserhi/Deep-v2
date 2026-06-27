@@ -38,7 +38,7 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 	[[nodiscard]] inline Quat inversed() const;
 
 	inline Mat4 ToMat4() const;
-	static inline Quat FromMat4(Arg_Mat4 in_mat);
+	static inline Quat s_FromMat4(Arg_Mat4 in_mat);
 
 	//
 
@@ -75,7 +75,7 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 	friend inline Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_val);
 
 	// Rotate a vector by the inverse of this quaternion
-	static inline Vec3 InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_val);
+	static inline Vec3 s_InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_val);
 
 	//
 

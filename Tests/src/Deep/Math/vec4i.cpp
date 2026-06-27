@@ -76,8 +76,8 @@ TEST(Vec4i, Scale) {
 TEST(Vec4i, Dot) {
 	Deep::Vec4i a{ 1, 2, 3, 4 };
 	Deep::Vec4i b{ 4, 3, 2, 1 };
-	int32 c = Deep::Vec4i::Dot(a, b);
-	int32 d = Deep::Vec4i::Dot(b, a);
+	int32 c = Deep::Vec4i::s_Dot(a, b);
+	int32 d = Deep::Vec4i::s_Dot(b, a);
 	EXPECT_EQ(c, 20);
 	EXPECT_EQ(d, 20);
 }
@@ -116,5 +116,5 @@ TEST(Vec4i, Div) {
 
 TEST(Vec4i, ManhattanDistance) {
 	Deep::Vec4i a{ 1, 2, 3, 4 };
-	EXPECT_EQ(a.manhattanDistance(), 10);
+	EXPECT_EQ(a.m_ManhattanDistance(), 10);
 }

@@ -32,7 +32,7 @@ Int64x2::operator Type() const {
 	return m_internal;
 }
 
-Int64x2 Int64x2::Replicate(int64 in_value) {
+Int64x2 Int64x2::s_Replicate(int64 in_value) {
 #ifdef DEEP_USE_SSE
 	return _mm_set1_epi64x(in_value);
 #else
@@ -48,7 +48,7 @@ int32 Int64x2::ToBooleanBitMask() const {
 #endif
 }
 
-Int64x2 Int64x2::Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
+Int64x2 Int64x2::s_Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cmpeq_epi64(in_a, in_b);
 #else
@@ -66,7 +66,7 @@ constexpr const int64& Int64x2::operator[](size_t in_index) const {
 
 bool operator!=(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
-	return Int64x2::Equals(in_a, in_b).ToBooleanBitMask() != 0b11;
+	return Int64x2::s_Equals(in_a, in_b).ToBooleanBitMask() != 0b11;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y;
 #endif

@@ -13,4 +13,8 @@ const Vec3& RayHit3D::m_Normal4() const {
 	return *reinterpret_cast<const Vec3*>(&m_normal);
 }
 
+Vec3 RayHit3D::m_Normal() const {
+	return Vec3::s_FixW(m_Normal4());
+}
+
 DEEP_NAMESPACE_END

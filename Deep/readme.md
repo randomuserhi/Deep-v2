@@ -12,13 +12,15 @@ cmake --build build
 
 - `g_camelCase` for globals
 - `m_camelCase` for members
+- `m_CamelCase` for getter/setter functions
 - `k_camelCase` for constants
 - `e_camelCase` for enum values
-- `s_camelCase` for static
+- `s_camelCase` for static members
 - `CamelCase` for functions
-- `m_CamelCase` for getter/setter functions
+- `s_CamelCase` for static member functions
 - `CamelCase` for types
 - `Constexpr_CamelCase` for functions that overload another function to provide a `constexpr` version of it
+- `Constexpr_s_CamelCase` for static function overloads that provide a `constexpr` version of it
 - `Constexpr` as a member function to provide a `constexpr` constructor overload
 - `in_camelCase` for in arguments
 - `out_camelCase` for out arguments

@@ -18,19 +18,19 @@ Vec2i::Vec2i(Arg_Vec3i in_vec) :
 Vec2i::Vec2i(Arg_Vec4i in_vec) :
 	m_int32x2{ in_vec.m_int32x4 } {}
 
-float32 Vec2i::sqrdMagnitude() const {
-	return static_cast<Vec2>(*this).sqrdMagnitude();
+float32 Vec2i::m_SqrdMagnitude() const {
+	return static_cast<Vec2>(*this).m_SqrdMagnitude();
 }
 
-float32 Vec2i::magnitude() const {
-	return static_cast<Vec2>(*this).magnitude();
+float32 Vec2i::m_Magnitude() const {
+	return static_cast<Vec2>(*this).m_Magnitude();
 }
 
-int32 Vec2i::manhattanDistance() const {
+int32 Vec2i::m_ManhattanDistance() const {
 	return x + y;
 }
 
-int32 Vec2i::Dot(Arg_Vec2i in_a, Arg_Vec2i in_b) {
+int32 Vec2i::s_Dot(Arg_Vec2i in_a, Arg_Vec2i in_b) {
 	return in_a.x * in_b.x + in_a.y * in_b.y;
 }
 

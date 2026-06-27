@@ -66,7 +66,7 @@ struct [[nodiscard]] alignas(Float32x4) Mat4 {
 	friend inline Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
 	friend inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
 
-	[[nodiscard]] static inline Mat4 FromQuaternion(const Quat& in_quat);
+	[[nodiscard]] static inline Mat4 s_FromQuaternion(const Quat& in_quat);
 
 	//
 

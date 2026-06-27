@@ -45,7 +45,7 @@ constexpr Float32x2 Int32x2::Constexpr_ReinterpretAsFloat() const {
 	return BitCast<Float32x2>(*this);
 }
 
-Int32x2 Int32x2::Replicate(int32 in_value) {
+Int32x2 Int32x2::s_Replicate(int32 in_value) {
 	return Int32x2{ in_value, in_value };
 }
 
@@ -53,29 +53,25 @@ int32 Int32x2::ToBooleanBitMask() const {
 	return (x >> 31) | ((y >> 31) << 1);
 }
 
-Int32x2 Int32x2::Min(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
+Int32x2 Int32x2::s_Min(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 	return Int32x2{
 		Deep::Min(in_a.x, in_b.x), //
 		Deep::Min(in_a.y, in_b.y)  //
 	};
 }
 
-Int32x2 Int32x2::Max(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
+Int32x2 Int32x2::s_Max(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 	return Int32x2{
 		Deep::Max(in_a.x, in_b.x), //
 		Deep::Max(in_a.y, in_b.y)  //
 	};
 }
 
-Int32x2 Int32x2::Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
+Int32x2 Int32x2::s_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 	return Int32x2{ in_a.x == in_b.x ? int32(0xffffffff) : 0, in_a.y == in_b.y ? int32(0xffffffff) : 0 };
 }
-constexpr Int32x2 Int32x2::Constexpr_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
-	return Int32x2::Constexpr(in_a.x == in_b.x ? int32(0xffffffff) : 0, //
-	                          in_a.y == in_b.y ? int32(0xffffffff) : 0);
-}
 
-Int32x2 Int32x2::Select(Arg_Int32x2 in_a, Arg_Int32x2 in_b, Arg_Int32x2 in_control) {
+Int32x2 Int32x2::s_Select(Arg_Int32x2 in_a, Arg_Int32x2 in_b, Arg_Int32x2 in_control) {
 	return Int32x2{ in_control.x ? in_b.x : in_a.x, in_control.y ? in_b.y : in_a.y };
 }
 

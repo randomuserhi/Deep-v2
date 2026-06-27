@@ -49,7 +49,7 @@ Mat4 Mat4::transposed() const {
 #endif
 }
 
-Mat4 Mat4::FromQuaternion(const Quat& in_quat) {
+Mat4 Mat4::s_FromQuaternion(const Quat& in_quat) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion should be normalized");
 
 	// See: https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation section 'Quaternion-derived rotation matrix'
@@ -327,8 +327,8 @@ constexpr const float32& Mat4::operator[](size_t in_index) const {
 }
 
 bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
-	return ((Float32x4::Equals(in_a.m_cols[0], in_b.m_cols[0]) & Float32x4::Equals(in_a.m_cols[1], in_b.m_cols[1]))
-	        & (Float32x4::Equals(in_a.m_cols[2], in_b.m_cols[2]) & Float32x4::Equals(in_a.m_cols[3], in_b.m_cols[3])))
+	return ((Float32x4::s_Equals(in_a.m_cols[0], in_b.m_cols[0]) & Float32x4::s_Equals(in_a.m_cols[1], in_b.m_cols[1]))
+	        & (Float32x4::s_Equals(in_a.m_cols[2], in_b.m_cols[2]) & Float32x4::s_Equals(in_a.m_cols[3], in_b.m_cols[3])))
 	           .ToBooleanBitMask()
 	       != 0b1111;
 }

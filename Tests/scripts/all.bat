@@ -11,7 +11,11 @@ set "Build[2]_Name= NO_SIMD_INTRINSICS"
 set "Build[2]_Path=-no-simd"
 set "Build[2]_Args=!COMMON_ARGS! -DDEEP_NO_SIMD_INTRINSICS=ON"
 
-set "BUILD_COUNT=2"
+set "Build[3]_Name= FLOATING_POINT_EXCEPTIONS"
+set "Build[3]_Path=-fp-exceptions"
+set "Build[3]_Args=!COMMON_ARGS! -DDEEP_USE_FLOATING_POINT_EXCEPTIONS=ON"
+
+set "BUILD_COUNT=3"
 
 set "Build_Type[1]=DEBUG"
 set "Build_Type_Value[1]=Debug"

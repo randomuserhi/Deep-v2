@@ -26,12 +26,12 @@ struct [[nodiscard]] alignas(Int32x4) Vec4i {
 
 	//
 
-	[[nodiscard]] inline int32 manhattanDistance() const;
+	[[nodiscard]] inline int32 m_ManhattanDistance() const;
 
-	[[nodiscard]] inline float32 sqrdMagnitude() const;
-	[[nodiscard]] inline float32 magnitude() const;
+	[[nodiscard]] inline float32 m_SqrdMagnitude() const;
+	[[nodiscard]] inline float32 m_Magnitude() const;
 
-	[[nodiscard]] static inline int32 Dot(Arg_Vec4i in_a, Arg_Vec4i in_b);
+	[[nodiscard]] static inline int32 s_Dot(Arg_Vec4i in_a, Arg_Vec4i in_b);
 
 	//
 

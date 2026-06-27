@@ -29,19 +29,19 @@ struct [[nodiscard]] alignas(Float32x2) Vec2 {
 	//
 
 	inline Vec2& Normalize();
-	[[nodiscard]] inline Vec2 normalized() const;
+	[[nodiscard]] inline Vec2 m_Normalized() const;
 	[[nodiscard]] inline bool IsNormalized(float in_tolerance = 1.0e-6f) const;
 
-	[[nodiscard]] inline float32 sqrdMagnitude() const;
-	[[nodiscard]] inline float32 magnitude() const;
+	[[nodiscard]] inline float32 m_SqrdMagnitude() const;
+	[[nodiscard]] inline float32 m_Magnitude() const;
 
-	[[nodiscard]] static inline float32 Dot(Arg_Vec2 in_a, Arg_Vec2 in_b);
-	[[nodiscard]] static inline float32 Cross(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	[[nodiscard]] static inline float32 s_Dot(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	[[nodiscard]] static inline float32 s_Cross(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
-	[[nodiscard]] static inline Vec2 Rotate(Arg_Vec2 in_a, float in_radians);
-	[[nodiscard]] static inline float32 Angle(Arg_Vec2 in_a, Arg_Vec2 in_b);
+	[[nodiscard]] static inline Vec2 s_Rotate(Arg_Vec2 in_a, float in_radians);
+	[[nodiscard]] static inline float32 s_Angle(Arg_Vec2 in_a, Arg_Vec2 in_b);
 
-	[[nodiscard]] static inline Vec2 Lerp(Arg_Vec2 in_a, Arg_Vec2 in_b, float32 in_t);
+	[[nodiscard]] static inline Vec2 s_Lerp(Arg_Vec2 in_a, Arg_Vec2 in_b, float32 in_t);
 
 	//
 

@@ -12,7 +12,7 @@ Quat::Quat(Float32x4 in_float32x4) :
 Quat::Quat(Vec4 in_vec) :
 	vec{ in_vec } {};
 
-Quat Quat::FromMat4(Arg_Mat4 in_mat) {
+Quat Quat::s_FromMat4(Arg_Mat4 in_mat) {
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
 	float trace = in_mat.m00 + in_mat.m11 + in_mat.m22;
@@ -62,7 +62,7 @@ bool Quat::IsNormalized(float in_tolerance) const {
 
 Mat4 Quat::ToMat4() const {
 	Mat4 m;
-	return m.FromQuaternion(*this);
+	return m.s_FromQuaternion(*this);
 }
 
 Quat& Quat::Conjugate() {
@@ -77,7 +77,7 @@ Quat Quat::conjugated() const {
 }
 
 Quat& Quat::Inverse() {
-	return Conjugate() /= vec.magnitude();
+	return Conjugate() /= vec.m_Magnitude();
 }
 Quat Quat::inversed() const {
 	Quat q = *this;
@@ -91,8 +91,8 @@ Quat::Quat(Vec3 in_axis, float32 in_angle) {
 	//   w       = cos(0.5f * inAngle)
 
 	Float32x4 s, c;
-	Float32x4::Replicate(0.5f * in_angle).SinCos(s, c);
-	m_float32x4 = Float32x4::Select(in_axis.m_float32x4 * s, c, Int32x4{ 0, 0, 0, int32(0xffffffff) });
+	Float32x4::s_Replicate(0.5f * in_angle).SinCos(s, c);
+	m_float32x4 = Float32x4::s_Select(in_axis.m_float32x4 * s, c, Int32x4{ 0, 0, 0, int32(0xffffffff) });
 }
 
 constexpr float32& Quat::operator[](size_t in_index) {
@@ -230,7 +230,7 @@ Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_vec) {
 	return Vec3{ (in_quat * Vec4(in_vec, 0.0f) * in_quat.conjugated()).m_float32x4 };
 }
 
-Vec3 Quat::InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_vec) {
+Vec3 Quat::s_InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_vec) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
 	// Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)

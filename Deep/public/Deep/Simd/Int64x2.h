@@ -58,7 +58,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	//
 
 	// Replicate the given value across all components
-	static inline Int64x2 Replicate(int64 in_value);
+	static inline Int64x2 s_Replicate(int64 in_value);
 
 	// Treats the 2 components as booleans where true is when the most significant bit is set
 	// and returns it as a bit mask.
@@ -70,7 +70,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static inline Int64x2 Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b);
+	static inline Int64x2 s_Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b);
 
 	//
 

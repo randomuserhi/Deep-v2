@@ -62,8 +62,8 @@ TEST(Vec2, Scale) {
 TEST(Vec2, Dot) {
 	Deep::Vec2 a{ 1, 2 };
 	Deep::Vec2 b{ 2, 1 };
-	float32 c = Deep::Vec2::Dot(a, b);
-	float32 d = Deep::Vec2::Dot(b, a);
+	float32 c = Deep::Vec2::s_Dot(a, b);
+	float32 d = Deep::Vec2::s_Dot(b, a);
 	EXPECT_EQ(c, 4);
 	EXPECT_EQ(d, 4);
 }
