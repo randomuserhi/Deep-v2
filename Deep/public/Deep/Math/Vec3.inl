@@ -41,9 +41,9 @@ float32 Vec3::sqrdMagnitude() const {
 }
 float32 Vec3::magnitude() const {
 #ifdef DEEP_USE_SSE
-	__m128 t = _mm_mul_ps(m_float32x4, m_float32x4);
-	__m128 y = _mm_shuffle_ps(t, t, _MM_SHUFFLE(1, 1, 1, 1));
-	__m128 z = _mm_shuffle_ps(t, t, _MM_SHUFFLE(2, 2, 2, 2));
+	Float32x4 t = _mm_mul_ps(m_float32x4, m_float32x4);
+	Float32x4 y = _mm_shuffle_ps(t, t, _MM_SHUFFLE(1, 1, 1, 1));
+	Float32x4 z = _mm_shuffle_ps(t, t, _MM_SHUFFLE(2, 2, 2, 2));
 	t = _mm_add_ss(t, y);
 	t = _mm_add_ss(t, z);
 	return _mm_cvtss_f32(_mm_sqrt_ss(t));
@@ -54,9 +54,9 @@ float32 Vec3::magnitude() const {
 
 float32 Vec3::Dot(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 #ifdef DEEP_USE_SSE
-	__m128 t = _mm_mul_ps(in_a.m_float32x4, in_b.m_float32x4);
-	__m128 y = _mm_shuffle_ps(t, t, _MM_SHUFFLE(1, 1, 1, 1));
-	__m128 z = _mm_shuffle_ps(t, t, _MM_SHUFFLE(2, 2, 2, 2));
+	Float32x4 t = _mm_mul_ps(in_a.m_float32x4, in_b.m_float32x4);
+	Float32x4 y = _mm_shuffle_ps(t, t, _MM_SHUFFLE(1, 1, 1, 1));
+	Float32x4 z = _mm_shuffle_ps(t, t, _MM_SHUFFLE(2, 2, 2, 2));
 	t = _mm_add_ss(t, y);
 	t = _mm_add_ss(t, z);
 	return _mm_cvtss_f32(t);
