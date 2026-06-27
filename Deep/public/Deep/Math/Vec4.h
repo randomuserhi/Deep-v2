@@ -9,7 +9,6 @@
 
 DEEP_NAMESPACE_BEGIN
 
-// Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
 struct [[nodiscard]] alignas(Float32x4) Vec4 {
 	//
 

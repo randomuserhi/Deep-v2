@@ -28,7 +28,7 @@ DEEP_NAMESPACE_BEGIN
 
 // Abstraction layer for __m128i SIMD type representing 2 independent values
 //
-// Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
+
 struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 #if defined(DEEP_USE_SSE)
 	using Type = __m128i;

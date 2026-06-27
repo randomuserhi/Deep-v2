@@ -13,7 +13,7 @@ DEEP_NAMESPACE_BEGIN
 // Matrix4x4
 // Notation is column followed by row, so m10 is column 1, row 0.
 //
-// Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
+
 struct [[nodiscard]] alignas(Float32x4) Mat4 {
 	//
 

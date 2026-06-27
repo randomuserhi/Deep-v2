@@ -9,7 +9,10 @@
 
 DEEP_NAMESPACE_BEGIN
 
-// Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
+// Actually represents storage of 4 values (x, y, z, _w)
+// On initialization, `_w = z`
+// On division, `_w` must match `z` to prevent divide by zero errors when floating point exceptions are enabled. The method
+// `s_FixW` can be used to enforce this. Apart from division or initialization, the state of `_w` is undefined.
 struct [[nodiscard]] alignas(Float32x4) Vec3 {
 	//
 

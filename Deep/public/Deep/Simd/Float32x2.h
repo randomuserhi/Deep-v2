@@ -29,7 +29,7 @@ DEEP_NAMESPACE_BEGIN
 // Abstraction layer for float32x2_t SIMD type representing 4 independent values
 // We do not use __m64 for x86_64 systems as its an outdated mmx technology, rather the lower 64 bits of __m128 are used
 //
-// Implementation based on Jolt: https://github.com/jrouwe/JoltPhysics/tree/master/Jolt/Math
+
 struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Float32x2 {
 #if defined(DEEP_USE_NEON)
 	using Type = float32x2_t;

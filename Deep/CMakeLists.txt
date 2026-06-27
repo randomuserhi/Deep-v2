@@ -321,7 +321,7 @@ if (NOT DEEP_NO_SIMD_INTRINSICS)
 			# Deep currently doesn't implement the WASM specific SIMD intrinsics so uses the SSE 4.2 intrinsics
 			# See: https://emscripten.org/docs/porting/simd.html#webassembly-simd-intrinsics
 			# Note that this does not require the browser to actually support SSE 4.2 it merely means that it can translate those instructions to WASM SIMD instructions
-			target_compile_options(Jolt PUBLIC -msimd128 -msse4.2)
+			target_compile_options(Deep PUBLIC -msimd128 -msse4.2)
 		else()
 			if (DEEP_USE_AVX512)
 				target_compile_options(Deep PUBLIC -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl)
