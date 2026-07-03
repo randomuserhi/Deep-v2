@@ -20,7 +20,7 @@ cmake --build build
 - `s_CamelCase` for static member functions
 - `CamelCase` for types
 - `Constexpr_CamelCase` for functions that overload another function to provide a `constexpr` version of it
-- `Constexpr_s_CamelCase` for static function overloads that provide a `constexpr` version of it
+- `sConstexpr_CamelCase` for static function overloads that provide a `constexpr` version of it
 - `Constexpr` as a member function to provide a `constexpr` constructor overload
 - `in_camelCase` for in arguments
 - `out_camelCase` for out arguments
