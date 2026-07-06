@@ -7,7 +7,7 @@
 DEEP_NAMESPACE_BEGIN
 
 bool IsOverlapping(Arg_Vec2 in_point, Arg_Aabb2D in_box) {
-	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
+	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0, "Extents of box must be > 0.");
 	Vec2 minA = in_box.m_center - in_box.m_extents;
 	Vec2 maxA = in_box.m_center + in_box.m_extents;
 	return in_point.x > minA.x && in_point.x < maxA.x && //
