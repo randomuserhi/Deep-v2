@@ -100,6 +100,9 @@ struct [[nodiscard]] alignas(Float32x2) Vec2 {
 	DEEP_EXPORT static const Vec2 k_down;
 	DEEP_EXPORT static const Vec2 k_left;
 	DEEP_EXPORT static const Vec2 k_right;
+
+	static constexpr int k_numAxis = 2;
+	DEEP_EXPORT static const Vec2 k_axis[k_numAxis];
 };
 
 static_assert(std::is_trivial<Vec2>(), "Is supposed to be a trivial type!");
