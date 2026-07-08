@@ -18,13 +18,6 @@ size_t PacketWriter::m_Size() const {
 	return m_buffer.size();
 }
 
-// TODO(randomuserhi): Important read,
-//                     https://stackoverflow.com/questions/3022552/is-there-any-standard-htonl-like-function-for-64-bits-integers-in-c
-
-// TODO(randomuserhi): My netcode uses little-endian view across network as most architectures are little-endian.
-//                     Therefore I need my own implementation of htons and htonl for converting big-endian hosts to
-//                     little endian.
-
 void PacketWriter::WriteUInt8(uint8 in_byte) {
 	m_buffer.push_back(in_byte);
 }
@@ -42,40 +35,46 @@ void PacketWriter::WriteBytes(const uint8* in_bytes, size_t in_numBytes) {
 void PacketWriter::WriteUInt16(uint16 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<uint16*>(m_buffer.data() + old) = hton(in_value);
+	in_value = hton(in_value);
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 void PacketWriter::WriteInt16(int16 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<int16*>(m_buffer.data() + old) = hton(in_value);
+	in_value = hton(in_value);
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 
 void PacketWriter::WriteUInt32(uint32 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<uint32*>(m_buffer.data() + old) = hton(in_value);
+	in_value = hton(in_value);
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 void PacketWriter::WriteInt32(int32 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<int32*>(m_buffer.data() + old) = hton(in_value);
+	in_value = hton(in_value);
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 
 void PacketWriter::WriteUInt64(uint64 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<uint64*>(m_buffer.data() + old) = hton(in_value);
+	in_value = hton(in_value);
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 void PacketWriter::WriteInt64(int64 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<int64*>(m_buffer.data() + old) = hton(in_value);
+	in_value = hton(in_value);
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 
 void PacketWriter::WriteFloat32(float32 in_value) {
 	size_t old = m_buffer.size();
 	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	*reinterpret_cast<uint32*>(m_buffer.data() + old) = hton(*reinterpret_cast<uint32*>(&in_value));
+	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
 }
 void PacketWriter::WriteFloat16(float32 in_value) {
 	float16 half = FloatToHalf(in_value);

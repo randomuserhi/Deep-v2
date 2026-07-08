@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Deep/Memory.h"
 #include "Deep/Net/PacketReader.h"
 #include "Deep/Bit.h"
 
@@ -22,21 +23,21 @@ uint8 PacketReader::ReadUInt8() {
 uint16 PacketReader::ReadUInt16() {
 	uint16 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const uint16*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return ntoh(value);
 }
 uint32 PacketReader::ReadUInt32() {
 	uint32 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const uint32*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return ntoh(value);
 }
 uint64 PacketReader::ReadUInt64() {
 	uint64 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const uint64*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return ntoh(value);
 }
@@ -44,21 +45,21 @@ uint64 PacketReader::ReadUInt64() {
 int16 PacketReader::ReadInt16() {
 	int16 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const int16*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return ntoh(value);
 }
 int32 PacketReader::ReadInt32() {
 	int32 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const int32*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return ntoh(value);
 }
 int64 PacketReader::ReadInt64() {
 	int64 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const int64*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return ntoh(value);
 }
@@ -66,14 +67,14 @@ int64 PacketReader::ReadInt64() {
 float32 PacketReader::ReadFloat16() {
 	uint16 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const uint16*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return HalfToFloat(ntoh(value));
 }
 float32 PacketReader::ReadFloat32() {
 	uint32 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
-	value = *reinterpret_cast<const uint32*>(m_head);
+	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
 	return AsFloat(ntoh(value));
 }
