@@ -25,6 +25,7 @@ cmake --build build
 - `in_camelCase` for in arguments
 - `out_camelCase` for out arguments
 - `io_camelCase` for in-out arguments
+- `_CamelCase` for concepts
 
 - `Arg_CamelCase` for argument types
   - These types provide the fastest way to pass an object as a const parameter.
@@ -34,10 +35,18 @@ cmake --build build
 
 Avoid class / struct level dll export:
 ```cpp
-class DEEP_EXPORT A {}
-struct DEEP_EXPORT A {}
+// Don't
+class ENGINE_EXPORT A { ... }
+struct ENGINE_EXPORT A { ... }
+
+// Do
+class A {
+  ENGINE_EXPORT void Method();
+}
+struct A {
+  ENGINE_EXPORT void Method();
+}
 ```
-Prefer exporting each function / static member individually.
 This is to prevent issues with inline methods and shared libraries when compilers choose to not inline them and the dll does not emit a definition.
 
 # Notes

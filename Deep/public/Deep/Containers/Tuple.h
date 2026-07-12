@@ -22,9 +22,9 @@ struct TupleStorage {
 	constexpr TupleStorage(U&& in_val) :
 		data(std::forward<U>(in_val)) {}
 
-	constexpr inline auto& get();
+	constexpr inline auto& Get();
 
-	constexpr inline const auto& get() const;
+	constexpr inline const auto& Get() const;
 };
 
 template<std::size_t I, typename T>
@@ -55,10 +55,10 @@ struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag
 	constexpr inline TupleImpl(Args&&... args);
 
 	template<std::size_t I>
-	constexpr inline decltype(auto) get();
+	constexpr inline decltype(auto) Get();
 
 	template<std::size_t I>
-	constexpr inline decltype(auto) get() const;
+	constexpr inline decltype(auto) Get() const;
 };
 
 #if __cplusplus >= 202002L

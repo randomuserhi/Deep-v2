@@ -27,14 +27,14 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 	//
 
 	inline Quat& Normalize();
-	[[nodiscard]] inline Quat normalized() const;
+	[[nodiscard]] inline Quat m_Normalized() const;
 	[[nodiscard]] inline bool IsNormalized(float roTolerance = 1.0e-6f) const;
 
 	inline Quat& Conjugate();
-	[[nodiscard]] inline Quat conjugated() const;
+	[[nodiscard]] inline Quat m_Conjugated() const;
 
 	inline Quat& Inverse();
-	[[nodiscard]] inline Quat inversed() const;
+	[[nodiscard]] inline Quat m_Inversed() const;
 
 	inline Mat4 ToMat4() const;
 	static inline Quat s_FromMat4(Arg_Mat4 in_mat);

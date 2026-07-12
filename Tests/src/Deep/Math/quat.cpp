@@ -12,7 +12,7 @@ TEST(Quat, Equality) {
 
 TEST(Quat, Conjugate) {
 	const Deep::Quat a{ 0.0f, 1.0f, 0.0f, 0.0f };
-	const Deep::Quat b = a.conjugated();
+	const Deep::Quat b = a.m_Conjugated();
 
 	EXPECT_EQ(b.x, -0.0f);
 	EXPECT_EQ(b.y, -1.0f);
@@ -23,10 +23,10 @@ TEST(Quat, Conjugate) {
 TEST(Quat, FromAxisAngle) {
 	const Deep::Quat a{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, Deep::k_pi };
 
-	EXPECT_TRUE(Deep::isClose(a.x, 0.0f));
-	EXPECT_TRUE(Deep::isClose(a.y, 1.0f));
-	EXPECT_TRUE(Deep::isClose(a.z, 0.0f));
-	EXPECT_TRUE(Deep::isClose(a.w, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(a.x, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(a.y, 1.0f));
+	EXPECT_TRUE(Deep::IsClose(a.z, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(a.w, 0.0f));
 }
 
 TEST(Quat, RotateVector) {
@@ -34,9 +34,9 @@ TEST(Quat, RotateVector) {
 	const Deep::Vec3 v{ 1.0f, 0.0f, 0.0f };
 	const Deep::Vec3 result = q * v;
 
-	EXPECT_TRUE(Deep::isClose(result.x, 0.0f));
-	EXPECT_TRUE(Deep::isClose(result.y, 0.0f));
-	EXPECT_TRUE(Deep::isClose(result.z, -1.0f));
+	EXPECT_TRUE(Deep::IsClose(result.x, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(result.y, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(result.z, -1.0f));
 }
 
 TEST(Quat, InverseRotateVector) {
@@ -44,7 +44,7 @@ TEST(Quat, InverseRotateVector) {
 	const Deep::Vec3 v{ 1.0f, 0.0f, 0.0f };
 	const Deep::Vec3 result = Deep::Quat::s_InverseRotate(q, v);
 
-	EXPECT_TRUE(Deep::isClose(result.x, 0.0f));
-	EXPECT_TRUE(Deep::isClose(result.y, 0.0f));
-	EXPECT_TRUE(Deep::isClose(result.z, 1.0f));
+	EXPECT_TRUE(Deep::IsClose(result.x, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(result.y, 0.0f));
+	EXPECT_TRUE(Deep::IsClose(result.z, 1.0f));
 }

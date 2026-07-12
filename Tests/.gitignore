@@ -3,6 +3,7 @@ bin/
 build/
 all/
 /.vs
+/.vscode
 .idea/
 Makefile
 

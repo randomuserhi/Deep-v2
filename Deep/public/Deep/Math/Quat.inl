@@ -52,7 +52,7 @@ Quat& Quat::Normalize() {
 	vec.Normalize();
 	return *this;
 }
-Quat Quat::normalized() const {
+Quat Quat::m_Normalized() const {
 	Quat q = *this;
 	return q.Normalize();
 }
@@ -71,7 +71,7 @@ Quat& Quat::Conjugate() {
 		m_float32x4 ^ Int32x4{ int32(0x80000000), int32(0x80000000), int32(0x80000000), int32(0) }.ReinterpretAsFloat();
 	return *this;
 }
-Quat Quat::conjugated() const {
+Quat Quat::m_Conjugated() const {
 	Quat q = *this;
 	return q.Conjugate();
 }
@@ -79,7 +79,7 @@ Quat Quat::conjugated() const {
 Quat& Quat::Inverse() {
 	return Conjugate() /= vec.m_Magnitude();
 }
-Quat Quat::inversed() const {
+Quat Quat::m_Inversed() const {
 	Quat q = *this;
 	return q.Inverse();
 }
@@ -227,14 +227,14 @@ Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_vec) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
 	// Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)
-	return Vec3{ (in_quat * Vec4(in_vec, 0.0f) * in_quat.conjugated()).m_float32x4 };
+	return Vec3{ (in_quat * Vec4(in_vec, 0.0f) * in_quat.m_Conjugated()).m_float32x4 };
 }
 
 Vec3 Quat::s_InverseRotate(Arg_Quat in_quat, Arg_Vec3 in_vec) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion must be normalized.");
 
 	// Rotating a vector by a quaternion is done by: p' = q * p * q^-1 (q^-1 = conjugated(q) for a unit quaternion)
-	return Vec3{ (in_quat.conjugated() * Vec4(in_vec, 0.0f) * in_quat).m_float32x4 };
+	return Vec3{ (in_quat.m_Conjugated() * Vec4(in_vec, 0.0f) * in_quat).m_float32x4 };
 }
 
 DEEP_NAMESPACE_END

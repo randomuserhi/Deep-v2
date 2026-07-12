@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Memory.h"
-#include "Deep/Tuple.h"
+#include "Deep/Containers/Tuple.h"
 
 TEST(Tuple, Primitives) {
 	TEST_CASE(Constructor) {
@@ -106,7 +106,7 @@ TEST(Tuple, NonTrivial) {
 	TEST_CASE(TupleConstructor) {
 		Deep::Tuple<A, A> tuple{ A{ 5, destructorCount }, A{ 10, destructorCount } };
 
-		EXPECT_EQ(destructorCount, 2); // From destructing the 2 tempory A objects that were moved into the tuple
+		EXPECT_EQ(destructorCount, 2); // From destructing the 2 temporary A objects that were moved into the tuple
 		destructorCount = 0;
 
 		EXPECT_EQ(std::get<0>(tuple).size, 5);
@@ -121,7 +121,7 @@ TEST(Tuple, NonTrivial) {
 	TEST_CASE(MakeTuple) {
 		Deep::Tuple<A, A> tuple = Deep::MakeTuple(A{ 5, destructorCount }, A{ 10, destructorCount });
 
-		EXPECT_EQ(destructorCount, 2); // From destructing the 2 tempory A objects that were moved into the tuple
+		EXPECT_EQ(destructorCount, 2); // From destructing the 2 temporary A objects that were moved into the tuple
 		destructorCount = 0;
 
 		EXPECT_EQ(std::get<0>(tuple).size, 5);
