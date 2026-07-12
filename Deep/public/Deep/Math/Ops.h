@@ -77,11 +77,11 @@ inline constexpr T ATan2(const T& in_y, const T& in_x) {
 	return std::atan2(in_y, in_x);
 }
 
+// Based on https://numpy.org/devdocs/reference/generated/numpy.isclose.html
+// NOTE(randomuserhi): Does not account for NaN
 template<typename T>
 inline constexpr bool isClose(const T& in_a, const T& in_b, const T& in_relTolerance = static_cast<T>(k_relTolerance),
                               const T& in_absTolerance = static_cast<T>(k_absTolerance)) {
-	// Based on https://numpy.org/devdocs/reference/generated/numpy.isclose.html
-	// NOTE(randomuserhi): Does not account for NaN
 	return Abs(in_a - in_b) <= (in_absTolerance + in_relTolerance * Abs(in_b));
 }
 

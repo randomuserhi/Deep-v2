@@ -9,8 +9,6 @@
 
 DEEP_NAMESPACE_BEGIN
 
-// NOTE(randomuserhi): There are no bound checks on the data buffer being read
-// TODO(randomuserhi): Add bound checks - only in use with asserts
 struct PacketReader {
 	//
 

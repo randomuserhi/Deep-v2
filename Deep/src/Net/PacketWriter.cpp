@@ -8,7 +8,7 @@
 DEEP_NAMESPACE_BEGIN
 
 void PacketWriter::Write(Quat roQuat) {
-	m_buffer.reserve(m_buffer.size() + sizeof(uint8) + sizeof(float32) * 3);
+	m_buffer.resize(m_buffer.size() + sizeof(uint8) + sizeof(float32) * 3);
 
 	float32 largest = roQuat.x;
 	uint8 i = 0;
@@ -74,7 +74,7 @@ void PacketWriter::Write(Quat roQuat) {
 	}
 }
 void PacketWriter::WriteHalfQuat(Quat roQuat) {
-	m_buffer.reserve(m_buffer.size() + sizeof(uint8) + sizeof(float16) * 3);
+	m_buffer.resize(m_buffer.size() + sizeof(uint8) + sizeof(float16) * 3);
 
 	float32 largest = roQuat.x;
 	uint8 i = 0;
