@@ -45,26 +45,9 @@ inline bool IsAligned(T in_pointer, uint64 in_alignment) {
 	return (BitCast<std::uintptr_t>(in_pointer) & (in_alignment - 1)) == 0;
 }
 
-inline uint32 NumTrailingZeros(uint32 in_value) {
-#if defined(DEEP_CPU_X86)
-	#if defined(DEEP_USE_TZCNT)
-	return _tzcnt_u32(in_value);
-	#elif defined(DEEP_COMPILER_MSVC)
-	if (in_value == 0) {
-		return 32;
-	}
-	unsigned long result;
-	_BitScanForward(&result, in_value);
-	return result;
-	#else
-	if (in_value == 0) {
-		return 32;
-	}
-	return __builtin_ctz(in_value);
-	#endif
-#else
-	return std::countr_zero(in_value);
-#endif
+template<typename T>
+constexpr inline int32 NumTrailingZeros(T in_value) {
+	return std::countr_zero<T>(in_value);
 }
 
 inline uint32 RotateLeft(const uint32 in_value, const int32 in_offset) {
