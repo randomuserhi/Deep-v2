@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Deep.h"
+#include "Deep/Templates.h"
 
 #include <functional>
 #include <type_traits>
@@ -19,7 +20,12 @@ public:
 	constexpr TupleStorage() = default;
 
 	template<typename U>
-	constexpr TupleStorage(U&& in_val);
+		requires std::is_constructible_v<Type, U&&>
+	constexpr inline explicit TupleStorage(U&& in_val) noexcept(std::is_nothrow_constructible_v<Type, U&&>);
+
+	template<typename... Args>
+	constexpr inline explicit TupleStorage(ConstructorArgs<Type, Args...>&& in_constructor) noexcept(
+		noexcept(std::move(in_constructor).Construct()));
 
 	//
 
@@ -59,20 +65,22 @@ struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag
 	constexpr TupleImpl& operator=(TupleImpl&&) = default;
 
 	template<typename... Args>
-		requires(sizeof...(Args) == sizeof...(Ts) && (std::is_constructible_v<Ts, Args &&> && ...))
-	constexpr inline TupleImpl(Args&&... args);
+		requires(sizeof...(Args) == sizeof...(Ts)
+	             && (std::is_constructible_v<TupleStorage<TupleIndexTag<Is, Ts>>, Args &&> && ...))
+	constexpr inline explicit TupleImpl(Args&&... in_args) noexcept(
+		(std::is_nothrow_constructible_v<TupleStorage<TupleIndexTag<Is, Ts>>, Args&&> && ...));
 
 	template<std::size_t I>
-	constexpr inline decltype(auto) Get() &;
+	[[nodiscard]] constexpr inline decltype(auto) Get() &;
 
 	template<std::size_t I>
-	constexpr inline decltype(auto) Get() const&;
+	[[nodiscard]] constexpr inline decltype(auto) Get() const&;
 
 	template<std::size_t I>
-	constexpr inline decltype(auto) Get() &&;
+	[[nodiscard]] constexpr inline decltype(auto) Get() &&;
 
 	template<std::size_t I>
-	constexpr inline decltype(auto) Get() const&&;
+	[[nodiscard]] constexpr inline decltype(auto) Get() const&&;
 };
 
 template<typename F, typename TupleType, std::size_t... Is>
@@ -92,7 +100,7 @@ struct Tuple : Detail::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...>
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) get(Tuple<Ts...>& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) get(Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
 //
@@ -101,7 +109,7 @@ constexpr inline decltype(auto) get(Tuple<Ts...>& in_tuple);
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) get(const Tuple<Ts...>& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) get(const Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
 //
@@ -110,7 +118,7 @@ constexpr inline decltype(auto) get(const Tuple<Ts...>& in_tuple);
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) get(Tuple<Ts...>&& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) get(Tuple<Ts...>&& in_tuple);
 
 // Get an item by index from a tuple
 //
@@ -119,7 +127,7 @@ constexpr inline decltype(auto) get(Tuple<Ts...>&& in_tuple);
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) get(const Tuple<Ts...>&& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) get(const Tuple<Ts...>&& in_tuple);
 
 } // namespace Detail
 
@@ -130,25 +138,29 @@ using Tuple = Detail::Tuple<Ts...>;
 
 // Get an item by index from a tuple
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) Get(Tuple<Ts...>& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) Get(Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) Get(const Tuple<Ts...>& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) Get(const Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) Get(Tuple<Ts...>&& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) Get(Tuple<Ts...>&& in_tuple);
 
 // Get an item by index from a tuple
 template<std::size_t I, typename... Ts>
-constexpr inline decltype(auto) Get(const Tuple<Ts...>&& in_tuple);
+[[nodiscard]] constexpr inline decltype(auto) Get(const Tuple<Ts...>&& in_tuple);
 
 template<typename... Ts>
-constexpr inline auto MakeTuple(Ts&&... in_args);
+[[nodiscard]] constexpr inline auto MakeTuple(Ts&&... in_args);
+
+template<_ConstructorArgs... Args>
+[[nodiscard]] constexpr inline auto ConstructTuple(Args&&... in_constructorArgs) noexcept(
+	noexcept(Tuple<typename std::remove_cvref_t<Args>::Type...>{ std::forward<Args>(in_constructorArgs)... }));
 
 template<typename... Ts>
-constexpr inline auto Tie(Ts&... in_args);
+[[nodiscard]] constexpr inline auto Tie(Ts&... in_args);
 
 template<typename F, typename... Ts>
 constexpr inline decltype(auto) Apply(F&& in_function, Tuple<Ts...>& in_tuple) noexcept(

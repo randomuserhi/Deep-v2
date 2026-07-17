@@ -1,3 +1,4 @@
+#include "Deep/Templates.h"
 #include "Tests.h"
 
 #include "Deep.h"
@@ -149,6 +150,21 @@ TEST(Tuple, NonTrivial) {
 
 		EXPECT_EQ(destructorCount, 2); // From destructing the 2 temporary A objects that were moved into the tuple
 		destructorCount = 0;
+
+		EXPECT_EQ(Deep::Get<0>(tuple).size, 5);
+		EXPECT_NE(Deep::Get<0>(tuple).m_buffer, nullptr);
+
+		EXPECT_EQ(Deep::Get<1>(tuple).size, 10);
+		EXPECT_NE(Deep::Get<1>(tuple).m_buffer, nullptr);
+	}
+	EXPECT_EQ(destructorCount, 2); // Destruction of tuple
+
+	destructorCount = 0;
+	TEST_CASE(ConstructTuple) {
+		Deep::Tuple<A, A> tuple =
+			Deep::ConstructTuple(Deep::ConstructWith<A>(5, destructorCount), Deep::ConstructWith<A>(10, destructorCount));
+
+		EXPECT_EQ(destructorCount, 0); // No temporaries to destroy, should be constructed in place
 
 		EXPECT_EQ(Deep::Get<0>(tuple).size, 5);
 		EXPECT_NE(Deep::Get<0>(tuple).m_buffer, nullptr);

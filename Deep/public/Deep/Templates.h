@@ -2,11 +2,17 @@
 
 #include "Deep.h"
 
-#include "Deep/Containers/Tuple.h"
-
 #include <type_traits>
+#include <utility>
 
 DEEP_NAMESPACE_BEGIN
+
+namespace Detail {
+
+template<typename... Ts>
+struct Tuple;
+
+}
 
 template<typename T, typename... Args>
 class ConstructorArgs;
@@ -65,7 +71,7 @@ template<typename T, typename... Args>
 class ConstructorArgs final {
 public:
 	using Type = T;
-	using ArgumentsTuple = Tuple<Args&&...>;
+	using ArgumentsTuple = Detail::Tuple<Args&&...>;
 
 	constexpr explicit ConstructorArgs(Args&&... in_args) noexcept(
 		std::is_nothrow_constructible_v<ArgumentsTuple, Args&&...>) :
@@ -104,8 +110,9 @@ private:
 };
 
 template<typename T, typename... Args>
-[[nodiscard]] constexpr inline ConstructorArgs<T, std::unwrap_reference_t<Args>...> ConstructWith(Args&&... args);
+[[nodiscard]] constexpr inline auto ConstructWith(Args&&... args);
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Templates.inl" // IWYU pragma: export
+#include "Deep/Containers/Tuple.h" // IWYU pragma: export
+#include "Deep/Templates.inl"      // IWYU pragma: export
