@@ -37,6 +37,11 @@ CONSTRUCTOR_ARGS_TEMPLATE
 	return ConstructorArgs<T, std::unwrap_reference_t<Args>...>{ std::forward<Args>(args)... };
 }
 
+template<typename T, _ConstructorArgs... in_Args>
+[[nodiscard]] constexpr static inline size_t CountConstructorArgs() {
+	return (0 + ... + std::is_same_v<T, typename std::decay_t<in_Args>::Type>);
+}
+
 #undef CONSTRUCTOR_ARGS_TEMPLATE
 #undef CONSTRUCTOR_ARGS
 

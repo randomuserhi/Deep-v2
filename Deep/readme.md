@@ -26,6 +26,8 @@ cmake --build build
 - `out_camelCase` for out arguments
 - `io_camelCase` for in-out arguments
 - `_CamelCase` for concepts
+- `CamelCase` for namespaces
+- `impl_CamelCase` for implementation specific namespaces often used to hide implementation specific templates used in meta-programming.
 
 - `Arg_CamelCase` for argument types
   - These types provide the fastest way to pass an object as a const parameter.
@@ -48,6 +50,19 @@ struct A {
 }
 ```
 This is to prevent issues with inline methods and shared libraries when compilers choose to not inline them and the dll does not emit a definition.
+
+For templates where the template parameter acts more like a function parameter as opposed to a type declaration, use `in_CamelCase` name scheme:
+```cpp
+// `T` is used like a type
+template<typename T>
+class Vector {};
+
+// `T` is used like a type, but `in_TypeList` is used like a function parameter
+template<typename T, typename... in_TypeList>
+constexpr static inline size_t CountOccurences() {
+	return (0 + ... + std::is_same_v<T, in_TypeList>);
+}
+```
 
 # Notes
 

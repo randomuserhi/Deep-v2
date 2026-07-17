@@ -8,7 +8,7 @@
 DEEP_NAMESPACE_BEGIN
 
 // Tuple declaration
-namespace Detail {
+namespace impl_Tuple {
 template<typename... Ts>
 struct Tuple;
 }
@@ -16,7 +16,7 @@ struct Tuple;
 template<typename T, typename... Args>
 class ConstructorArgs;
 
-namespace Detail {
+namespace impl_ConstructorArgs {
 
 template<typename T>
 struct IsConstructorArgs : std::false_type {};
@@ -24,10 +24,10 @@ struct IsConstructorArgs : std::false_type {};
 template<typename T, typename... Args>
 struct IsConstructorArgs<ConstructorArgs<T, Args...>> : std::true_type {};
 
-} // namespace Detail
+} // namespace impl_ConstructorArgs
 
 template<typename T>
-concept _ConstructorArgs = Detail::IsConstructorArgs<std::remove_cvref_t<T>>::value;
+concept _ConstructorArgs = impl_ConstructorArgs::IsConstructorArgs<std::remove_cvref_t<T>>::value;
 
 // A non-owning single use container for constructor arguments.
 //
@@ -69,7 +69,7 @@ template<typename T, typename... Args>
 class ConstructorArgs final {
 public:
 	using Type = T;
-	using ArgumentsTuple = Detail::Tuple<Args&&...>;
+	using ArgumentsTuple = impl_Tuple::Tuple<Args&&...>;
 
 	constexpr explicit ConstructorArgs(Args&&... in_args) noexcept(
 		std::is_nothrow_constructible_v<ArgumentsTuple, Args&&...>) :
@@ -109,6 +109,10 @@ private:
 
 template<typename T, typename... Args>
 [[nodiscard]] constexpr inline auto ConstructWith(Args&&... args);
+
+// Counts the number of `ConstructorArgs` in `in_args` that construct type `T`.
+template<typename T, _ConstructorArgs... in_args>
+[[nodiscard]] constexpr static inline size_t CountConstructorArgs();
 
 DEEP_NAMESPACE_END
 

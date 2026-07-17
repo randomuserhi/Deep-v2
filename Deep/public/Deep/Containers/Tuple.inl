@@ -5,7 +5,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-namespace Detail {
+namespace impl_Tuple {
 
 template<typename T>
 template<typename U>
@@ -110,26 +110,26 @@ template<std::size_t I, typename... Ts>
 	return std::move(in_tuple).template Get<I>();
 }
 
-} // namespace Detail
+} // namespace impl_Tuple
 
 template<std::size_t I, typename... Ts>
 [[nodiscard]] constexpr decltype(auto) Get(Deep::Tuple<Ts...>& in_tuple) {
-	return Detail::get<I, Ts...>(in_tuple);
+	return impl_Tuple::get<I, Ts...>(in_tuple);
 }
 
 template<std::size_t I, typename... Ts>
 [[nodiscard]] constexpr decltype(auto) Get(const Deep::Tuple<Ts...>& in_tuple) {
-	return Detail::get<I, Ts...>(in_tuple);
+	return impl_Tuple::get<I, Ts...>(in_tuple);
 }
 
 template<std::size_t I, typename... Ts>
 [[nodiscard]] constexpr decltype(auto) Get(Deep::Tuple<Ts...>&& in_tuple) {
-	return Detail::get<I, Ts...>(std::move(in_tuple));
+	return impl_Tuple::get<I, Ts...>(std::move(in_tuple));
 }
 
 template<std::size_t I, typename... Ts>
 [[nodiscard]] constexpr decltype(auto) Get(const Deep::Tuple<Ts...>&& in_tuple) {
-	return Detail::get<I, Ts...>(std::move(in_tuple));
+	return impl_Tuple::get<I, Ts...>(std::move(in_tuple));
 }
 
 template<typename... Ts>
@@ -152,26 +152,26 @@ template<typename... Ts>
 
 template<typename F, typename... Ts>
 constexpr decltype(auto) Apply(F&& in_function, Tuple<Ts...>& in_tuple) noexcept(
-	noexcept(Detail::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{}))) {
-	return Detail::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{});
+	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{}))) {
+	return impl_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{});
 }
 
 template<typename F, typename... Ts>
 constexpr decltype(auto) Apply(F&& in_function, const Tuple<Ts...>& in_tuple) noexcept(
-	noexcept(Detail::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{}))) {
-	return Detail::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{});
+	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{}))) {
+	return impl_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{});
 }
 
 template<typename F, typename... Ts>
 constexpr decltype(auto) Apply(F&& in_function, Tuple<Ts...>&& in_tuple) noexcept(
-	noexcept(Detail::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{}))) {
-	return Detail::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{});
+	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{}))) {
+	return impl_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{});
 }
 
 template<typename F, typename... Ts>
 constexpr decltype(auto) Apply(F&& in_function, const Tuple<Ts...>&& in_tuple) noexcept(
-	noexcept(Detail::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{}))) {
-	return Detail::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{});
+	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{}))) {
+	return impl_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{});
 }
 
 DEEP_NAMESPACE_END
