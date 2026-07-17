@@ -8,16 +8,42 @@ TEST(Tuple, Primitives) {
 	TEST_CASE(Constructor) {
 		Deep::Tuple<int32, int32> tuple{ 5, 10 };
 
-		EXPECT_EQ(std::get<0>(tuple), 5);
-		EXPECT_EQ(std::get<1>(tuple), 10);
+		EXPECT_EQ(Deep::Get<0>(tuple), 5);
+		EXPECT_EQ(Deep::Get<1>(tuple), 10);
 	}
 
 	TEST_CASE(MakeTuple) {
 		Deep::Tuple<int32, int32> tuple = Deep::MakeTuple(5, 10);
 
-		EXPECT_EQ(std::get<0>(tuple), 5);
-		EXPECT_EQ(std::get<1>(tuple), 10);
+		EXPECT_EQ(Deep::Get<0>(tuple), 5);
+		EXPECT_EQ(Deep::Get<1>(tuple), 10);
 	}
+
+	TEST_CASE(Unpacking) {
+		Deep::Tuple<int32, int32> tuple = Deep::MakeTuple(5, 10);
+		auto [x, y] = tuple;
+		auto& [refx, refy] = tuple;
+
+		refx = 2;
+		refy = 4;
+
+		EXPECT_EQ(x, 5);
+		EXPECT_EQ(y, 10);
+
+		EXPECT_EQ(Deep::Get<0>(tuple), 2);
+		EXPECT_EQ(Deep::Get<1>(tuple), 4);
+	}
+}
+
+TEST(Tuple, Apply) {
+	constexpr auto add = [](int32 a, int32 b) -> int32 {
+		return a + b;
+	};
+
+	Deep::Tuple<int32, int32> args{ 5, 10 };
+	int32 sum = Deep::Apply(add, args);
+
+	EXPECT_EQ(sum, 15);
 }
 
 TEST(Tuple, Tie) {
@@ -26,24 +52,24 @@ TEST(Tuple, Tie) {
 	auto tie = Deep::Tie(a, b);
 
 	TEST_CASE(Bind) {
-		EXPECT_EQ(std::get<0>(tie), 5);
-		EXPECT_EQ(std::get<1>(tie), 10);
+		EXPECT_EQ(Deep::Get<0>(tie), 5);
+		EXPECT_EQ(Deep::Get<1>(tie), 10);
 	}
 
 	TEST_CASE(ReassignVars) {
 		a = 15;
 		b = 25;
 
-		EXPECT_EQ(std::get<0>(tie), 15);
-		EXPECT_EQ(std::get<1>(tie), 25);
+		EXPECT_EQ(Deep::Get<0>(tie), 15);
+		EXPECT_EQ(Deep::Get<1>(tie), 25);
 	}
 
 	TEST_CASE(ReassignTuple) {
-		std::get<0>(tie) = 5;
-		std::get<1>(tie) = 10;
+		Deep::Get<0>(tie) = 5;
+		Deep::Get<1>(tie) = 10;
 
-		EXPECT_EQ(std::get<0>(tie), 5);
-		EXPECT_EQ(std::get<1>(tie), 10);
+		EXPECT_EQ(Deep::Get<0>(tie), 5);
+		EXPECT_EQ(Deep::Get<1>(tie), 10);
 	}
 }
 
@@ -56,21 +82,21 @@ TEST(Tuple, PlainOldData) {
 	TEST_CASE(Constructor) {
 		Deep::Tuple<A, A> tuple{ A{ 5, 10 }, A{ 2, 3 } };
 
-		EXPECT_EQ(std::get<0>(tuple).a, 5);
-		EXPECT_EQ(std::get<0>(tuple).b, 10);
+		EXPECT_EQ(Deep::Get<0>(tuple).a, 5);
+		EXPECT_EQ(Deep::Get<0>(tuple).b, 10);
 
-		EXPECT_EQ(std::get<1>(tuple).a, 2);
-		EXPECT_EQ(std::get<1>(tuple).b, 3);
+		EXPECT_EQ(Deep::Get<1>(tuple).a, 2);
+		EXPECT_EQ(Deep::Get<1>(tuple).b, 3);
 	}
 
 	TEST_CASE(MakeTuple) {
 		Deep::Tuple<A, A> tuple = Deep::MakeTuple(A{ 5, 10 }, A{ 2, 3 });
 
-		EXPECT_EQ(std::get<0>(tuple).a, 5);
-		EXPECT_EQ(std::get<0>(tuple).b, 10);
+		EXPECT_EQ(Deep::Get<0>(tuple).a, 5);
+		EXPECT_EQ(Deep::Get<0>(tuple).b, 10);
 
-		EXPECT_EQ(std::get<1>(tuple).a, 2);
-		EXPECT_EQ(std::get<1>(tuple).b, 3);
+		EXPECT_EQ(Deep::Get<1>(tuple).a, 2);
+		EXPECT_EQ(Deep::Get<1>(tuple).b, 3);
 	}
 }
 
@@ -109,11 +135,11 @@ TEST(Tuple, NonTrivial) {
 		EXPECT_EQ(destructorCount, 2); // From destructing the 2 temporary A objects that were moved into the tuple
 		destructorCount = 0;
 
-		EXPECT_EQ(std::get<0>(tuple).size, 5);
-		EXPECT_NE(std::get<0>(tuple).m_buffer, nullptr);
+		EXPECT_EQ(Deep::Get<0>(tuple).size, 5);
+		EXPECT_NE(Deep::Get<0>(tuple).m_buffer, nullptr);
 
-		EXPECT_EQ(std::get<1>(tuple).size, 10);
-		EXPECT_NE(std::get<1>(tuple).m_buffer, nullptr);
+		EXPECT_EQ(Deep::Get<1>(tuple).size, 10);
+		EXPECT_NE(Deep::Get<1>(tuple).m_buffer, nullptr);
 	}
 	EXPECT_EQ(destructorCount, 2); // Destruction of tuple
 
@@ -124,11 +150,11 @@ TEST(Tuple, NonTrivial) {
 		EXPECT_EQ(destructorCount, 2); // From destructing the 2 temporary A objects that were moved into the tuple
 		destructorCount = 0;
 
-		EXPECT_EQ(std::get<0>(tuple).size, 5);
-		EXPECT_NE(std::get<0>(tuple).m_buffer, nullptr);
+		EXPECT_EQ(Deep::Get<0>(tuple).size, 5);
+		EXPECT_NE(Deep::Get<0>(tuple).m_buffer, nullptr);
 
-		EXPECT_EQ(std::get<1>(tuple).size, 10);
-		EXPECT_NE(std::get<1>(tuple).m_buffer, nullptr);
+		EXPECT_EQ(Deep::Get<1>(tuple).size, 10);
+		EXPECT_NE(Deep::Get<1>(tuple).m_buffer, nullptr);
 	}
 	EXPECT_EQ(destructorCount, 2); // Destruction of tuple
 }
