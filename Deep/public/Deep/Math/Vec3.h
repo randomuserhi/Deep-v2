@@ -115,7 +115,7 @@ struct [[nodiscard]] alignas(Float32x4) Vec3 {
 	DEEP_EXPORT static const Vec3 k_forwards;
 	DEEP_EXPORT static const Vec3 k_backwards;
 
-	static constexpr int k_numAxis = 3;
+	constexpr static int k_numAxis = 3;
 	DEEP_EXPORT static const Vec3 k_axis[k_numAxis];
 };
 
