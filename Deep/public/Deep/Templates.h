@@ -36,28 +36,28 @@ concept _ConstructorArgs = Detail::IsConstructorArgs<std::remove_cvref_t<T>>::va
 // ```cpp
 // template<typename... Specs>
 // [[nodiscard]] constexpr auto ConstructAll(Specs&&... specs) {
-// 	return Deep::ConstructTuple(std::forward<Specs>(specs)...);
+//   return Deep::ConstructTuple(std::forward<Specs>(specs)...);
 // }
 //
 // struct Widget {
-// 	Widget(int32 in_id, const char* in_name) :
-// 		m_id{ in_id }, m_name{ in_name } {}
+//   Widget(int32 in_id, const char* in_name) :
+//     m_id{ in_id }, m_name{ in_name } {}
 //
-// 	int32 m_id;
-// 	const char* m_name;
+//   int32 m_id;
+//   const char* m_name;
 // };
 //
 // struct Connection {
-// 	Connection(const char* in_address, int32 in_port) :
-// 		m_port{ in_port }, m_address{ in_address } {}
+//   Connection(const char* in_address, int32 in_port) :
+//     m_port{ in_port }, m_address{ in_address } {}
 //
-// 	int32 m_port;
-// 	const char* m_address;
+//   int32 m_port;
+//   const char* m_address;
 // };
 //
 // auto [widget, connection] = ConstructAll(
-//     Deep::ConstructWith<Widget>(42, "Main"),
-//     Deep::ConstructWith<Connection>("localhost", 8080u)
+//   Deep::ConstructWith<Widget>(42, "Main"),
+//   Deep::ConstructWith<Connection>("localhost", 8080u)
 // );
 // ```
 //

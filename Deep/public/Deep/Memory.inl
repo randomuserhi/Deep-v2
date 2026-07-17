@@ -103,7 +103,8 @@ T* TMemset(T* in_dest, int32 in_value, size_t in_size) {
 
 template<typename A, typename B>
 constexpr bool DoBuffersOverlap(A* in_a, size_t in_sizeA, B* in_b, size_t in_sizeB) {
-	if (!in_a || !in_b) return false;
+	if (in_a == nullptr || in_b == nullptr) return false;
+	if (in_sizeA == 0 || in_sizeB == 0) return false;
 
 	auto* a_begin = reinterpret_cast<std::byte*>(in_a);
 	auto* b_begin = reinterpret_cast<std::byte*>(in_b);

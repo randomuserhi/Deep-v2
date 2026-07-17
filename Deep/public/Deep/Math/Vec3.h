@@ -50,7 +50,19 @@ struct [[nodiscard]] alignas(Float32x4) Vec3 {
 	Deep_ForceInline constexpr float32& operator[](size_t);
 	Deep_ForceInline constexpr const float32& operator[](size_t) const;
 
-	// Copy only the xyz components, retaining the current _w value
+	// Copy only the xyz components, retaining the current _w value.
+	//
+	// Used in situations involving tight packing where _w may have a different meaning:
+	// ```cpp
+	// struct A {
+	//   // For better packing, a Float3 (12 bytes) is used for the normal rather than a Vec3 (16 bytes).
+	//   // As a result, `m_normal` and `m_distance` form a full Vec4 - and can be loaded as a Vec3.
+	//   //
+	//   // When writing to m_normal as a Vec3, use Vec3::XYZ to prevent overwriting m_distance.
+	//   alignas(Deep_AlignOf(Vec3)) Float3 m_normal;
+	//   float32 m_distance;
+	// };
+	// ```
 	inline void XYZ(Arg_Vec3 in_vec);
 
 	// Equality
