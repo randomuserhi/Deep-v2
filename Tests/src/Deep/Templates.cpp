@@ -1,3 +1,4 @@
+#include "Deep/Containers/Tuple.h"
 #include "Tests.h"
 
 #include "Deep.h"
@@ -6,9 +7,7 @@
 
 template<typename... Specs>
 [[nodiscard]] constexpr auto ConstructAll(Specs&&... specs) {
-	static_assert((!std::is_lvalue_reference_v<Specs> && ...),
-	              "Constructor args must be consumed immediately (cannot exist as lvalue)");
-	return Deep::Tuple<typename std::remove_cvref_t<Specs>::Type...>{ std::forward<Specs>(specs).Construct()... };
+	return Deep::ConstructTuple(std::forward<Specs>(specs)...);
 }
 
 struct Widget {
