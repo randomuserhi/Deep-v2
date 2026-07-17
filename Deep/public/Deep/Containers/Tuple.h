@@ -79,25 +79,6 @@ template<typename F, typename TupleType, std::size_t... Is>
 constexpr inline decltype(auto) ApplyImpl(F&& in_function, TupleType&& in_tuple, std::index_sequence<Is...>) noexcept(
 	noexcept(std::invoke(std::forward<F>(in_function), std::forward<TupleType>(in_tuple).template Get<Is>()...)));
 
-#if __cplusplus >= 202002L
-template<typename T>
-using Unwrap = std::unwrap_ref_decay_t<T>;
-#else
-// Manual implementation of std::unwrap_ref_decay_t<T> for C++11/14/17
-template<typename T>
-struct UnwrapType {
-	using type = std::decay_t<T>;
-};
-
-template<typename T>
-struct UnwrapType<std::reference_wrapper<T>> {
-	using type = T&;
-};
-
-template<typename T>
-using Unwrap = typename UnwrapType<std::decay_t<T>>::type;
-#endif
-
 template<typename... Ts>
 struct Tuple : Detail::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...> {
 	using BaseType = typename Detail::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...>;

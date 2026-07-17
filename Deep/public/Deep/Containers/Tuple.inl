@@ -124,7 +124,7 @@ constexpr decltype(auto) Get(const Deep::Tuple<Ts...>&& in_tuple) {
 
 template<typename... Ts>
 constexpr auto MakeTuple(Ts&&... in_args) {
-	return Tuple<Deep::Detail::Unwrap<Ts>...>(std::forward<Ts>(in_args)...);
+	return Tuple<std::unwrap_ref_decay_t<Ts>...>(std::forward<Ts>(in_args)...);
 }
 
 template<typename... Ts>

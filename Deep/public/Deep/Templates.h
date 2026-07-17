@@ -19,19 +19,6 @@ struct IsConstructorArgs : std::false_type {};
 template<typename T, typename... Args>
 struct IsConstructorArgs<ConstructorArgs<T, Args...>> : std::true_type {};
 
-template<typename Original, typename Decayed = std::remove_cvref_t<Original>>
-struct ConstructorArgType {
-	using Type = Original;
-};
-
-template<typename Original, typename U>
-struct ConstructorArgType<Original, std::reference_wrapper<U>> {
-	using Type = U&;
-};
-
-template<typename T>
-using ResolveConstructorArgType = typename ConstructorArgType<T>::Type;
-
 } // namespace Detail
 
 template<typename T>
@@ -117,7 +104,7 @@ private:
 };
 
 template<typename T, typename... Args>
-[[nodiscard]] constexpr inline ConstructorArgs<T, Detail::ResolveConstructorArgType<Args>...> ConstructWith(Args&&... args);
+[[nodiscard]] constexpr inline ConstructorArgs<T, std::unwrap_reference_t<Args>...> ConstructWith(Args&&... args);
 
 DEEP_NAMESPACE_END
 

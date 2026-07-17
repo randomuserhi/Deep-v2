@@ -31,8 +31,8 @@ void ConstructorArgs<T, Args...>::ConstructImpl(T* in_destination, std::index_se
 }
 
 template<typename T, typename... Args>
-[[nodiscard]] constexpr inline ConstructorArgs<T, Detail::ResolveConstructorArgType<Args>...> ConstructWith(Args&&... args) {
-	return ConstructorArgs<T, Detail::ResolveConstructorArgType<Args>...>{ std::forward<Args>(args)... };
+[[nodiscard]] constexpr inline ConstructorArgs<T, std::unwrap_reference_t<Args>...> ConstructWith(Args&&... args) {
+	return ConstructorArgs<T, std::unwrap_reference_t<Args>...>{ std::forward<Args>(args)... };
 }
 
 DEEP_NAMESPACE_END
