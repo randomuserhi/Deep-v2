@@ -5,34 +5,39 @@
 
 DEEP_NAMESPACE_BEGIN
 
-template<typename T, typename... Args>
-[[nodiscard]] constexpr T
-ConstructorArgs<T, Args...>::Construct() && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
+#define CONSTRUCTOR_ARGS_TEMPLATE template<typename T, typename... Args>
+#define CONSTRUCTOR_ARGS ConstructorArgs<T, Args...>
+
+CONSTRUCTOR_ARGS_TEMPLATE
+[[nodiscard]] constexpr T CONSTRUCTOR_ARGS::Construct() && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
 	return std::move(*this).ConstructImpl(std::index_sequence_for<Args...>{});
 }
 
-template<typename T, typename... Args>
+CONSTRUCTOR_ARGS_TEMPLATE
 template<std::size_t... Is>
-constexpr T ConstructorArgs<T, Args...>::ConstructImpl(std::index_sequence<Is...>) && noexcept(
-	std::is_nothrow_constructible_v<T, Args&&...>) {
+constexpr T
+CONSTRUCTOR_ARGS::ConstructImpl(std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
 	return T(std::move(m_args).template Get<Is>()...);
 }
 
-template<typename T, typename... Args>
-void ConstructorArgs<T, Args...>::Construct(T* in_destination) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
+CONSTRUCTOR_ARGS_TEMPLATE
+void CONSTRUCTOR_ARGS::Construct(T* in_destination) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
 	std::move(*this).ConstructImpl(in_destination, std::index_sequence_for<Args...>{});
 }
 
-template<typename T, typename... Args>
+CONSTRUCTOR_ARGS_TEMPLATE
 template<std::size_t... Is>
-void ConstructorArgs<T, Args...>::ConstructImpl(T* in_destination, std::index_sequence<Is...>) && noexcept(
-	std::is_nothrow_constructible_v<T, Args&&...>) {
+void CONSTRUCTOR_ARGS::ConstructImpl(T* in_destination,
+                                     std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
 	::new (in_destination) T(std::move(m_args).template Get<Is>()...);
 }
 
-template<typename T, typename... Args>
+CONSTRUCTOR_ARGS_TEMPLATE
 [[nodiscard]] constexpr inline auto ConstructWith(Args&&... args) {
 	return ConstructorArgs<T, std::unwrap_reference_t<Args>...>{ std::forward<Args>(args)... };
 }
+
+#undef CONSTRUCTOR_ARGS_TEMPLATE
+#undef CONSTRUCTOR_ARGS
 
 DEEP_NAMESPACE_END

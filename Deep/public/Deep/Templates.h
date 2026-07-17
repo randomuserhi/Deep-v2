@@ -7,11 +7,10 @@
 
 DEEP_NAMESPACE_BEGIN
 
+// Tuple declaration
 namespace Detail {
-
 template<typename... Ts>
 struct Tuple;
-
 }
 
 template<typename T, typename... Args>
