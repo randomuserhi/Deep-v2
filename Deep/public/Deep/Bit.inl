@@ -4,6 +4,7 @@
 #include "Deep/Bit.h"
 
 #include <bit>
+#include <limits>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -48,6 +49,11 @@ inline bool IsAligned(T in_pointer, uint64 in_alignment) {
 template<typename T>
 constexpr inline int32 NumTrailingZeros(T in_value) {
 	return std::countr_zero<T>(in_value);
+}
+
+template<std::integral T>
+constexpr inline int32 NumBits() {
+	return std::numeric_limits<T>::digits;
 }
 
 inline uint32 RotateLeft(const uint32 in_value, const int32 in_offset) {

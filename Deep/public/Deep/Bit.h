@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 
-// TODO(randomuserhi): Create `Bit.inl` for consistency
+#include <concepts>
 
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
@@ -51,6 +51,9 @@ inline bool IsAligned(T in_pointer, uint64 in_alignment);
 // Compute number of trailing zero bits (how many low bits are zero)
 template<typename T>
 constexpr inline int32 NumTrailingZeros(T in_value);
+
+template<std::integral T>
+constexpr inline int32 NumBits();
 
 inline uint32 RotateLeft(const uint32 in_value, const int32 in_offset);
 inline uint32 RotateRight(const uint32 in_value, const int32 in_offset);
