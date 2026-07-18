@@ -1,0 +1,18 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "Tests",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/Tests/build/bin/",
+            "program": "${workspaceFolder}/Tests/build/bin/Tests.exe",
+            "symbolSearchPath": "${workspaceFolder}/Tests/build/bin/",
+            "externalConsole": true,
+            "logging": {
+                "moduleLoad": false,
+                "trace": true
+            }
+        }
+    ]
+}
