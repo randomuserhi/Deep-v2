@@ -14,6 +14,7 @@ TEST(SetBit, Archetype) {
 		};
 
 		using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+		static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 		Archetype arch{ 10 };
 		for (size_t i = 0; i < 10; ++i) {
@@ -50,6 +51,7 @@ TEST(SetBit, Archetype) {
 		};
 
 		using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+		static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 		size_t destructorCalls = 0;
 		{
@@ -80,6 +82,7 @@ TEST(SetBit, ArchetypeView) {
 	};
 
 	using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+	static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 	Archetype arch{ 10 };
 	for (size_t i = 0; i < 10; ++i) {
