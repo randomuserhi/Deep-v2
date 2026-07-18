@@ -13,18 +13,18 @@ DEEP_NAMESPACE_BEGIN
 
 namespace SetBit {
 
-#define ARCHETYPE_ITERATOR_TEMPLATE template<_Integer in_IterMask, typename... Components>
-#define ARCHETYPE_ITERATOR ArchetypeIterator<in_IterMask, Components...>
+#define ARCHETYPE_ITERATOR_TEMPLATE template<c_BitMask in_BitMask, typename... Components>
+#define ARCHETYPE_ITERATOR ArchetypeIterator<in_BitMask, Components...>
 
 ARCHETYPE_ITERATOR_TEMPLATE
-ARCHETYPE_ITERATOR::ArchetypeIterator(IterMask in_mask, Components*... in_components) :
+ARCHETYPE_ITERATOR::ArchetypeIterator(BitMask in_mask, Components*... in_components) :
 	m_remaining{ in_mask }, m_components{ in_components... } {}
 
 ARCHETYPE_ITERATOR_TEMPLATE
 template<std::size_t... Is>
 ARCHETYPE_ITERATOR::reference ARCHETYPE_ITERATOR::Deref(std::index_sequence<Is...>) const {
-	Deep_Assert(m_remaining != 0, "End of iterator.");
-	return reference{ Get<Is>(m_components)[CountTrailingZeros(m_remaining)]... };
+	Deep_Assert(*this != Sentinel{}, "End of iterator.");
+	return reference{ Get<Is>(m_components)[m_remaining.IndexOfLowestSetBit()]... };
 }
 
 ARCHETYPE_ITERATOR_TEMPLATE
@@ -34,40 +34,40 @@ ARCHETYPE_ITERATOR::reference ARCHETYPE_ITERATOR::operator*() const {
 
 ARCHETYPE_ITERATOR_TEMPLATE
 bool ARCHETYPE_ITERATOR::operator==(Sentinel) const {
-	return m_remaining == 0;
+	return !m_remaining.Any();
 }
 
 ARCHETYPE_ITERATOR_TEMPLATE
 bool ARCHETYPE_ITERATOR::operator!=(Sentinel) const {
-	return m_remaining != 0;
+	return m_remaining.Any();
 }
 
 ARCHETYPE_ITERATOR_TEMPLATE
 ARCHETYPE_ITERATOR& ARCHETYPE_ITERATOR::operator++() {
-	Deep_Assert(m_remaining != 0, "End of iterator.");
-	m_remaining &= m_remaining - 1;
+	Deep_Assert(*this != Sentinel{}, "End of iterator.");
+	m_remaining.PopLowestSetBit();
 	return *this;
 }
 
 #undef ARCHETYPE_ITERATOR_TEMPLATE
 #undef ARCHETYPE_ITERATOR
 
-#define ARCHETYPE_VIEW_TEMPLATE template<_Integer in_IterMask, typename... Components>
-#define ARCHETYPE_VIEW ArchetypeView<in_IterMask, Components...>
+#define ARCHETYPE_VIEW_TEMPLATE template<c_BitMask in_BitMask, typename... Components>
+#define ARCHETYPE_VIEW ArchetypeView<in_BitMask, Components...>
 
 ARCHETYPE_VIEW_TEMPLATE
-ARCHETYPE_VIEW::ArchetypeView(IterMask in_activeMask, Components*... in_components) :
+ARCHETYPE_VIEW::ArchetypeView(BitMask in_activeMask, Components*... in_components) :
 	m_activeMask{ in_activeMask }, m_components{ in_components... } {}
 
 ARCHETYPE_VIEW_TEMPLATE
 template<std::size_t... Is>
-ArchetypeIterator<typename ARCHETYPE_VIEW::IterMask, Components...>
+ArchetypeIterator<typename ARCHETYPE_VIEW::BitMask, Components...>
 ARCHETYPE_VIEW::CreateIterator(std::index_sequence<Is...>) const {
-	return ArchetypeIterator<IterMask, Components...>{ m_activeMask, Get<Is>(m_components)... };
+	return ArchetypeIterator<BitMask, Components...>{ m_activeMask, Get<Is>(m_components)... };
 }
 
 ARCHETYPE_VIEW_TEMPLATE
-ArchetypeIterator<typename ARCHETYPE_VIEW::IterMask, Components...> ARCHETYPE_VIEW::begin() const {
+ArchetypeIterator<typename ARCHETYPE_VIEW::BitMask, Components...> ARCHETYPE_VIEW::begin() const {
 	return CreateIterator(std::index_sequence_for<Components...>{});
 }
 
@@ -89,8 +89,8 @@ T* impl_Archetype::ComponentStorage<T>::Get() {
 	return m_data;
 }
 
-#define FIXED_SIZE_ARCHETYPE_TEMPLATE template<_Integer in_IterMask, typename... Components>
-#define FIXED_SIZE_ARCHETYPE FixedSizeArchetype<in_IterMask, Components...>
+#define FIXED_SIZE_ARCHETYPE_TEMPLATE template<c_BitMask in_BitMask, typename... Components>
+#define FIXED_SIZE_ARCHETYPE FixedSizeArchetype<in_BitMask, Components...>
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
@@ -130,10 +130,9 @@ FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(const FixedSizeArchetype& in_other) :
 	(AllocateComponent<Components>(m_capacity), ...);
 
 	// Copy active entities
-	IterMask remaining = in_other.m_activeMask;
-	while (remaining != 0) {
-		const int32 index = CountTrailingZeros(remaining);
-		remaining &= remaining - 1;
+	BitMask remaining = in_other.m_activeMask;
+	while (remaining.Any()) {
+		const int32 index = remaining.PopLowestSetBit();
 
 		// Construct components using copy constructor
 		ConstructEntity(index, ConstructWith<Components>(in_other.GetComponent<Components>(index))...);
@@ -157,10 +156,9 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeArchetype& 
 
 	// Destruct current entities
 	{
-		IterMask remaining = m_activeMask;
-		while (remaining != 0) {
-			const int32 index = CountTrailingZeros(remaining);
-			remaining &= remaining - 1;
+		BitMask remaining = m_activeMask;
+		while (remaining.Any()) {
+			const int32 index = remaining.PopLowestSetBit();
 
 			DestructEntity(index);
 		}
@@ -174,10 +172,9 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeArchetype& 
 
 	// Copy active entities
 	{
-		IterMask remaining = in_other.m_activeMask;
-		while (remaining != 0) {
-			const int32 index = CountTrailingZeros(remaining);
-			remaining &= remaining - 1;
+		BitMask remaining = in_other.m_activeMask;
+		while (remaining.Any()) {
+			const int32 index = remaining.PopLowestSetBit();
 
 			// Construct components using copy constructor
 			ConstructEntity(index, ConstructWith<Components>(in_other.GetComponent<Components>(index))...);
@@ -193,10 +190,9 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeArchetype&& in_ot
 
 	// Destruct current entities
 	{
-		IterMask remaining = m_activeMask;
-		while (remaining != 0) {
-			const int32 index = CountTrailingZeros(remaining);
-			remaining &= remaining - 1;
+		BitMask remaining = m_activeMask;
+		while (remaining.Any()) {
+			const int32 index = remaining.PopLowestSetBit();
 
 			DestructEntity(index);
 		}
@@ -218,10 +214,9 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeArchetype&& in_ot
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE FIXED_SIZE_ARCHETYPE::~FixedSizeArchetype() {
-	IterMask remaining = m_activeMask;
-	while (remaining != 0) {
-		const int32 index = CountTrailingZeros(remaining);
-		remaining &= remaining - 1;
+	BitMask remaining = m_activeMask;
+	while (remaining.Any()) {
+		const int32 index = remaining.PopLowestSetBit();
 
 		DestructEntity(index);
 	}
@@ -255,7 +250,7 @@ constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponentImpl(TaggedArg&& i
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T, _ConstructorArgs... TaggedArgs>
-constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponent(IndexType in_index, TaggedArgs&&... in_componentArgs) {
+constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponent(size_t in_index, TaggedArgs&&... in_componentArgs) {
 	T* ptr = GetComponentPtr<T>() + in_index;
 
 	constexpr size_t occurences = CountConstructorArgs<T, TaggedArgs...>();
@@ -271,7 +266,7 @@ constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponent(IndexType in_inde
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
-inline void FIXED_SIZE_ARCHETYPE::DestructComponent(IndexType in_index) {
+inline void FIXED_SIZE_ARCHETYPE::DestructComponent(size_t in_index) {
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		GetComponentPtr<T>()[in_index].~T();
 	}
@@ -279,7 +274,7 @@ inline void FIXED_SIZE_ARCHETYPE::DestructComponent(IndexType in_index) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<_ConstructorArgs... TaggedArgs>
-void FIXED_SIZE_ARCHETYPE::ConstructEntity(IndexType in_index, TaggedArgs&&... in_componentArgs) {
+void FIXED_SIZE_ARCHETYPE::ConstructEntity(size_t in_index, TaggedArgs&&... in_componentArgs) {
 	static_assert((s_validComponent<typename std::decay_t<TaggedArgs>::Type> && ...),
 	              "Archetype must contain all components that the given constructor args specify.");
 
@@ -287,34 +282,32 @@ void FIXED_SIZE_ARCHETYPE::ConstructEntity(IndexType in_index, TaggedArgs&&... i
 	Deep_Assert(!IsActive(in_index), "An entity is already constructed here.");
 
 	// Mark entity as active
-	m_activeMask |= IterMask{ 1 } << in_index;
+	m_activeMask.Set(in_index, true);
 
 	// Construct components
 	(ConstructComponent<Components, TaggedArgs...>(in_index, std::forward<TaggedArgs>(in_componentArgs)...), ...);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-void FIXED_SIZE_ARCHETYPE::DestructEntity(IndexType in_index) {
+void FIXED_SIZE_ARCHETYPE::DestructEntity(size_t in_index) {
 	Deep_Assert(in_index < m_capacity, "Invalid index.");
 	Deep_Assert(IsActive(in_index), "Cannot destruct an entity that has not been constructed yet.");
 
 	// Mark entity as inactive
-	m_activeMask &= ~(IterMask{ 1 } << in_index);
+	m_activeMask.Set(in_index, false);
 
 	// Destruct components
 	(DestructComponent<Components>(in_index), ...);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-bool FIXED_SIZE_ARCHETYPE::IsActive(IndexType in_index) const {
-	Deep_Assert(in_index < m_capacity, "Invalid index.");
-	IterMask flag = IterMask{ 1 } << in_index;
-	return (m_activeMask & flag) != 0;
+bool FIXED_SIZE_ARCHETYPE::IsActive(size_t in_index) const {
+	return m_activeMask[in_index];
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 size_t FIXED_SIZE_ARCHETYPE::Size() const {
-	return CountSetBits(m_activeMask);
+	return m_activeMask.NumSetBits();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -323,7 +316,7 @@ const size_t& FIXED_SIZE_ARCHETYPE::m_Capacity() const {
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE template<typename T>
-const T& FIXED_SIZE_ARCHETYPE::GetComponent(IndexType in_index) const {
+const T& FIXED_SIZE_ARCHETYPE::GetComponent(size_t in_index) const {
 	static_assert(s_validComponent<T>, "Archetype must contain component 'T'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
@@ -332,7 +325,7 @@ const T& FIXED_SIZE_ARCHETYPE::GetComponent(IndexType in_index) const {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
-T& FIXED_SIZE_ARCHETYPE::GetComponent(IndexType in_index) {
+T& FIXED_SIZE_ARCHETYPE::GetComponent(size_t in_index) {
 	static_assert(s_validComponent<T>, "Archetype must contain component 'T'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
@@ -341,7 +334,7 @@ T& FIXED_SIZE_ARCHETYPE::GetComponent(IndexType in_index) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-Tuple<const Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(IndexType in_index) const {
+Tuple<const Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(size_t in_index) const {
 	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
@@ -350,7 +343,7 @@ Tuple<const Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(IndexType in_index) cons
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(IndexType in_index) {
+Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(size_t in_index) {
 	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
@@ -359,34 +352,34 @@ Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(IndexType in_index) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-ArchetypeView<typename FIXED_SIZE_ARCHETYPE::IterMask, Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) {
+ArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
-	return ArchetypeView<IterMask, Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	return ArchetypeView<BitMask, Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-ArchetypeView<typename FIXED_SIZE_ARCHETYPE::IterMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) const {
+ArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) const {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
 	//                     version.
 	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
-	return ArchetypeView<IterMask, const Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	return ArchetypeView<BitMask, const Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::IterMask, Components...> FIXED_SIZE_ARCHETYPE::begin() {
-	return ArchetypeIterator<IterMask, Components...>{ m_activeMask, GetComponentPtr<Components>()... };
+ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::BitMask, Components...> FIXED_SIZE_ARCHETYPE::begin() {
+	return ArchetypeIterator<BitMask, Components...>{ m_activeMask, GetComponentPtr<Components>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::IterMask, const Components...> FIXED_SIZE_ARCHETYPE::begin() const {
-	return ArchetypeIterator<IterMask, const Components...>{ m_activeMask, GetComponentPtr<Components>()... };
+ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::BitMask, const Components...> FIXED_SIZE_ARCHETYPE::begin() const {
+	return ArchetypeIterator<BitMask, const Components...>{ m_activeMask, GetComponentPtr<Components>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE

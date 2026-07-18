@@ -7,6 +7,9 @@
 DEEP_NAMESPACE_BEGIN
 
 template<typename T>
-concept _Integer = std::integral<T> && !std::same_as<T, bool>;
+concept c_Integer = std::integral<T> && !std::same_as<T, bool>;
+
+template<typename T>
+concept c_UnsignedInteger = std::unsigned_integral<T>;
 
 DEEP_NAMESPACE_END

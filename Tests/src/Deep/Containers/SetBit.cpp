@@ -2,6 +2,7 @@
 
 #define DEEP_TESTABLE
 #include "Deep.h"
+#include "Deep/Bit/IntegerBitMask.h"
 #include "Deep/Containers/SetBit.h"
 
 TEST(SetBit, Archetype) {
@@ -13,7 +14,7 @@ TEST(SetBit, Archetype) {
 			int32 m_value;
 		};
 
-		using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+		using Archetype = Deep::SetBit::FixedSizeArchetype<Deep::IntegerBitMask<uint16>, A, B>;
 		static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 		Archetype arch{ 10 };
@@ -50,7 +51,7 @@ TEST(SetBit, Archetype) {
 			int32 m_value;
 		};
 
-		using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+		using Archetype = Deep::SetBit::FixedSizeArchetype<Deep::IntegerBitMask<uint16>, A, B>;
 		static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 		size_t destructorCalls = 0;
@@ -81,7 +82,7 @@ TEST(SetBit, ArchetypeView) {
 		int32 m_value;
 	};
 
-	using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+	using Archetype = Deep::SetBit::FixedSizeArchetype<Deep::IntegerBitMask<uint16>, A, B>;
 	static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 	Archetype arch{ 10 };
@@ -126,7 +127,7 @@ TEST(SetBit, Copy) {
 		int32 m_value;
 	};
 
-	using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+	using Archetype = Deep::SetBit::FixedSizeArchetype<Deep::IntegerBitMask<uint16>, A, B>;
 	static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 	auto isComponentPtrEq = []<typename T>(Archetype& in_a, Archetype& in_b) {
@@ -214,7 +215,7 @@ TEST(SetBit, Move) {
 		int32 m_value;
 	};
 
-	using Archetype = Deep::SetBit::FixedSizeArchetype<uint16, A, B>;
+	using Archetype = Deep::SetBit::FixedSizeArchetype<Deep::IntegerBitMask<uint16>, A, B>;
 	static_assert(Archetype::k_maxCapacity == 16, "With a `uint16` mask, only 16 items can be made max.");
 
 	auto isComponentNullPtr = []<typename T>(Archetype& in_arch) {

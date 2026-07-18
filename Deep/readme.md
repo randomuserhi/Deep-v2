@@ -25,7 +25,7 @@ cmake --build build
 - `in_camelCase` for in arguments
 - `out_camelCase` for out arguments
 - `io_camelCase` for in-out arguments
-- `_CamelCase` for concepts
+- `c_CamelCase` for concepts
 - `CamelCase` for namespaces
 - `impl_CamelCase` for implementation specific namespaces often used to hide implementation specific templates used in meta-programming.
 
