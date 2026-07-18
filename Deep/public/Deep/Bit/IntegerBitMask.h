@@ -44,6 +44,10 @@ concept c_BitMask = std::copyable<T> && requires(T a, const T ca, std::size_t i,
 	{ ca | ca } -> std::same_as<T>;
 	{ a &= ca } -> std::same_as<T&>;
 	{ ca & ca } -> std::same_as<T>;
+
+	// Not operator
+	{ a.Inverse() } -> std::same_as<void>;
+	{ ~ca } -> std::same_as<T>;
 };
 
 template<c_UnsignedInteger T>
@@ -57,6 +61,9 @@ constexpr Deep_ForceInline IntegerBitMask<T> operator|(IntegerBitMask<T>, Arg_In
 
 template<c_UnsignedInteger T>
 constexpr Deep_ForceInline IntegerBitMask<T> operator&(IntegerBitMask<T>, Arg_IntegerBitMask<T>);
+
+template<c_UnsignedInteger T>
+constexpr Deep_ForceInline IntegerBitMask<T> operator~(IntegerBitMask<T>);
 
 template<c_UnsignedInteger T>
 constexpr Deep_ForceInline bool operator==(Arg_IntegerBitMask<T>, Arg_IntegerBitMask<T>);
@@ -77,6 +84,8 @@ public:
 
 	constexpr Deep_ForceInline void Set(size_t in_index, bool in_value);
 
+	constexpr Deep_ForceInline void Inverse();
+
 	constexpr Deep_ForceInline size_t IndexOfLowestSetBit() const;
 
 	constexpr Deep_ForceInline size_t PopLowestSetBit();
@@ -88,6 +97,8 @@ public:
 
 	constexpr Deep_ForceInline IntegerBitMask& operator&=(Arg_IntegerBitMask<T> in_other);
 	friend constexpr Deep_ForceInline IntegerBitMask operator& <>(IntegerBitMask, Arg_IntegerBitMask<T>);
+
+	friend constexpr Deep_ForceInline IntegerBitMask operator~ <>(IntegerBitMask);
 
 	//
 

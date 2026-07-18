@@ -40,6 +40,11 @@ constexpr void INTEGER_BITMASK::Set(size_t in_index, bool in_value) {
 }
 
 INTEGER_BITMASK_TEMPLATE
+constexpr void INTEGER_BITMASK::Inverse() {
+	m_bits = ~m_bits;
+}
+
+INTEGER_BITMASK_TEMPLATE
 constexpr size_t INTEGER_BITMASK::IndexOfLowestSetBit() const {
 	Deep_Assert(Any(), "No bits are set, cannot get lowest set bit.");
 
@@ -71,6 +76,12 @@ constexpr INTEGER_BITMASK& INTEGER_BITMASK::operator&=(Arg_IntegerBitMask<T> in_
 INTEGER_BITMASK_TEMPLATE
 constexpr Deep_ForceInline INTEGER_BITMASK operator&(INTEGER_BITMASK in_a, Arg_IntegerBitMask<T> in_b) {
 	return in_a &= in_b;
+}
+
+INTEGER_BITMASK_TEMPLATE
+constexpr Deep_ForceInline INTEGER_BITMASK operator~(INTEGER_BITMASK in_a) {
+	in_a.Inverse();
+	return in_a;
 }
 
 INTEGER_BITMASK_TEMPLATE
