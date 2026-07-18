@@ -13,8 +13,8 @@ DEEP_NAMESPACE_BEGIN
 
 namespace SetBit {
 
-#define ARCHETYPE_ITERATOR_TEMPLATE template<_Integer IterMask, typename... Components>
-#define ARCHETYPE_ITERATOR ArchetypeIterator<IterMask, Components...>
+#define ARCHETYPE_ITERATOR_TEMPLATE template<_Integer in_IterMask, typename... Components>
+#define ARCHETYPE_ITERATOR ArchetypeIterator<in_IterMask, Components...>
 
 ARCHETYPE_ITERATOR_TEMPLATE
 ARCHETYPE_ITERATOR::ArchetypeIterator(IterMask in_mask, Components*... in_components) :
@@ -56,8 +56,8 @@ ARCHETYPE_ITERATOR& ARCHETYPE_ITERATOR::operator++() {
 #undef ARCHETYPE_ITERATOR_TEMPLATE
 #undef ARCHETYPE_ITERATOR
 
-#define ARCHETYPE_VIEW_TEMPLATE template<_Integer IterMask, typename... Components>
-#define ARCHETYPE_VIEW ArchetypeView<IterMask, Components...>
+#define ARCHETYPE_VIEW_TEMPLATE template<_Integer in_IterMask, typename... Components>
+#define ARCHETYPE_VIEW ArchetypeView<in_IterMask, Components...>
 
 ARCHETYPE_VIEW_TEMPLATE
 ARCHETYPE_VIEW::ArchetypeView(IterMask in_mask, Components*... in_components) :
@@ -65,12 +65,13 @@ ARCHETYPE_VIEW::ArchetypeView(IterMask in_mask, Components*... in_components) :
 
 ARCHETYPE_VIEW_TEMPLATE
 template<std::size_t... Is>
-ArchetypeIterator<IterMask, Components...> ARCHETYPE_VIEW::CreateIterator(std::index_sequence<Is...>) const {
+ArchetypeIterator<typename ARCHETYPE_VIEW::IterMask, Components...>
+ARCHETYPE_VIEW::CreateIterator(std::index_sequence<Is...>) const {
 	return ArchetypeIterator<IterMask, Components...>{ m_mask, Get<Is>(m_components)... };
 }
 
 ARCHETYPE_VIEW_TEMPLATE
-ArchetypeIterator<IterMask, Components...> ARCHETYPE_VIEW::begin() const {
+ArchetypeIterator<typename ARCHETYPE_VIEW::IterMask, Components...> ARCHETYPE_VIEW::begin() const {
 	return CreateIterator(std::index_sequence_for<Components...>{});
 }
 
@@ -92,8 +93,8 @@ T* ComponentStorage<T>::Get() {
 	return m_data;
 }
 
-#define FIXED_SIZE_ARCHETYPE_TEMPLATE template<_Integer IterMask, typename... Components>
-#define FIXED_SIZE_ARCHETYPE FixedSizeArchetype<IterMask, Components...>
+#define FIXED_SIZE_ARCHETYPE_TEMPLATE template<_Integer in_IterMask, typename... Components>
+#define FIXED_SIZE_ARCHETYPE FixedSizeArchetype<in_IterMask, Components...>
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
@@ -252,7 +253,7 @@ Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(IndexType in_index) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-ArchetypeView<IterMask, Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) {
+ArchetypeView<typename FIXED_SIZE_ARCHETYPE::IterMask, Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
@@ -262,7 +263,7 @@ ArchetypeView<IterMask, Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-ArchetypeView<IterMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) const {
+ArchetypeView<typename FIXED_SIZE_ARCHETYPE::IterMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) const {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent.
@@ -272,12 +273,12 @@ ArchetypeView<IterMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-ArchetypeIterator<IterMask, Components...> FIXED_SIZE_ARCHETYPE::begin() {
+ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::IterMask, Components...> FIXED_SIZE_ARCHETYPE::begin() {
 	return ArchetypeIterator<IterMask, Components...>{ m_activeMask, GetComponentPtr<Components>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-ArchetypeIterator<IterMask, const Components...> FIXED_SIZE_ARCHETYPE::begin() const {
+ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::IterMask, const Components...> FIXED_SIZE_ARCHETYPE::begin() const {
 	return ArchetypeIterator<IterMask, const Components...>{ m_activeMask, GetComponentPtr<Components>()... };
 }
 

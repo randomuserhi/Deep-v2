@@ -11,9 +11,11 @@ DEEP_NAMESPACE_BEGIN
 
 namespace SetBit {
 
-template<_Integer IterMask, typename... Components>
+template<_Integer in_IterMask, typename... Components>
 class ArchetypeIterator {
 public:
+	using IterMask = in_IterMask;
+
 	using reference = Tuple<Components&...>;
 	using iterator_category = std::forward_iterator_tag;
 
@@ -40,8 +42,11 @@ private:
 	Tuple<Components*...> m_components;
 };
 
-template<_Integer IterMask, typename... Components>
+template<_Integer in_IterMask, typename... Components>
 class ArchetypeView {
+public:
+	using IterMask = in_IterMask;
+
 public:
 	inline ArchetypeView(IterMask in_mask, Components*... in_components);
 
@@ -70,12 +75,14 @@ struct ComponentStorage {
 	inline T* Get();
 };
 
-template<_Integer IterMask, typename... Components>
+template<_Integer in_IterMask, typename... Components>
 class FixedSizeArchetype : private ComponentStorage<Components>... {
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
 	              "Components must be non-volatile and non-const value types.");
 
 public:
+	using IterMask = in_IterMask;
+
 	// NOTE(randomuserhi): Since bit masks are stuck to integer types, on traditional systems, the max id is 64
 	//                     `uint8` can store up to 256 indices which is more than enough.
 	using IndexType = uint8;
