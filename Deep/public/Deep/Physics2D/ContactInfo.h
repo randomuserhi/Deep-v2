@@ -6,7 +6,7 @@
 DEEP_NAMESPACE_BEGIN
 
 struct ContactInfo {
-	Deep::Vec2 m_normal;
+	Vec2 m_normal;
 	float32 m_penetrationDistance;
 };
 
