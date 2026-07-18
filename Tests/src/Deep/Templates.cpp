@@ -1,9 +1,9 @@
-#include "Deep/Containers/Tuple.h"
 #include "Tests.h"
 
 #include "Deep.h"
 #include "Deep/Memory.h"
 #include "Deep/Templates.h"
+#include "Deep/Containers/Tuple.h"
 
 template<typename... Specs>
 [[nodiscard]] constexpr auto ConstructAll(Specs&&... specs) {
@@ -41,6 +41,16 @@ TEST(Templates, ConstructAll) {
 
 TEST(Templates, Construct) {
 	TEST_CASE(Default) {
+		struct A {
+			int32 m_value;
+		};
+
+		A a = Deep::ConstructWith<A>(42).Construct();
+
+		EXPECT_EQ(a.m_value, 42);
+	}
+
+	TEST_CASE(Explicit) {
 		const char* str = "Main";
 		auto widget = Deep::ConstructWith<Widget>(42, str).Construct();
 

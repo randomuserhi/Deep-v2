@@ -174,3 +174,17 @@ TEST(Tuple, NonTrivial) {
 	}
 	EXPECT_EQ(destructorCount, 2); // Destruction of tuple
 }
+
+TEST(Tuple, Equality) {
+	{
+		Deep::Tuple<int, int> a{ 42, 32 };
+		Deep::Tuple<long, int> b{ 42L, 32 };
+		EXPECT_EQ(a, b);
+	}
+
+	{
+		Deep::Tuple<int, int> a{ 12, 5 };
+		Deep::Tuple<int, int> b{ 12, 32 };
+		EXPECT_NE(a, b);
+	}
+}
