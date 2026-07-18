@@ -60,14 +60,14 @@ ARCHETYPE_ITERATOR& ARCHETYPE_ITERATOR::operator++() {
 #define ARCHETYPE_VIEW ArchetypeView<in_IterMask, Components...>
 
 ARCHETYPE_VIEW_TEMPLATE
-ARCHETYPE_VIEW::ArchetypeView(IterMask in_mask, Components*... in_components) :
-	m_mask{ in_mask }, m_components{ in_components... } {}
+ARCHETYPE_VIEW::ArchetypeView(IterMask in_activeMask, Components*... in_components) :
+	m_activeMask{ in_activeMask }, m_components{ in_components... } {}
 
 ARCHETYPE_VIEW_TEMPLATE
 template<std::size_t... Is>
 ArchetypeIterator<typename ARCHETYPE_VIEW::IterMask, Components...>
 ARCHETYPE_VIEW::CreateIterator(std::index_sequence<Is...>) const {
-	return ArchetypeIterator<IterMask, Components...>{ m_mask, Get<Is>(m_components)... };
+	return ArchetypeIterator<IterMask, Components...>{ m_activeMask, Get<Is>(m_components)... };
 }
 
 ARCHETYPE_VIEW_TEMPLATE
@@ -84,12 +84,12 @@ Sentinel ARCHETYPE_VIEW::end() const {
 #undef ARCHETYPE_VIEW
 
 template<typename T>
-const T* ComponentStorage<T>::Get() const {
+const T* impl_Archetype::ComponentStorage<T>::Get() const {
 	return m_data;
 }
 
 template<typename T>
-T* ComponentStorage<T>::Get() {
+T* impl_Archetype::ComponentStorage<T>::Get() {
 	return m_data;
 }
 
@@ -99,13 +99,13 @@ T* ComponentStorage<T>::Get() {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::AllocateComponent(size_t in_size) {
-	static_cast<ComponentStorage<T>&>(*this).m_data = TMalloc<T>(in_size);
+	static_cast<impl_Archetype::ComponentStorage<T>&>(*this).m_data = TMalloc<T>(in_size);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::DeallocateComponent() {
-	TFree<T>(static_cast<ComponentStorage<T>&>(*this).m_data);
+	TFree<T>(static_cast<impl_Archetype::ComponentStorage<T>&>(*this).m_data);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -134,14 +134,14 @@ FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 const T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() const {
 	static_assert(s_validComponent<T>, "Component type not in archetype");
-	return static_cast<const ComponentStorage<T>&>(*this).Get();
+	return static_cast<const impl_Archetype::ComponentStorage<T>&>(*this).Get();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() {
 	static_assert(s_validComponent<T>, "Component type not in archetype");
-	return static_cast<ComponentStorage<T>&>(*this).Get();
+	return static_cast<impl_Archetype::ComponentStorage<T>&>(*this).Get();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE

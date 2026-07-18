@@ -11,6 +11,8 @@ DEEP_NAMESPACE_BEGIN
 
 namespace SetBit {
 
+// Iterator for set-bit archetypes.
+// Uses a bitmask to skip over entities via set-bit iteration, allowing for fast sparse iteration over small blocks.
 template<_Integer in_IterMask, typename... Components>
 class ArchetypeIterator {
 public:
@@ -42,13 +44,19 @@ private:
 	Tuple<Components*...> m_components;
 };
 
+// View for set-bit archetypes.
+// Represents a view of a subset of components of an archetype.
+//
+// Can also be constructed to treat a set of buffers as an archetype view.
+//
+// The mask represents the currently active members of the archetype view.
 template<_Integer in_IterMask, typename... Components>
 class ArchetypeView {
 public:
 	using IterMask = in_IterMask;
 
 public:
-	inline ArchetypeView(IterMask in_mask, Components*... in_components);
+	inline ArchetypeView(IterMask in_activeMask, Components*... in_components);
 
 	inline ArchetypeIterator<IterMask, Components...> begin() const;
 	inline Sentinel end() const;
@@ -62,11 +70,13 @@ private:
 
 	//
 
-	IterMask m_mask;
+	IterMask m_activeMask;
 	Tuple<Components*...> m_components;
 };
 
-// Helper class to produce inheritance chain in archetype template:
+namespace impl_Archetype {
+
+// Utility object to generate inheritance chain for archetype storage
 template<typename T>
 struct ComponentStorage {
 	T* m_data = nullptr;
@@ -75,8 +85,33 @@ struct ComponentStorage {
 	inline T* Get();
 };
 
+} // namespace impl_Archetype
+
+// Set-bit variant of the Archetype container.
+//
+// Stores components as a Structure-Of-Arrays (SoA) where access is performed via set-bit iteration.
+//
+// Set-bit iteration is where items are iterated via a mask such as 0b1011. This iterates the first 2 elements, skips 1 and
+// then the last element. As it uses bit masks, these containers are inherently designed for small blocks. For varying
+// block sizes, you can specify a smaller mask type such as `uint16` for 16 items, `uint32` for 32 items or `uint64` for 64
+// items.
+//
+// The container maintains a mask for active (constructed) entities which is considered by default during iteration, make
+// sure to construct all entities via `ConstructEntity` before using them.
+//
+// The use of masks is helpful as it allows easy combining to iterate mixtures of entities:
+//
+// ```cpp
+// IterMask stunned = 0b1001;
+// IterMask airborne = 0b0010;
+// IterMask canMove = ~(stunned | airborne);
+//
+// for (auto [transform] : archetype.View<Transform>(canMove)) {
+//   // Iterate the transforms of all entities that can move
+// }
+// ```
 template<_Integer in_IterMask, typename... Components>
-class FixedSizeArchetype : private ComponentStorage<Components>... {
+class FixedSizeArchetype : private impl_Archetype::ComponentStorage<Components>... {
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
 	              "Components must be non-volatile and non-const value types.");
 
@@ -103,7 +138,10 @@ public:
 
 	//
 
+	// Checks if the given item at `in_index` is active (has been constructed)
 	inline bool IsActive(IndexType in_index) const;
+
+	// Get the number of active (constructed) items
 	inline size_t Size() const;
 
 	// Get component of an entity
@@ -118,11 +156,11 @@ public:
 	template<typename... Ts>
 	inline Tuple<Ts&...> GetComponents(IndexType in_index);
 
-	// Construct an entity at the given index position.
+	// Construct an entity at the given index position
 	template<_ConstructorArgs... TaggedArgs>
 	inline void ConstructEntity(IndexType in_index, TaggedArgs&&... in_componentArgs);
 
-	// Destruct an entity at the given index position.
+	// Destruct an entity at the given index position
 	inline void DestructEntity(IndexType in_index);
 
 	// Iterate entity components.
@@ -138,11 +176,6 @@ public:
 	inline ArchetypeIterator<IterMask, Components...> begin();
 	inline ArchetypeIterator<IterMask, const Components...> begin() const;
 	inline Sentinel end() const;
-
-	//
-
-	template<typename T>
-	constexpr static bool s_validComponent = (std::is_same_v<T, Components> || ...);
 
 	//
 
@@ -193,10 +226,16 @@ private:
 
 	//
 
+	template<typename T>
+	constexpr static bool s_validComponent = (std::is_same_v<T, Components> || ...);
+
+	//
+
 	// Bitmask for which entities have been constructed via `ConstructEntity`.
 	// Its undefined behaviour access entities that have not been constructed.
 	IterMask m_activeMask;
 
+	// The maximum number of entities the archetype can store.
 	size_t m_capacity;
 };
 
