@@ -105,9 +105,9 @@ struct ComponentStorage {
 // The use of masks is helpful as it allows easy combining to iterate mixtures of entities:
 //
 // ```cpp
-// IterMask stunned = 0b1001;
-// IterMask airborne = 0b0010;
-// IterMask canMove = ~(stunned | airborne);
+// BitMask stunned = 0b1001;
+// BitMask airborne = 0b0010;
+// BitMask canMove = ~(stunned | airborne);
 //
 // for (auto [transform] : archetype.View<Transform>(canMove)) {
 //   // Iterate the transforms of all entities that can move
