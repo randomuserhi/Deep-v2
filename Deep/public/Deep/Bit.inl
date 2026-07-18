@@ -47,8 +47,13 @@ inline bool IsAligned(T in_pointer, uint64 in_alignment) {
 }
 
 template<typename T>
-constexpr inline int32 NumTrailingZeros(T in_value) {
+constexpr inline int32 CountTrailingZeros(T in_value) {
 	return std::countr_zero<T>(in_value);
+}
+
+template<typename T>
+constexpr inline int32 CountSetBits(T in_value) {
+	return std::popcount<T>(in_value);
 }
 
 template<std::integral T>
