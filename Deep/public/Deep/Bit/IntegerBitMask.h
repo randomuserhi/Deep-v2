@@ -105,6 +105,8 @@ public:
 	constexpr static size_t k_maxNumBits = Deep::NumBits<T>();
 
 private:
+	DEEP_PRIVATE_TESTABLE
+
 	T m_bits;
 };
 
