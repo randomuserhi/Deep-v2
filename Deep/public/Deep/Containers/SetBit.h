@@ -71,7 +71,7 @@ struct ComponentStorage {
 };
 
 template<_Integer IterMask, typename... Components>
-class FixedSizeArchetype final : private ComponentStorage<Components>... {
+class FixedSizeArchetype : private ComponentStorage<Components>... {
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
 	              "Components must be non-volatile and non-const value types.");
 
