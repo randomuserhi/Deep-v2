@@ -145,6 +145,9 @@ public:
 	// Get the number of active (constructed) items
 	inline size_t Size() const;
 
+	// Get the max number of entities
+	inline const size_t& m_Capacity() const;
+
 	// Get component of an entity
 	template<typename T>
 	inline const T& GetComponent(IndexType in_index) const;

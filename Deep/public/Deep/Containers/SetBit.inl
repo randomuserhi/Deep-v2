@@ -216,6 +216,11 @@ size_t FIXED_SIZE_ARCHETYPE::Size() const {
 	return CountSetBits(m_activeMask);
 }
 
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+const size_t& FIXED_SIZE_ARCHETYPE::m_Capacity() const {
+	return m_capacity;
+}
+
 FIXED_SIZE_ARCHETYPE_TEMPLATE template<typename T>
 const T& FIXED_SIZE_ARCHETYPE::GetComponent(IndexType in_index) const {
 	static_assert(s_validComponent<T>, "Archetype must contain component 'T'.");
