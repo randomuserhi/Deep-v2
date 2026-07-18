@@ -4,89 +4,193 @@
 #include "Deep/Bit.h"
 #include "Deep/Concepts.h"
 #include "Deep/Templates.h"
+#include <iterator>
+#include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
 namespace SetBit {
 
-// Iterator
-template<_Integer in_maskType, typename T>
-class Iterator {
+template<_Integer IterMask, typename... Components>
+class ArchetypeIterator {
 public:
-	using IterMask = in_maskType;
+	using reference = Tuple<Components&...>;
+	using iterator_category = std::forward_iterator_tag;
 
 public:
+	inline ArchetypeIterator(IterMask in_mask, Components*... in_components);
+
+	inline reference operator*() const;
+	inline ArchetypeIterator& operator++();
+
+	inline bool operator==(Sentinel) const;
+	inline bool operator!=(Sentinel) const;
+
 private:
 	DEEP_PRIVATE_TESTABLE
+
+	// Helper that returns tuple of items
+	template<std::size_t... Is>
+	reference Deref(std::index_sequence<Is...>) const;
+
+	//
+
+	IterMask m_remaining;
+	size_t m_index;
+	Tuple<Components*...> m_components;
+};
+
+template<_Integer IterMask, typename... Components>
+class ArchetypeView {
+public:
+	inline ArchetypeView(IterMask in_mask, Components*... in_components);
+
+	inline ArchetypeIterator<IterMask, Components...> begin() const;
+	inline Sentinel end() const;
+
+private:
+	DEEP_PRIVATE_TESTABLE
+
+	// Helper to unpack component buffers into an iterator
+	template<std::size_t... Is>
+	inline ArchetypeIterator<IterMask, Components...> CreateIterator(std::index_sequence<Is...>) const;
+
+	//
+
+	IterMask m_mask;
+	Tuple<Components*...> m_components;
 };
 
 // Helper class to produce inheritance chain in archetype template:
 template<typename T>
 struct ComponentStorage {
-	T* data = nullptr;
+	T* m_data = nullptr;
 
-	inline T* Get() const;
+	inline const T* Get() const;
+	inline T* Get();
 };
 
-template<_Integer in_maskType, typename... Components>
-class Archetype final : private ComponentStorage<Components>... {
-	static_assert(((std::is_copy_assignable_v<Components> && std::is_move_assignable_v<Components>) && ...),
-	              "Components must be copy assignable and move assignable.");
+template<_Integer IterMask, typename... Components>
+class FixedSizeArchetype final : private ComponentStorage<Components>... {
+	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
+	              "Components must be non-volatile and non-const value types.");
 
 public:
-	using IterMask = in_maskType;
-
 	// NOTE(randomuserhi): Since bit masks are stuck to integer types, on traditional systems, the max id is 64
 	//                     `uint8` can store up to 256 indices which is more than enough.
-	using Handle = uint8;
+	using IndexType = uint8;
+	static_assert(std::is_integral_v<IndexType> && std::is_unsigned_v<IndexType>,
+	              "IndexType must be an unsigned integer type.");
 
 public:
-	inline Archetype(const Archetype&) = default;
-	inline Archetype(Archetype&&) = default;
-	inline Archetype& operator=(const Archetype&) = default;
-	inline Archetype& operator=(Archetype&&) = default;
-	inline Archetype() = default;
+	inline FixedSizeArchetype(const FixedSizeArchetype&);
+	inline FixedSizeArchetype(FixedSizeArchetype&&);
+	inline FixedSizeArchetype& operator=(const FixedSizeArchetype&);
+	inline FixedSizeArchetype& operator=(FixedSizeArchetype&&);
+
+	explicit inline FixedSizeArchetype(size_t in_capacity);
 
 	//
 
-	inline ~Archetype();
+	inline ~FixedSizeArchetype();
 
 	//
 
-	// Get raw pointer to component array
+	inline bool IsActive(IndexType in_index) const;
+	inline size_t Size() const;
+
+	// Get component of an entity
 	template<typename T>
-	inline T* GetComponentPtr() const;
+	inline const T& GetComponent(IndexType in_index) const;
+	template<typename T>
+	inline T& GetComponent(IndexType in_index);
 
+	// Get components of an entity
+	template<typename... Ts>
+	inline Tuple<const Ts&...> GetComponents(IndexType in_index) const;
+	template<typename... Ts>
+	inline Tuple<Ts&...> GetComponents(IndexType in_index);
+
+	// Construct an entity at the given index position.
 	template<_ConstructorArgs... TaggedArgs>
-	inline Handle CreateEntity(TaggedArgs&&... in_componentArgs);
+	inline void ConstructEntity(IndexType in_index, TaggedArgs&&... in_componentArgs);
+
+	// Destruct an entity at the given index position.
+	inline void DestructEntity(IndexType in_index);
+
+	// Iterate entity components.
+	//
+	// A mask can be provided to skip certain entities. Note that only active (constructed) entities are iterated regardless
+	// of the mask value.
+	template<typename... Ts>
+	inline ArchetypeView<IterMask, Ts...> View(IterMask in_mask = ~0);
+	template<typename... Ts>
+	inline ArchetypeView<IterMask, const Ts...> View(IterMask in_mask = ~0) const;
+
+	// Range iterator begin/end implementation
+	inline ArchetypeIterator<IterMask, Components...> begin();
+	inline ArchetypeIterator<IterMask, const Components...> begin() const;
+	inline Sentinel end() const;
 
 	//
 
 	template<typename T>
-	constexpr static bool s_validComponent = std::is_same_v<T, Handle> || (std::is_same_v<T, Components> || ...);
+	constexpr static bool s_validComponent = (std::is_same_v<T, Components> || ...);
 
 	//
 
-	constexpr static size_t k_maxSize = NumBits<IterMask>();
+	// SetBit uses a bit mask to handle iteration of entities.
+	// This means the maximum capacity of an archetype is limited to the number of bits the mask has.
+	constexpr static size_t k_maxCapacity = NumBits<IterMask>();
 
 private:
 	DEEP_PRIVATE_TESTABLE
 
-	template<typename T, typename... TaggedArgs>
-	constexpr inline void ConstructComponent(uint32 in_index, TaggedArgs&&... in_componentArgs);
+	// Get raw pointer to component array
+	template<typename T>
+	inline const T* GetComponentPtr() const;
+	template<typename T>
+	inline T* GetComponentPtr();
+
+	// Utility that allocates memory for a given component, `T`, buffer.
+	template<typename T>
+	inline void AllocateComponent(size_t in_size);
+
+	// Utility that deallocates memory for a given component, `T`, buffer.
+	template<typename T>
+	inline void DeallocateComponent();
+
+	// Utility that constructs component `T` from `ConstructorArg`.
+	//
+	// If the given `ConstructorArg` is not for type `T`, reduces to a noop.
+	// Does not default construct `T`.
+	//
+	// Used by ConstructComponent to handle unpacking of `TaggedArgs` list.
+	template<typename T, _ConstructorArgs TaggedArg>
+	constexpr inline void ConstructComponentImpl(TaggedArg&& in_componentArg, T* in_ptr);
+
+	// Utility that constructs component `T` given a set of `ConstructorArg`s.
+	//
+	// If a `ConstructorArg` exists for `T`, `T` is constructed using the given `ConstructorArg`,
+	// otherwise `T` is default constructed.
+	//
+	// Used by `CreateEntity` to construct components from given `TaggedArgs` list.
+	template<typename T, _ConstructorArgs... TaggedArgs>
+	constexpr inline void ConstructComponent(IndexType in_index, TaggedArgs&&... in_componentArgs);
+
+	// Utility that destructs the component `T`.
+	//
+	// Used by `DestructEntity` to destruct components.
+	template<typename T>
+	constexpr inline void DestructComponent(IndexType in_index);
 
 	//
 
-	template<typename T, typename... TaggedArgs>
-	constexpr static inline size_t s_CountArgTags();
-
-	template<typename T, typename TaggedArg>
-	constexpr static inline void s_ConstructComponentFromArgs(T* in_ptr, TaggedArg&& in_componentArgs);
-
-	//
+	// Bitmask for which entities have been constructed via `ConstructEntity`.
+	// Its undefined behaviour access entities that have not been constructed.
+	IterMask m_activeMask;
 
 	size_t m_capacity;
-	size_t m_size;
 };
 
 } // namespace SetBit
