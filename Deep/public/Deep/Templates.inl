@@ -29,7 +29,7 @@ CONSTRUCTOR_ARGS_TEMPLATE
 template<std::size_t... Is>
 void CONSTRUCTOR_ARGS::ConstructImpl(T* in_destination,
                                      std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>) {
-	::new (in_destination) T(std::move(m_args).template Get<Is>()...);
+	::new (in_destination) T{ std::move(m_args).template Get<Is>()... };
 }
 
 CONSTRUCTOR_ARGS_TEMPLATE
@@ -40,6 +40,11 @@ CONSTRUCTOR_ARGS_TEMPLATE
 template<typename T, _ConstructorArgs... in_Args>
 [[nodiscard]] constexpr static inline size_t CountConstructorArgs() {
 	return (0 + ... + std::is_same_v<T, typename std::decay_t<in_Args>::Type>);
+}
+
+template<typename T, typename... in_Args>
+[[nodiscard]] constexpr static inline size_t CountTypeOccurences() {
+	return (0 + ... + std::is_same_v<T, in_Args>);
 }
 
 #undef CONSTRUCTOR_ARGS_TEMPLATE

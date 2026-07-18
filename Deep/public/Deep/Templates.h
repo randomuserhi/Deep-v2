@@ -7,6 +7,11 @@
 
 DEEP_NAMESPACE_BEGIN
 
+// Empty structure that can be used as a flag type.
+//
+// For example, can be used to signal the end of an iterator.
+struct Sentinel {};
+
 // Tuple declaration
 namespace impl_Tuple {
 template<typename... Ts>
@@ -67,6 +72,9 @@ concept _ConstructorArgs = impl_ConstructorArgs::IsConstructorArgs<std::remove_c
 // ```
 template<typename T, typename... Args>
 class ConstructorArgs final {
+	static_assert(std::is_constructible_v<T, Args&&...>,
+	              "ConstructorArgs target type cannot be constructed from the provided arguments");
+
 public:
 	using Type = T;
 	using ArgumentsTuple = impl_Tuple::Tuple<Args&&...>;
@@ -113,6 +121,10 @@ template<typename T, typename... Args>
 // Counts the number of `ConstructorArgs` in `in_args` that construct type `T`.
 template<typename T, _ConstructorArgs... in_args>
 [[nodiscard]] constexpr static inline size_t CountConstructorArgs();
+
+// Count the number of times `T` appears in `Ts`.
+template<typename T, typename... in_Ts>
+[[nodiscard]] constexpr static inline size_t CountTypeOccurences();
 
 DEEP_NAMESPACE_END
 
