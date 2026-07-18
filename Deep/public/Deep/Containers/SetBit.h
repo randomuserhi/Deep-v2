@@ -13,6 +13,10 @@ namespace SetBit {
 
 // Iterator for set-bit archetypes.
 // Uses a bitmask to skip over entities via set-bit iteration, allowing for fast sparse iteration over small blocks.
+//
+// NOTE(randomuserhi): `operator*()` always calls `Deep::CountTrailingZeros` to get the iterator item. As a result,
+//                     repeatedly dereferencing the iterator for the same item is not advised, always cache the
+//                     dereferenced item and reuse it.
 template<_Integer in_IterMask, typename... Components>
 class ArchetypeIterator {
 public:
@@ -40,7 +44,6 @@ private:
 	//
 
 	IterMask m_remaining;
-	size_t m_index;
 	Tuple<Components*...> m_components;
 };
 
@@ -125,11 +128,10 @@ public:
 	              "IndexType must be an unsigned integer type.");
 
 public:
-	// TODO(randomuserhi): Implement copy & move constructors + assignment operators
-	inline FixedSizeArchetype(const FixedSizeArchetype&) = delete;
-	inline FixedSizeArchetype(FixedSizeArchetype&&) = delete;
-	inline FixedSizeArchetype& operator=(const FixedSizeArchetype&) = delete;
-	inline FixedSizeArchetype& operator=(FixedSizeArchetype&&) = delete;
+	inline FixedSizeArchetype(const FixedSizeArchetype&);
+	inline FixedSizeArchetype(FixedSizeArchetype&&);
+	inline FixedSizeArchetype& operator=(const FixedSizeArchetype&);
+	inline FixedSizeArchetype& operator=(FixedSizeArchetype&&);
 
 	explicit inline FixedSizeArchetype(size_t in_capacity);
 
@@ -161,6 +163,12 @@ public:
 	inline Tuple<Ts&...> GetComponents(IndexType in_index);
 
 	// Construct an entity at the given index position
+	//
+	// For components without default constructors, they can be constructed via `Deep::ConstructWith<T>`:
+	// ```cpp
+	// // Where `A` is the component to forward params to
+	// arch.ConstructEntity(0, Deep::ConstructWith<A>(param0, param1));
+	// ```
 	template<_ConstructorArgs... TaggedArgs>
 	inline void ConstructEntity(IndexType in_index, TaggedArgs&&... in_componentArgs);
 
@@ -204,6 +212,13 @@ private:
 	template<typename T>
 	inline void DeallocateComponent();
 
+	// Utility that moves the component buffer `T` from one archetype to another.
+	// The move sets the given component buffer `T` in `in_other` to nullptr.
+	//
+	// Used by move assignment/constructor.
+	template<typename T>
+	inline void MoveComponent(FixedSizeArchetype&& in_other);
+
 	// Utility that constructs component `T` from `ConstructorArg`.
 	//
 	// If the given `ConstructorArg` is not for type `T`, reduces to a noop.
@@ -226,7 +241,7 @@ private:
 	//
 	// Used by `DestructEntity` to destruct components.
 	template<typename T>
-	constexpr inline void DestructComponent(IndexType in_index);
+	inline void DestructComponent(IndexType in_index);
 
 	//
 

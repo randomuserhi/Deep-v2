@@ -18,14 +18,13 @@ namespace SetBit {
 
 ARCHETYPE_ITERATOR_TEMPLATE
 ARCHETYPE_ITERATOR::ArchetypeIterator(IterMask in_mask, Components*... in_components) :
-	m_remaining{ in_mask },
-	m_index{ in_mask != 0 ? static_cast<size_t>(CountTrailingZeros(m_remaining)) : 0 },
-	m_components{ in_components... } {}
+	m_remaining{ in_mask }, m_components{ in_components... } {}
 
 ARCHETYPE_ITERATOR_TEMPLATE
 template<std::size_t... Is>
 ARCHETYPE_ITERATOR::reference ARCHETYPE_ITERATOR::Deref(std::index_sequence<Is...>) const {
-	return reference{ Get<Is>(m_components)[m_index]... };
+	Deep_Assert(m_remaining != 0, "End of iterator.");
+	return reference{ Get<Is>(m_components)[CountTrailingZeros(m_remaining)]... };
 }
 
 ARCHETYPE_ITERATOR_TEMPLATE
@@ -47,9 +46,6 @@ ARCHETYPE_ITERATOR_TEMPLATE
 ARCHETYPE_ITERATOR& ARCHETYPE_ITERATOR::operator++() {
 	Deep_Assert(m_remaining != 0, "End of iterator.");
 	m_remaining &= m_remaining - 1;
-	if (m_remaining != 0) {
-		m_index = static_cast<size_t>(CountTrailingZeros(m_remaining));
-	}
 	return *this;
 }
 
@@ -105,7 +101,19 @@ inline void FIXED_SIZE_ARCHETYPE::AllocateComponent(size_t in_size) {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::DeallocateComponent() {
-	TFree<T>(static_cast<impl_Archetype::ComponentStorage<T>&>(*this).m_data);
+	impl_Archetype::ComponentStorage<T>& storage = static_cast<impl_Archetype::ComponentStorage<T>&>(*this);
+	TFree<T>(storage.m_data);
+	storage.m_data = nullptr;
+}
+
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+template<typename T>
+inline void FIXED_SIZE_ARCHETYPE::MoveComponent(FixedSizeArchetype&& in_other) {
+	impl_Archetype::ComponentStorage<T>& storage = static_cast<impl_Archetype::ComponentStorage<T>&>(*this);
+	impl_Archetype::ComponentStorage<T>& other = static_cast<impl_Archetype::ComponentStorage<T>&>(in_other);
+
+	storage.m_data = other.m_data;
+	other.m_data = nullptr;
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -113,6 +121,100 @@ FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(size_t in_capacity) :
 	m_activeMask{ 0 }, m_capacity{ in_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 	(AllocateComponent<Components>(m_capacity), ...);
+}
+
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(const FixedSizeArchetype& in_other) :
+	m_activeMask{ 0 }, m_capacity{ in_other.m_capacity } {
+	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
+	(AllocateComponent<Components>(m_capacity), ...);
+
+	// Copy active entities
+	IterMask remaining = in_other.m_activeMask;
+	while (remaining != 0) {
+		const int32 index = CountTrailingZeros(remaining);
+		remaining &= remaining - 1;
+
+		// Construct components using copy constructor
+		ConstructEntity(index, ConstructWith<Components>(in_other.GetComponent<Components>(index))...);
+	}
+}
+
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(FixedSizeArchetype&& in_other) :
+	m_activeMask{ in_other.m_activeMask }, m_capacity{ in_other.m_capacity } {
+	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
+
+	// Invalidate and move buffers from the other archetype
+	(MoveComponent<Components>(std::move(in_other)), ...);
+	in_other.m_activeMask = 0;
+	in_other.m_capacity = 0;
+}
+
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeArchetype& in_other) {
+	if (this == &in_other) return *this;
+
+	// Destruct current entities
+	{
+		IterMask remaining = m_activeMask;
+		while (remaining != 0) {
+			const int32 index = CountTrailingZeros(remaining);
+			remaining &= remaining - 1;
+
+			DestructEntity(index);
+		}
+	}
+
+	// Reallocate buffers to maintain correct capacity
+	(DeallocateComponent<Components>(), ...);
+	m_capacity = in_other.m_capacity;
+	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
+	(AllocateComponent<Components>(m_capacity), ...);
+
+	// Copy active entities
+	{
+		IterMask remaining = in_other.m_activeMask;
+		while (remaining != 0) {
+			const int32 index = CountTrailingZeros(remaining);
+			remaining &= remaining - 1;
+
+			// Construct components using copy constructor
+			ConstructEntity(index, ConstructWith<Components>(in_other.GetComponent<Components>(index))...);
+		}
+	}
+
+	return *this;
+}
+
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeArchetype&& in_other) {
+	if (this == &in_other) return *this;
+
+	// Destruct current entities
+	{
+		IterMask remaining = m_activeMask;
+		while (remaining != 0) {
+			const int32 index = CountTrailingZeros(remaining);
+			remaining &= remaining - 1;
+
+			DestructEntity(index);
+		}
+	}
+
+	// Deallocate existing buffers
+	(DeallocateComponent<Components>(), ...);
+
+	m_activeMask = in_other.m_activeMask;
+	m_capacity = in_other.m_capacity;
+	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
+
+	// Invalidate and move buffers from the other archetype
+	(MoveComponent<Components>(std::move(in_other)), ...);
+	in_other.m_activeMask = 0;
+	in_other.m_capacity = 0;
+
+	return *this;
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE FIXED_SIZE_ARCHETYPE::~FixedSizeArchetype() {
@@ -126,7 +228,6 @@ FIXED_SIZE_ARCHETYPE_TEMPLATE FIXED_SIZE_ARCHETYPE::~FixedSizeArchetype() {
 
 	m_activeMask = 0;
 	m_capacity = 0;
-
 	(DeallocateComponent<Components>(), ...);
 }
 
@@ -170,7 +271,7 @@ constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponent(IndexType in_inde
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
-constexpr inline void FIXED_SIZE_ARCHETYPE::DestructComponent(IndexType in_index) {
+inline void FIXED_SIZE_ARCHETYPE::DestructComponent(IndexType in_index) {
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		GetComponentPtr<T>()[in_index].~T();
 	}
@@ -271,7 +372,8 @@ template<typename... Ts>
 ArchetypeView<typename FIXED_SIZE_ARCHETYPE::IterMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(IterMask in_mask) const {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
-	//                     Although this is the const version, we still allow it to keep syntax consistent.
+	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
+	//                     version.
 	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
 	return ArchetypeView<IterMask, const Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
@@ -294,6 +396,8 @@ Sentinel FIXED_SIZE_ARCHETYPE::end() const {
 
 #undef FIXED_SIZE_ARCHETYPE_TEMPLATE
 #undef FIXED_SIZE_ARCHETYPE
+
+#undef SETBIT_FOR
 
 } // namespace SetBit
 
