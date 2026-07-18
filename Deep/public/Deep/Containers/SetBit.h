@@ -125,10 +125,11 @@ public:
 	              "IndexType must be an unsigned integer type.");
 
 public:
-	inline FixedSizeArchetype(const FixedSizeArchetype&);
-	inline FixedSizeArchetype(FixedSizeArchetype&&);
-	inline FixedSizeArchetype& operator=(const FixedSizeArchetype&);
-	inline FixedSizeArchetype& operator=(FixedSizeArchetype&&);
+	// TODO(randomuserhi): Implement copy & move constructors + assignment operators
+	inline FixedSizeArchetype(const FixedSizeArchetype&) = delete;
+	inline FixedSizeArchetype(FixedSizeArchetype&&) = delete;
+	inline FixedSizeArchetype& operator=(const FixedSizeArchetype&) = delete;
+	inline FixedSizeArchetype& operator=(FixedSizeArchetype&&) = delete;
 
 	explicit inline FixedSizeArchetype(size_t in_capacity);
 
