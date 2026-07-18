@@ -129,6 +129,30 @@ template<std::size_t I, typename... Ts>
 template<std::size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) get(const Tuple<Ts...>&& in_tuple);
 
+template<typename LeftTuple, typename RightTuple, typename IndexSequence>
+struct TupleEqualityComparable;
+
+template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+using TupleEqualityComparableBoolConstant = std::bool_constant<(requires(const LeftTuple& lhs, const RightTuple& rhs) {
+	static_cast<bool>(lhs.template Get<Is>() == rhs.template Get<Is>());
+} && ...)>;
+
+template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+struct TupleEqualityComparable<LeftTuple, RightTuple, std::index_sequence<Is...>>
+	: TupleEqualityComparableBoolConstant<LeftTuple, RightTuple, Is...> {};
+
+template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+[[nodiscard]] constexpr inline bool
+TupleEqualImpl(const LeftTuple& in_left, const RightTuple& in_right, std::index_sequence<Is...>) noexcept(
+	(noexcept(static_cast<bool>(in_left.template Get<Is>() == in_right.template Get<Is>())) && ...));
+
+template<typename... LeftTs, typename... RightTs>
+	requires(
+		sizeof...(LeftTs) == sizeof...(RightTs)
+		&& TupleEqualityComparable<Tuple<LeftTs...>, Tuple<RightTs...>, std::make_index_sequence<sizeof...(LeftTs)>>::value)
+[[nodiscard]] constexpr inline bool operator==(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(
+	noexcept(TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{})));
+
 } // namespace impl_Tuple
 
 // Custom tuple class that is actually zero cost :

@@ -91,44 +91,60 @@ constexpr decltype(auto) ApplyImpl(F&& in_function, TupleType&& in_tuple, std::i
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) get(Deep::Tuple<Ts...>& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) get(Tuple<Ts...>& in_tuple) {
 	return in_tuple.template Get<I>();
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) get(const Deep::Tuple<Ts...>& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) get(const Tuple<Ts...>& in_tuple) {
 	return in_tuple.template Get<I>();
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) get(Deep::Tuple<Ts...>&& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) get(Tuple<Ts...>&& in_tuple) {
 	return std::move(in_tuple).template Get<I>();
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) get(const Deep::Tuple<Ts...>&& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) get(const Tuple<Ts...>&& in_tuple) {
 	return std::move(in_tuple).template Get<I>();
+}
+
+template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+[[nodiscard]] constexpr inline bool
+TupleEqualImpl(const LeftTuple& in_left, const RightTuple& in_right, std::index_sequence<Is...>) noexcept(
+	(noexcept(static_cast<bool>(in_left.template Get<Is>() == in_right.template Get<Is>())) && ...)) {
+	return (static_cast<bool>(in_left.template Get<Is>() == in_right.template Get<Is>()) && ...);
+}
+
+template<typename... LeftTs, typename... RightTs>
+	requires(
+		sizeof...(LeftTs) == sizeof...(RightTs)
+		&& TupleEqualityComparable<Tuple<LeftTs...>, Tuple<RightTs...>, std::make_index_sequence<sizeof...(LeftTs)>>::value)
+[[nodiscard]] constexpr inline bool operator==(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(
+	noexcept(TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{}))) {
+	return TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{});
 }
 
 } // namespace impl_Tuple
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) Get(Deep::Tuple<Ts...>& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) Get(Tuple<Ts...>& in_tuple) {
 	return impl_Tuple::get<I, Ts...>(in_tuple);
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) Get(const Deep::Tuple<Ts...>& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) Get(const Tuple<Ts...>& in_tuple) {
 	return impl_Tuple::get<I, Ts...>(in_tuple);
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) Get(Deep::Tuple<Ts...>&& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) Get(Tuple<Ts...>&& in_tuple) {
 	return impl_Tuple::get<I, Ts...>(std::move(in_tuple));
 }
 
 template<std::size_t I, typename... Ts>
-[[nodiscard]] constexpr decltype(auto) Get(const Deep::Tuple<Ts...>&& in_tuple) {
+[[nodiscard]] constexpr decltype(auto) Get(const Tuple<Ts...>&& in_tuple) {
 	return impl_Tuple::get<I, Ts...>(std::move(in_tuple));
 }
 
