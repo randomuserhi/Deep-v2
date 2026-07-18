@@ -9,8 +9,6 @@
 
 DEEP_NAMESPACE_BEGIN
 
-namespace SetBit {
-
 // Iterator for set-bit archetypes.
 // Uses a bitmask to skip over entities via set-bit iteration, allowing for fast sparse iteration over small blocks.
 //
@@ -18,7 +16,7 @@ namespace SetBit {
 //                     repeatedly dereferencing the iterator for the same item is not advised, always cache the
 //                     dereferenced item and reuse it.
 template<c_BitMask in_BitMask, typename... Components>
-class ArchetypeIterator {
+class SetBitArchetypeIterator {
 public:
 	using BitMask = in_BitMask;
 
@@ -26,10 +24,10 @@ public:
 	using iterator_category = std::forward_iterator_tag;
 
 public:
-	inline ArchetypeIterator(BitMask in_mask, Components*... in_components);
+	inline SetBitArchetypeIterator(BitMask in_mask, Components*... in_components);
 
 	inline reference operator*() const;
-	inline ArchetypeIterator& operator++();
+	inline SetBitArchetypeIterator& operator++();
 
 	inline bool operator==(Sentinel) const;
 	inline bool operator!=(Sentinel) const;
@@ -54,14 +52,14 @@ private:
 //
 // The mask represents the currently active members of the archetype view.
 template<c_BitMask in_BitMask, typename... Components>
-class ArchetypeView {
+class SetBitArchetypeView {
 public:
 	using BitMask = in_BitMask;
 
 public:
-	inline ArchetypeView(BitMask in_activeMask, Components*... in_components);
+	inline SetBitArchetypeView(BitMask in_activeMask, Components*... in_components);
 
-	inline ArchetypeIterator<BitMask, Components...> begin() const;
+	inline SetBitArchetypeIterator<BitMask, Components...> begin() const;
 	inline Sentinel end() const;
 
 private:
@@ -69,7 +67,7 @@ private:
 
 	// Helper to unpack component buffers into an iterator
 	template<std::size_t... Is>
-	inline ArchetypeIterator<BitMask, Components...> CreateIterator(std::index_sequence<Is...>) const;
+	inline SetBitArchetypeIterator<BitMask, Components...> CreateIterator(std::index_sequence<Is...>) const;
 
 	//
 
@@ -77,7 +75,7 @@ private:
 	Tuple<Components*...> m_components;
 };
 
-namespace impl_Archetype {
+namespace impl_SetBitArchetype {
 
 // Utility object to generate inheritance chain for archetype storage
 template<typename T>
@@ -88,9 +86,9 @@ struct ComponentStorage {
 	inline T* Get();
 };
 
-} // namespace impl_Archetype
+} // namespace impl_SetBitArchetype
 
-// Set-bit variant of the Archetype container.
+// Fixed size, set-bit variant of the Archetype container.
 //
 // Stores components as a Structure-Of-Arrays (SoA) where access is performed via set-bit iteration.
 //
@@ -114,7 +112,7 @@ struct ComponentStorage {
 // }
 // ```
 template<c_BitMask in_BitMask, typename... Components>
-class FixedSizeArchetype : private impl_Archetype::ComponentStorage<Components>... {
+class FixedSizeSetBitArchetype : private impl_SetBitArchetype::ComponentStorage<Components>... {
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
 	              "Components must be non-volatile and non-const value types.");
 
@@ -122,16 +120,16 @@ public:
 	using BitMask = in_BitMask;
 
 public:
-	inline FixedSizeArchetype(const FixedSizeArchetype&);
-	inline FixedSizeArchetype(FixedSizeArchetype&&);
-	inline FixedSizeArchetype& operator=(const FixedSizeArchetype&);
-	inline FixedSizeArchetype& operator=(FixedSizeArchetype&&);
+	inline FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype&);
+	inline FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&&);
+	inline FixedSizeSetBitArchetype& operator=(const FixedSizeSetBitArchetype&);
+	inline FixedSizeSetBitArchetype& operator=(FixedSizeSetBitArchetype&&);
 
-	explicit inline FixedSizeArchetype(size_t in_capacity);
+	explicit inline FixedSizeSetBitArchetype(size_t in_capacity);
 
 	//
 
-	inline ~FixedSizeArchetype();
+	inline ~FixedSizeSetBitArchetype();
 
 	//
 
@@ -174,13 +172,13 @@ public:
 	// A mask can be provided to skip certain entities. Note that only active (constructed) entities are iterated regardless
 	// of the mask value.
 	template<typename... Ts>
-	inline ArchetypeView<BitMask, Ts...> View(BitMask in_mask = ~0);
+	inline SetBitArchetypeView<BitMask, Ts...> View(BitMask in_mask = ~0);
 	template<typename... Ts>
-	inline ArchetypeView<BitMask, const Ts...> View(BitMask in_mask = ~0) const;
+	inline SetBitArchetypeView<BitMask, const Ts...> View(BitMask in_mask = ~0) const;
 
 	// Range iterator begin/end implementation
-	inline ArchetypeIterator<BitMask, Components...> begin();
-	inline ArchetypeIterator<BitMask, const Components...> begin() const;
+	inline SetBitArchetypeIterator<BitMask, Components...> begin();
+	inline SetBitArchetypeIterator<BitMask, const Components...> begin() const;
 	inline Sentinel end() const;
 
 	//
@@ -211,7 +209,7 @@ private:
 	//
 	// Used by move assignment/constructor.
 	template<typename T>
-	inline void MoveComponent(FixedSizeArchetype&& in_other);
+	inline void MoveComponent(FixedSizeSetBitArchetype&& in_other);
 
 	// Utility that constructs component `T` from `ConstructorArg`.
 	//
@@ -251,8 +249,6 @@ private:
 	// The maximum number of entities the archetype can store.
 	size_t m_capacity;
 };
-
-} // namespace SetBit
 
 DEEP_NAMESPACE_END
 

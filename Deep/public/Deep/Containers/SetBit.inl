@@ -11,13 +11,11 @@
 
 DEEP_NAMESPACE_BEGIN
 
-namespace SetBit {
-
 #define ARCHETYPE_ITERATOR_TEMPLATE template<c_BitMask in_BitMask, typename... Components>
-#define ARCHETYPE_ITERATOR ArchetypeIterator<in_BitMask, Components...>
+#define ARCHETYPE_ITERATOR SetBitArchetypeIterator<in_BitMask, Components...>
 
 ARCHETYPE_ITERATOR_TEMPLATE
-ARCHETYPE_ITERATOR::ArchetypeIterator(BitMask in_mask, Components*... in_components) :
+ARCHETYPE_ITERATOR::SetBitArchetypeIterator(BitMask in_mask, Components*... in_components) :
 	m_remaining{ in_mask }, m_components{ in_components... } {}
 
 ARCHETYPE_ITERATOR_TEMPLATE
@@ -53,21 +51,21 @@ ARCHETYPE_ITERATOR& ARCHETYPE_ITERATOR::operator++() {
 #undef ARCHETYPE_ITERATOR
 
 #define ARCHETYPE_VIEW_TEMPLATE template<c_BitMask in_BitMask, typename... Components>
-#define ARCHETYPE_VIEW ArchetypeView<in_BitMask, Components...>
+#define ARCHETYPE_VIEW SetBitArchetypeView<in_BitMask, Components...>
 
 ARCHETYPE_VIEW_TEMPLATE
-ARCHETYPE_VIEW::ArchetypeView(BitMask in_activeMask, Components*... in_components) :
+ARCHETYPE_VIEW::SetBitArchetypeView(BitMask in_activeMask, Components*... in_components) :
 	m_activeMask{ in_activeMask }, m_components{ in_components... } {}
 
 ARCHETYPE_VIEW_TEMPLATE
 template<std::size_t... Is>
-ArchetypeIterator<typename ARCHETYPE_VIEW::BitMask, Components...>
+SetBitArchetypeIterator<typename ARCHETYPE_VIEW::BitMask, Components...>
 ARCHETYPE_VIEW::CreateIterator(std::index_sequence<Is...>) const {
-	return ArchetypeIterator<BitMask, Components...>{ m_activeMask, Get<Is>(m_components)... };
+	return SetBitArchetypeIterator<BitMask, Components...>{ m_activeMask, Get<Is>(m_components)... };
 }
 
 ARCHETYPE_VIEW_TEMPLATE
-ArchetypeIterator<typename ARCHETYPE_VIEW::BitMask, Components...> ARCHETYPE_VIEW::begin() const {
+SetBitArchetypeIterator<typename ARCHETYPE_VIEW::BitMask, Components...> ARCHETYPE_VIEW::begin() const {
 	return CreateIterator(std::index_sequence_for<Components...>{});
 }
 
@@ -80,51 +78,51 @@ Sentinel ARCHETYPE_VIEW::end() const {
 #undef ARCHETYPE_VIEW
 
 template<typename T>
-const T* impl_Archetype::ComponentStorage<T>::Get() const {
+const T* impl_SetBitArchetype::ComponentStorage<T>::Get() const {
 	return m_data;
 }
 
 template<typename T>
-T* impl_Archetype::ComponentStorage<T>::Get() {
+T* impl_SetBitArchetype::ComponentStorage<T>::Get() {
 	return m_data;
 }
 
 #define FIXED_SIZE_ARCHETYPE_TEMPLATE template<c_BitMask in_BitMask, typename... Components>
-#define FIXED_SIZE_ARCHETYPE FixedSizeArchetype<in_BitMask, Components...>
+#define FIXED_SIZE_ARCHETYPE FixedSizeSetBitArchetype<in_BitMask, Components...>
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::AllocateComponent(size_t in_size) {
-	static_cast<impl_Archetype::ComponentStorage<T>&>(*this).m_data = TMalloc<T>(in_size);
+	static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this).m_data = TMalloc<T>(in_size);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::DeallocateComponent() {
-	impl_Archetype::ComponentStorage<T>& storage = static_cast<impl_Archetype::ComponentStorage<T>&>(*this);
+	impl_SetBitArchetype::ComponentStorage<T>& storage = static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this);
 	TFree<T>(storage.m_data);
 	storage.m_data = nullptr;
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
-inline void FIXED_SIZE_ARCHETYPE::MoveComponent(FixedSizeArchetype&& in_other) {
-	impl_Archetype::ComponentStorage<T>& storage = static_cast<impl_Archetype::ComponentStorage<T>&>(*this);
-	impl_Archetype::ComponentStorage<T>& other = static_cast<impl_Archetype::ComponentStorage<T>&>(in_other);
+inline void FIXED_SIZE_ARCHETYPE::MoveComponent(FixedSizeSetBitArchetype&& in_other) {
+	impl_SetBitArchetype::ComponentStorage<T>& storage = static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this);
+	impl_SetBitArchetype::ComponentStorage<T>& other = static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(in_other);
 
 	storage.m_data = other.m_data;
 	other.m_data = nullptr;
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(size_t in_capacity) :
+FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(size_t in_capacity) :
 	m_activeMask{ 0 }, m_capacity{ in_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 	(AllocateComponent<Components>(m_capacity), ...);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(const FixedSizeArchetype& in_other) :
+FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype& in_other) :
 	m_activeMask{ 0 }, m_capacity{ in_other.m_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 	(AllocateComponent<Components>(m_capacity), ...);
@@ -140,7 +138,7 @@ FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(const FixedSizeArchetype& in_other) :
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(FixedSizeArchetype&& in_other) :
+FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&& in_other) :
 	m_activeMask{ in_other.m_activeMask }, m_capacity{ in_other.m_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 
@@ -151,7 +149,7 @@ FIXED_SIZE_ARCHETYPE::FixedSizeArchetype(FixedSizeArchetype&& in_other) :
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeArchetype& in_other) {
+FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeSetBitArchetype& in_other) {
 	if (this == &in_other) return *this;
 
 	// Destruct current entities
@@ -185,7 +183,7 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeArchetype& 
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeArchetype&& in_other) {
+FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeSetBitArchetype&& in_other) {
 	if (this == &in_other) return *this;
 
 	// Destruct current entities
@@ -213,7 +211,7 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeArchetype&& in_ot
 	return *this;
 }
 
-FIXED_SIZE_ARCHETYPE_TEMPLATE FIXED_SIZE_ARCHETYPE::~FixedSizeArchetype() {
+FIXED_SIZE_ARCHETYPE_TEMPLATE FIXED_SIZE_ARCHETYPE::~FixedSizeSetBitArchetype() {
 	BitMask remaining = m_activeMask;
 	while (remaining.Any()) {
 		const int32 index = remaining.PopLowestSetBit();
@@ -230,14 +228,14 @@ FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 const T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() const {
 	static_assert(s_validComponent<T>, "Component type not in archetype");
-	return static_cast<const impl_Archetype::ComponentStorage<T>&>(*this).Get();
+	return static_cast<const impl_SetBitArchetype::ComponentStorage<T>&>(*this).Get();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() {
 	static_assert(s_validComponent<T>, "Component type not in archetype");
-	return static_cast<impl_Archetype::ComponentStorage<T>&>(*this).Get();
+	return static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this).Get();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -352,34 +350,34 @@ Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(size_t in_index) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-ArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) {
+SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
-	return ArchetypeView<BitMask, Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	return SetBitArchetypeView<BitMask, Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
-ArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) const {
+SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) const {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
 	//                     version.
 	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
-	return ArchetypeView<BitMask, const Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	return SetBitArchetypeView<BitMask, const Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::BitMask, Components...> FIXED_SIZE_ARCHETYPE::begin() {
-	return ArchetypeIterator<BitMask, Components...>{ m_activeMask, GetComponentPtr<Components>()... };
+SetBitArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::BitMask, Components...> FIXED_SIZE_ARCHETYPE::begin() {
+	return SetBitArchetypeIterator<BitMask, Components...>{ m_activeMask, GetComponentPtr<Components>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-ArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::BitMask, const Components...> FIXED_SIZE_ARCHETYPE::begin() const {
-	return ArchetypeIterator<BitMask, const Components...>{ m_activeMask, GetComponentPtr<Components>()... };
+SetBitArchetypeIterator<typename FIXED_SIZE_ARCHETYPE::BitMask, const Components...> FIXED_SIZE_ARCHETYPE::begin() const {
+	return SetBitArchetypeIterator<BitMask, const Components...>{ m_activeMask, GetComponentPtr<Components>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -389,9 +387,5 @@ Sentinel FIXED_SIZE_ARCHETYPE::end() const {
 
 #undef FIXED_SIZE_ARCHETYPE_TEMPLATE
 #undef FIXED_SIZE_ARCHETYPE
-
-#undef SETBIT_FOR
-
-} // namespace SetBit
 
 DEEP_NAMESPACE_END
