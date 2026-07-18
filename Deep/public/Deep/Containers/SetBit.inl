@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Bit.h"
 #include "Deep/Memory.h"
 #include "Deep/Templates.h"
 #include "Deep/Containers/SetBit.h"
