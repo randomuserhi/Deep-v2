@@ -43,6 +43,9 @@ int32 Vec3i::s_Dot(Arg_Vec3i in_a, Arg_Vec3i in_b) {
 
 void Vec3i::s_CheckW(Arg_Vec3i in_vec) {
 	Deep_Assert(in_vec.z == in_vec._w, "W component does not match.");
+#if !defined(DEEP_USE_ASSERTS)
+	(void)in_vec;
+#endif
 }
 
 Vec3i Vec3i::s_FixW(Arg_Vec3i in_vec) {
