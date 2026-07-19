@@ -66,6 +66,10 @@ constexpr T RotateRight(const T in_value, const int32 in_offset) noexcept {
 	return std::rotr(in_value, in_offset);
 }
 
+constexpr uint8 ReverseEndianness(const uint8 in_value) noexcept {
+	return in_value;
+}
+
 constexpr uint16 ReverseEndianness(const uint16 in_value) noexcept {
 	return static_cast<uint16>((in_value >> 8) | (in_value << 8));
 }
@@ -77,6 +81,10 @@ constexpr uint32 ReverseEndianness(const uint32 in_value) noexcept {
 constexpr uint64 ReverseEndianness(const uint64 in_value) noexcept {
 	return (static_cast<uint64>(ReverseEndianness(static_cast<uint32>(in_value))) << 32)
 	       | static_cast<uint64>(ReverseEndianness(static_cast<uint32>(in_value >> 32)));
+}
+
+constexpr int8 ReverseEndianness(const int8 in_value) noexcept {
+	return in_value;
 }
 
 constexpr int16 ReverseEndianness(const int16 in_value) noexcept {

@@ -63,9 +63,11 @@ constexpr inline T RotateLeft(const T in_value, const int32 in_offset) noexcept;
 template<std::unsigned_integral T>
 constexpr inline T RotateRight(const T in_value, const int32 in_offset) noexcept;
 
+constexpr Deep_ForceInline uint8 ReverseEndianness(const uint8 in_value) noexcept;
 constexpr inline uint16 ReverseEndianness(const uint16 in_value) noexcept;
 constexpr inline uint32 ReverseEndianness(const uint32 in_value) noexcept;
 constexpr inline uint64 ReverseEndianness(const uint64 in_value) noexcept;
+constexpr Deep_ForceInline int8 ReverseEndianness(const int8 in_value) noexcept;
 constexpr inline int16 ReverseEndianness(const int16 in_value) noexcept;
 constexpr inline int32 ReverseEndianness(const int32 in_value) noexcept;
 constexpr inline int64 ReverseEndianness(const int64 in_value) noexcept;
