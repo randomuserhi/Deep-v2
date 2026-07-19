@@ -19,7 +19,7 @@ DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 DEEP_SUPPRESS_WARNINGS_STD_END
 	#define DEEP_VEC_ALIGNMENT Deep_AlignOf(int32x2_t)
 #else
-	#define DEEP_VEC_ALIGNMENT Deep_AlignOf(int32)
+	#define DEEP_VEC_ALIGNMENT Deep_AlignOf(int64)
 #endif
 
 #include <type_traits>
