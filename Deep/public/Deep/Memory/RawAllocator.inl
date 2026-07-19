@@ -2,6 +2,8 @@
 
 #include "./RawAllocator.h"
 
+#include "Deep/Memory.h"
+
 DEEP_NAMESPACE_BEGIN
 
 template<typename T>
