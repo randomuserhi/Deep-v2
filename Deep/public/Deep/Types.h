@@ -4,21 +4,21 @@
 
 #pragma once
 
-#include "Deep.h"
+#include "Deep.h" // IWYU pragma: private, include "Deep.h"
 
-using byte = Deep::byte;
+using Deep::byte;
 
-using int8 = Deep::int8;
-using int16 = Deep::int16;
-using int32 = Deep::int32;
-using int64 = Deep::int64;
+using Deep::int16;
+using Deep::int32;
+using Deep::int64;
+using Deep::int8;
 
-using uint8 = Deep::uint8;
-using uint16 = Deep::uint16;
-using uint32 = Deep::uint32;
-using uint64 = Deep::uint64;
+using Deep::uint16;
+using Deep::uint32;
+using Deep::uint64;
+using Deep::uint8;
 
-using float16 = Deep::float16;
+using Deep::float16;
 
-using float32 = Deep::float32;
-using float64 = Deep::float64;
+using Deep::float32;
+using Deep::float64;

@@ -2,6 +2,7 @@
 
 #define DEEP_TESTABLE
 
+#include "Deep.h"
 #include "Deep/Types.h"
 #include "Deep/Bit/IntegerBitMask.h"
 

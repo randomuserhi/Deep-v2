@@ -1,5 +1,6 @@
 #include "Tests.h"
 
+#include "Deep.h"
 #include "Deep/Types.h"
 #include "Deep/Memory.h"
 #include "Deep/Containers/Tuple.h"
