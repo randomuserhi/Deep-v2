@@ -7,7 +7,7 @@
 DEEP_NAMESPACE_BEGIN
 
 template<typename T>
-T* RawAllocator<T>::s_Malloc(size_t in_size) {
+T* RawAllocator<T>::s_Malloc(size_t in_size) DEEP_ALLOC_NOEXCEPT {
 	return Deep::TMalloc<T>(in_size);
 }
 

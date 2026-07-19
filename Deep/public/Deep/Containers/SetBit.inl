@@ -2,6 +2,7 @@
 
 #include "./SetBit.h"
 
+#include "Deep.h"
 #include "Deep/Memory.h"
 #include "Deep/Templates/ConstructWith.h"
 #include "Deep/Templates/TypeLists.h"
@@ -133,6 +134,7 @@ inline void FIXED_SIZE_ARCHETYPE::MoveComponent(FixedSizeSetBitArchetype&& in_ot
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(size_t in_capacity) :
 	m_activeMask{ 0 }, m_capacity{ in_capacity } {
+	Deep_Assert(m_capacity > 0, "Archetype must have a non-zero size.");
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 	AllocateStorage();
 }
@@ -140,6 +142,7 @@ FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(size_t in_capacity) :
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype& in_other) :
 	m_activeMask{ 0 }, m_capacity{ in_other.m_capacity } {
+	Deep_Assert(m_capacity > 0, "Archetype must have a non-zero size.");
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 	AllocateStorage();
 
@@ -156,6 +159,7 @@ FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype& i
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&& in_other) noexcept :
 	m_activeMask{ in_other.m_activeMask }, m_capacity{ in_other.m_capacity } {
+	Deep_Assert(m_capacity > 0, "Archetype must have a non-zero size.");
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 
 	// Invalidate and move buffers from the other archetype
@@ -182,6 +186,7 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeSetBitArche
 	DeallocateStorage();
 
 	m_capacity = in_other.m_capacity;
+	Deep_Assert(m_capacity > 0, "Archetype must have a non-zero size.");
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 
 	// Allocate new buffer
@@ -220,6 +225,7 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeSetBitArchetype&&
 
 	m_activeMask = in_other.m_activeMask;
 	m_capacity = in_other.m_capacity;
+	Deep_Assert(m_capacity > 0, "Archetype must have a non-zero size.");
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 
 	// Invalidate and move buffers from the other archetype
