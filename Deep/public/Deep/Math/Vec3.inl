@@ -230,7 +230,7 @@ Vec3 operator*(Arg_Vec3 in_vec, float32 in_val) {
 #ifdef DEEP_USE_SSE
 	return Vec3{ in_vec.m_float32x4 * in_val };
 #else
-	return Vec3{ in_a.x * in_val, in_a.y * in_val, in_a.z * in_val };
+	return Vec3{ in_vec.x * in_val, in_vec.y * in_val, in_vec.z * in_val };
 #endif
 }
 
@@ -238,7 +238,7 @@ Vec3 operator*(float32 in_val, Arg_Vec3 in_vec) {
 #ifdef DEEP_USE_SSE
 	return Vec3{ in_val * in_vec.m_float32x4 };
 #else
-	return Vec3{ in_val * in_a.x, in_val * in_a.y, in_val * in_a.z };
+	return Vec3{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z };
 #endif
 }
 
