@@ -90,15 +90,15 @@ public:
 
 	constexpr Deep_ForceInline size_t PopLowestSetBit();
 
-	friend constexpr Deep_ForceInline bool operator== <T>(Arg_IntegerBitMask<T>, Arg_IntegerBitMask<T>);
+	friend constexpr bool operator== <T>(Arg_IntegerBitMask<T>, Arg_IntegerBitMask<T>);
 
 	constexpr Deep_ForceInline IntegerBitMask& operator|=(Arg_IntegerBitMask<T> in_other);
-	friend constexpr Deep_ForceInline IntegerBitMask operator| <T>(IntegerBitMask, Arg_IntegerBitMask<T>);
+	friend constexpr IntegerBitMask operator| <T>(IntegerBitMask, Arg_IntegerBitMask<T>);
 
 	constexpr Deep_ForceInline IntegerBitMask& operator&=(Arg_IntegerBitMask<T> in_other);
-	friend constexpr Deep_ForceInline IntegerBitMask operator& <T>(IntegerBitMask, Arg_IntegerBitMask<T>);
+	friend constexpr IntegerBitMask operator& <T>(IntegerBitMask, Arg_IntegerBitMask<T>);
 
-	friend constexpr Deep_ForceInline IntegerBitMask operator~ <T>(IntegerBitMask);
+	friend constexpr IntegerBitMask operator~ <T>(IntegerBitMask);
 
 	//
 

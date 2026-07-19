@@ -16,7 +16,7 @@ INTEGER_BITMASK_TEMPLATE
 constexpr bool INTEGER_BITMASK::operator[](size_t in_index) const {
 	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
 
-	T flag = T{ 1 } << in_index;
+	T flag = static_cast<T>(1 << in_index);
 	return (m_bits & flag) != 0;
 }
 
@@ -34,8 +34,8 @@ INTEGER_BITMASK_TEMPLATE
 constexpr void INTEGER_BITMASK::Set(size_t in_index, bool in_value) {
 	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
 
-	const T clear_mask = ~(T{ 1 } << in_index);
-	const T new_bit = T{ in_value } << in_index;
+	const T clear_mask = static_cast<T>(~(1 << in_index));
+	const T new_bit = static_cast<T>(in_value) << in_index;
 	m_bits = (m_bits & clear_mask) | new_bit;
 }
 
