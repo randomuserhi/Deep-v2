@@ -1,5 +1,6 @@
 #include "Tests.h"
 
+#include "Deep/Types.h"
 #include "Deep/Math/Vec2i.h"
 
 TEST(Vec2i, Equality) {

@@ -1,5 +1,6 @@
 #include "Tests.h"
 
+#include "Deep/Types.h"
 #include "Deep/Math/Vec3i.h"
 
 TEST(Vec3i, XYZ) {

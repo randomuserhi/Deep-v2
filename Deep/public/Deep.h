@@ -144,7 +144,28 @@
  * Deep Utilities
  */
 
-#include "Deep/Types.h" // IWYU pragma: export
+#include <cstdint>
+
+DEEP_NAMESPACE_BEGIN
+
+enum class byte : unsigned char {};
+
+using int8 = int8_t;
+using int16 = int16_t;
+using int32 = int32_t;
+using int64 = int64_t;
+
+using uint8 = uint8_t;
+using uint16 = uint16_t;
+using uint32 = uint32_t;
+using uint64 = uint64_t;
+
+using float16 = uint16_t;
+
+using float32 = float;
+using float64 = double;
+
+DEEP_NAMESPACE_END
 
 // TODO(randomuserhi):
 // - Detect architecture (64bit / 32bit), currently only 64 bit is supported
@@ -204,8 +225,8 @@
 #endif
 
 #ifdef DEEP_COMPILER_MSVC
-	// NOTE(randomuserhi): Undef MSVC pre-processor macros:
-    // https://stackoverflow.com/questions/21483038/undefining-min-and-max-macros
+// NOTE(randomuserhi): Undef MSVC pre-processor macros:
+// https://stackoverflow.com/questions/21483038/undefining-min-and-max-macros
 	#undef min
 	#undef max
 #endif
@@ -252,7 +273,7 @@
 		#error Unsupported CPU architecture
 	#endif
 #elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
-	// ARM CPU architecture
+// ARM CPU architecture
 	#define DEEP_CPU_ARM
 	#if defined(__aarch64__) || defined(_M_ARM64)
 		#define DEEP_USE_NEON
@@ -263,7 +284,7 @@
  * Tests
  */
 #if defined(DEEP_TESTABLE)
-	// exposes private members for testing
+// exposes private members for testing
 	#define DEEP_PRIVATE_TESTABLE public:
 #else
 	#define DEEP_PRIVATE_TESTABLE

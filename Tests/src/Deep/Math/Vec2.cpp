@@ -1,5 +1,6 @@
 #include "Tests.h"
 
+#include "Deep/Types.h"
 #include "Deep/Math/Vec2.h"
 
 // TODO(randomuserhi): Test Vec2::Rotate and Vec2::Angle

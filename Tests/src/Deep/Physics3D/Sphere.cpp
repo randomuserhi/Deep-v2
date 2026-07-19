@@ -1,9 +1,9 @@
-#include "Deep/Physics3D/Colliders/Sphere.h"
 #include "Tests.h"
 
 #include "Deep/Math/Vec3.h"
 #include "Deep/Physics3D/Ray.h"
 #include "Deep/Physics3D/Colliders.h"
+#include "Deep/Physics3D/Colliders/Sphere.h"
 
 // TODO(randomuserhi): Add grazing tests (when box edge == second box edge, or point lies on edge or ray origin starts on
 //                     edge)
