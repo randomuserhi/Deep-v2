@@ -21,8 +21,8 @@ int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_conta
 
 	float32 dx1 = maxB.x - minA.x;
 	float32 dx2 = maxA.x - minB.x;
-	contactInfo.m_penetrationDistance = Min(dx1, dx2);
 	contactInfo.m_Normal4() = { dx1 < dx2 ? -1.0f : 1.0f, 0.0f, 0.0f };
+	contactInfo.m_penetrationDistance = Min(dx1, dx2);
 
 	if (contactInfo.m_penetrationDistance <= 0) return 0;
 
