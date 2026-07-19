@@ -15,7 +15,11 @@ set "Build[3]_Name= FLOATING_POINT_EXCEPTIONS"
 set "Build[3]_Path=-fp-exceptions"
 set "Build[3]_Args=!COMMON_ARGS! -DDEEP_USE_FLOATING_POINT_EXCEPTIONS=ON"
 
-set "BUILD_COUNT=3"
+set "Build[4]_Name= CPP_EXCEPTIONS"
+set "Build[4]_Path=-cpp-exceptions"
+set "Build[4]_Args=!COMMON_ARGS! -DDEEP_CPP_EXCEPTIONS_ENABLED=ON"
+
+set "BUILD_COUNT=4"
 
 set "Build_Type[1]=DEBUG"
 set "Build_Type_Value[1]=Debug"

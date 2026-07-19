@@ -1,6 +1,7 @@
 #include "Tests.h"
 
 #define DEEP_TESTABLE
+#define DEEP_USE_TYPE_ALIASES
 #include "Deep.h"
 #include "Deep/Bit/IntegerBitMask.h"
 
