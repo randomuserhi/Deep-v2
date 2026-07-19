@@ -238,6 +238,17 @@ DEEP_NAMESPACE_END
 #endif
 
 /*
+ * Exceptions
+ */
+
+// Marks whether allocation methods such as Malloc, Realloc etc... throw exceptions or not
+#if DEEP_CPP_EXCEPTIONS_ENABLED
+	#define DEEP_ALLOC_NOEXCEPT
+#else
+	#define DEEP_ALLOC_NOEXCEPT noexcept
+#endif
+
+/*
  * Vectorised Instructions
  */
 

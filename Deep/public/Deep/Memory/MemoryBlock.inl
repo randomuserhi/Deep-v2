@@ -16,6 +16,11 @@ template<typename T, typename in_allocator>
 MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
                                                                    && std::is_nothrow_default_constructible_v<T>) :
 	m_size{ in_size } {
+	if (m_size == 0) {
+		m_ptr = nullptr;
+		return;
+	}
+
 	m_ptr = in_allocator::s_Malloc(m_size);
 #if DEEP_CPP_EXCEPTIONS_ENABLED
 	try {

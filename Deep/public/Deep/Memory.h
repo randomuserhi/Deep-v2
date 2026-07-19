@@ -2,12 +2,6 @@
 
 #include "Deep.h"
 
-#if DEEP_CPP_EXCEPTIONS_ENABLED
-	#define DEEP_ALLOC_NOEXCEPT
-#else
-	#define DEEP_ALLOC_NOEXCEPT noexcept
-#endif
-
 // Every allocation request with a valid, non-zero size and valid alignment, returns a non-null suitably aligned pointer,
 // throw std::bad_alloc when exceptions are enabled, or abort when exceptions are disabled.
 //
