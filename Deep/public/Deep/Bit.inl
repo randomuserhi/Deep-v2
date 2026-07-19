@@ -129,10 +129,11 @@ float16 FloatToHalf(const float32 in_value) {        // IEEE-754 16-bit floating
 
 template<std::endian WireEndian, c_Integer T>
 constexpr inline T HostToWire(T in_value) noexcept {
-	if constexpr (WireEndian == std::endian::native)
+	if constexpr (sizeof(T) == 1 || WireEndian == std::endian::native) {
 		return in_value;
-	else
+	} else {
 		return ReverseEndianness(in_value);
+	}
 }
 
 template<std::endian WireEndian, c_Integer T>
