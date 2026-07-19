@@ -4,6 +4,7 @@
 #include "Deep/Memory/RawAllocator.h"
 
 #include <concepts>
+#include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -44,28 +45,28 @@ template<typename T, typename in_allocator>
 Deep_ForceInline T* operator-(Arg_MemoryBlock<T, in_allocator>, size_t);
 
 // Light weight wrapper around a memory block (ptr + size)
-//
-// NOTE(randomuserhi): Currently does not support T with constructors or copy that can throw
-// TODO(randomuserhi): Support T that throw on copy or construct
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 class MemoryBlock {
 public:
-	inline MemoryBlock(const MemoryBlock&);
+	inline MemoryBlock(const MemoryBlock&) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
+	                                                && std::is_nothrow_copy_constructible_v<T>);
 	inline MemoryBlock(MemoryBlock&&) noexcept;
-	inline MemoryBlock& operator=(const MemoryBlock&);
+	inline MemoryBlock& operator=(const MemoryBlock&) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
+	                                                           && std::is_nothrow_copy_constructible_v<T>);
 	inline MemoryBlock& operator=(MemoryBlock&&) noexcept;
-	inline MemoryBlock();
+	inline MemoryBlock() noexcept;
 
 	// Allocates a block of size `in_size`.
-	explicit inline MemoryBlock(size_t in_size);
+	explicit inline MemoryBlock(size_t in_size) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
+	                                                     && std::is_nothrow_default_constructible_v<T>);
 
 	// Take ownership of an existing block.
 	//
 	// The block must be assigned the appropriate allocator to properly destruct the buffer.
 	// By default, uses Deep::TFree<T> to free the given pointer, and thus expects the pointer to be allocated
 	// with Deep::TMalloc<T>.
-	explicit inline MemoryBlock(T* in_ptr, size_t in_size);
+	explicit inline MemoryBlock(T* in_ptr, size_t in_size) noexcept;
 
 	//
 

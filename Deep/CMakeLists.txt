@@ -239,6 +239,7 @@ elseif (CLANG)
 	if (NOT DEEP_CPP_EXCEPTIONS_ENABLED)
 		target_compile_options(Deep PRIVATE -fno-exceptions)
 	else()
+		target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED)
 		target_compile_options(Deep PRIVATE -fexceptions)
 	endif()
 

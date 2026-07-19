@@ -2,38 +2,71 @@
 
 #include "Deep.h"
 #include "Deep/Memory/MemoryBlock.h"
+#include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>::MemoryBlock() :
+MemoryBlock<T, in_allocator>::MemoryBlock() noexcept :
 	m_ptr{ nullptr }, m_size{ 0 } {}
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) :
+MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
+                                                                   && std::is_nothrow_default_constructible_v<T>) :
 	m_size{ in_size } {
 	m_ptr = in_allocator::s_Malloc(m_size);
+#ifdef DEEP_CPP_EXCEPTIONS_ENABLED
+	try {
+		new (m_ptr) T[m_size];
+	} catch (...) {
+		in_allocator::s_Free(m_ptr);
+		throw;
+	}
+#else
 	new (m_ptr) T[m_size];
+#endif
 }
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>::MemoryBlock(T* in_ptr, size_t in_size) :
+MemoryBlock<T, in_allocator>::MemoryBlock(T* in_ptr, size_t in_size) noexcept :
 	m_ptr{ in_ptr }, m_size{ in_size } {}
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>::MemoryBlock(const MemoryBlock& in_other) :
+MemoryBlock<T, in_allocator>::MemoryBlock(const MemoryBlock& in_other) noexcept(
+	noexcept(in_allocator::s_Malloc(std::declval<size_t>())) && std::is_nothrow_copy_constructible_v<T>) :
 	m_size{ in_other.m_size } {
 	m_ptr = in_allocator::s_Malloc(m_size);
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
 		TMemcpy<T>(m_ptr, in_other.m_ptr, m_size);
 	} else {
+#ifdef DEEP_CPP_EXCEPTIONS_ENABLED
+		if constexpr (std::is_nothrow_copy_constructible_v<T>) {
+			for (size_t i = 0; i < m_size; ++i) {
+				new (m_ptr + i) T{ in_other[i] };
+			}
+		} else {
+			size_t constructed = 0;
+			try {
+				for (; constructed < m_size; ++constructed) {
+					new (m_ptr + constructed) T{ in_other[constructed] };
+				}
+			} catch (...) {
+				while (constructed > 0) {
+					m_ptr[--constructed].~T();
+				}
+				in_allocator::s_Free(m_ptr);
+				throw;
+			}
+		}
+#else
 		for (size_t i = 0; i < m_size; ++i) {
 			new (m_ptr + i) T{ in_other[i] };
 		}
+#endif
 	}
 }
 
@@ -69,7 +102,8 @@ MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(MemoryBloc
 
 template<typename T, typename in_allocator>
 	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const MemoryBlock& in_other) {
+MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const MemoryBlock& in_other) noexcept(
+	noexcept(in_allocator::s_Malloc(std::declval<size_t>())) && std::is_nothrow_copy_constructible_v<T>) {
 	Deep_Assert(m_ptr != in_other.m_ptr, "Cannot copy self into self.");
 
 	Deallocate();
@@ -79,9 +113,30 @@ MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const Memo
 	if constexpr (std::is_trivially_copy_constructible_v<T>) {
 		TMemcpy<T>(m_ptr, in_other.m_ptr, m_size);
 	} else {
+#ifdef DEEP_CPP_EXCEPTIONS_ENABLED
+		if constexpr (std::is_nothrow_copy_constructible_v<T>) {
+			for (size_t i = 0; i < m_size; ++i) {
+				new (m_ptr + i) T{ in_other[i] };
+			}
+		} else {
+			size_t constructed = 0;
+			try {
+				for (; constructed < m_size; ++constructed) {
+					new (m_ptr + constructed) T{ in_other[constructed] };
+				}
+			} catch (...) {
+				while (constructed > 0) {
+					m_ptr[--constructed].~T();
+				}
+				in_allocator::s_Free(m_ptr);
+				throw;
+			}
+		}
+#else
 		for (size_t i = 0; i < m_size; ++i) {
 			new (m_ptr + i) T{ in_other[i] };
 		}
+#endif
 	}
 
 	return *this;
