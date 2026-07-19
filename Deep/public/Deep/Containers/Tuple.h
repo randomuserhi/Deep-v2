@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Templates.h"
+#include "Deep/ConstructWith.h"
 
 #include <functional>
 #include <type_traits>
@@ -179,7 +179,7 @@ template<std::size_t I, typename... Ts>
 template<typename... Ts>
 [[nodiscard]] constexpr inline auto MakeTuple(Ts&&... in_args);
 
-template<_ConstructorArgs... Args>
+template<c_ConstructorArgs... Args>
 [[nodiscard]] constexpr inline auto ConstructTuple(Args&&... in_constructorArgs) noexcept(
 	noexcept(Tuple<typename std::remove_cvref_t<Args>::Type...>{ std::forward<Args>(in_constructorArgs)... }));
 

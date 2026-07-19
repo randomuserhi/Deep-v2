@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Memory.h"
-#include "Deep/Templates.h"
+#include "Deep/ConstructWith.h"
 #include "Deep/Containers/SetBit.h"
 
 #include <type_traits>
@@ -238,7 +238,7 @@ T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() {
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-template<typename T, _ConstructorArgs TaggedArg>
+template<typename T, c_ConstructorArgs TaggedArg>
 constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponentImpl(TaggedArg&& in_componentArg, T* in_ptr) {
 	if constexpr (std::is_same_v<T, typename std::decay_t<TaggedArg>::Type>) {
 		std::move(in_componentArg).Construct(in_ptr);
@@ -246,7 +246,7 @@ constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponentImpl(TaggedArg&& i
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-template<typename T, _ConstructorArgs... TaggedArgs>
+template<typename T, c_ConstructorArgs... TaggedArgs>
 constexpr inline void FIXED_SIZE_ARCHETYPE::ConstructComponent(size_t in_index, TaggedArgs&&... in_componentArgs) {
 	T* ptr = GetComponentPtr<T>() + in_index;
 
@@ -270,7 +270,7 @@ inline void FIXED_SIZE_ARCHETYPE::DestructComponent(size_t in_index) {
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-template<_ConstructorArgs... TaggedArgs>
+template<c_ConstructorArgs... TaggedArgs>
 void FIXED_SIZE_ARCHETYPE::ConstructEntity(size_t in_index, TaggedArgs&&... in_componentArgs) {
 	static_assert((s_validComponent<typename std::decay_t<TaggedArgs>::Type> && ...),
 	              "Archetype must contain all components that the given constructor args specify.");

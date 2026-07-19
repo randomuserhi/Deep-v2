@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep/Containers/Tuple.h"
-#include "Deep/Templates.h"
+#include "Deep/ConstructWith.h"
 
 DEEP_NAMESPACE_BEGIN
 
@@ -153,7 +153,7 @@ template<typename... Ts>
 	return Tuple<std::unwrap_ref_decay_t<Ts>...>(std::forward<Ts>(in_args)...);
 }
 
-template<_ConstructorArgs... Args>
+template<c_ConstructorArgs... Args>
 [[nodiscard]] constexpr auto ConstructTuple(Args&&... in_constructorArgs) noexcept(
 	noexcept(Tuple<typename std::remove_cvref_t<Args>::Type...>{ std::forward<Args>(in_constructorArgs)... })) {
 	static_assert((!std::is_lvalue_reference_v<Args> && ...), "Constructor specifications must be consumed immediately");

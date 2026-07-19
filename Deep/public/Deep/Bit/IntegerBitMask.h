@@ -116,6 +116,8 @@ extern template class IntegerBitMask<uint16>;
 extern template class IntegerBitMask<uint32>;
 extern template class IntegerBitMask<uint64>;
 
+// TODO(randomuserhi): Implement a `template<size_t N> class BitMask` that wraps `template<size_t N> std::bitset`
+
 DEEP_NAMESPACE_END
 
 #include "Deep/Bit/IntegerBitMask.inl" // IWYU pragma: export

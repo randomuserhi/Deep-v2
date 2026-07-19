@@ -32,7 +32,7 @@ struct IsConstructorArgs<ConstructorArgs<T, Args...>> : std::true_type {};
 } // namespace impl_ConstructorArgs
 
 template<typename T>
-concept _ConstructorArgs = impl_ConstructorArgs::IsConstructorArgs<std::remove_cvref_t<T>>::value;
+concept c_ConstructorArgs = impl_ConstructorArgs::IsConstructorArgs<std::remove_cvref_t<T>>::value;
 
 // A non-owning single use container for constructor arguments.
 //
@@ -119,7 +119,7 @@ template<typename T, typename... Args>
 [[nodiscard]] constexpr inline auto ConstructWith(Args&&... args);
 
 // Counts the number of `ConstructorArgs` in `in_args` that construct type `T`.
-template<typename T, _ConstructorArgs... in_args>
+template<typename T, c_ConstructorArgs... in_args>
 [[nodiscard]] constexpr static inline size_t CountConstructorArgs();
 
 // Count the number of times `T` appears in `Ts`.
@@ -129,4 +129,4 @@ template<typename T, typename... in_Ts>
 DEEP_NAMESPACE_END
 
 #include "Deep/Containers/Tuple.h" // IWYU pragma: export
-#include "Deep/Templates.inl"      // IWYU pragma: export
+#include "Deep/ConstructWith.inl"  // IWYU pragma: export

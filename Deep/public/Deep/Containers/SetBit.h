@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Bit/IntegerBitMask.h"
-#include "Deep/Templates.h"
+#include "Deep/ConstructWith.h"
 
 #include <iterator>
 #include <type_traits>
@@ -161,7 +161,7 @@ public:
 	// // Where `A` is the component to forward params to
 	// arch.ConstructEntity(0, Deep::ConstructWith<A>(param0, param1));
 	// ```
-	template<_ConstructorArgs... TaggedArgs>
+	template<c_ConstructorArgs... TaggedArgs>
 	inline void ConstructEntity(size_t in_index, TaggedArgs&&... in_componentArgs);
 
 	// Destruct an entity at the given index position
@@ -217,7 +217,7 @@ private:
 	// Does not default construct `T`.
 	//
 	// Used by ConstructComponent to handle unpacking of `TaggedArgs` list.
-	template<typename T, _ConstructorArgs TaggedArg>
+	template<typename T, c_ConstructorArgs TaggedArg>
 	constexpr inline void ConstructComponentImpl(TaggedArg&& in_componentArg, T* in_ptr);
 
 	// Utility that constructs component `T` given a set of `ConstructorArg`s.
@@ -226,7 +226,7 @@ private:
 	// otherwise `T` is default constructed.
 	//
 	// Used by `CreateEntity` to construct components from given `TaggedArgs` list.
-	template<typename T, _ConstructorArgs... TaggedArgs>
+	template<typename T, c_ConstructorArgs... TaggedArgs>
 	constexpr inline void ConstructComponent(size_t in_index, TaggedArgs&&... in_componentArgs);
 
 	// Utility that destructs the component `T`.
