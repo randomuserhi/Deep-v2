@@ -4,11 +4,12 @@
 #include "Deep/Memory.h"
 
 #include <type_traits> // IWYU pragma: keep
+#include <concepts>
 
 DEEP_NAMESPACE_BEGIN
 
 template<typename T, typename Type>
-concept _RawAllocator = requires {
+concept c_RawAllocator = requires {
 	{ T::s_Malloc } -> std::convertible_to<Type * (*)(size_t)>;
 	{ T::s_Free } -> std::convertible_to<void (*)(Type*)>;
 };
