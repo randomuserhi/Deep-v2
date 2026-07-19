@@ -40,7 +40,7 @@ constexpr inline Container* ContainerOf(Member* in_memberAddr, Member Container:
 // Returns true on a system that uses BigEndian
 constexpr inline bool IsBigEndian();
 
-// Check if value is a power of 2
+// Check if value is a power of 2.
 template<typename T>
 constexpr bool IsPowerOf2(T in_value);
 

@@ -36,7 +36,7 @@ constexpr inline bool IsBigEndian() {
 
 template<typename T>
 constexpr bool IsPowerOf2(T in_value) {
-	return (in_value & (in_value - 1)) == 0;
+	return in_value != 0 && (in_value & (in_value - 1)) == 0;
 }
 
 template<typename T>
