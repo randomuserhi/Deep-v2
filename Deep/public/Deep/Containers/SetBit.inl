@@ -4,7 +4,10 @@
 #include "Deep/Memory.h"
 #include "Deep/ConstructWith.h"
 #include "Deep/Containers/SetBit.h"
+#include "Deep/Templates/TypeLists.h"
 
+#include <cstdint>
+#include <malloc.h>
 #include <type_traits>
 #include <utility>
 
@@ -92,16 +95,28 @@ T* impl_SetBitArchetype::ComponentStorage<T>::Get() {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
-inline void FIXED_SIZE_ARCHETYPE::AllocateComponent(size_t in_size) {
-	static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this).m_data = TMalloc<T>(in_size);
+inline void FIXED_SIZE_ARCHETYPE::SetComponentPtr(void* in_ptr) {
+	static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this).m_data = static_cast<T*>(in_ptr);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-template<typename T>
-inline void FIXED_SIZE_ARCHETYPE::DeallocateComponent() {
-	impl_SetBitArchetype::ComponentStorage<T>& storage = static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this);
-	TFree<T>(storage.m_data);
-	storage.m_data = nullptr;
+inline void FIXED_SIZE_ARCHETYPE::AllocateStorage() {
+	Layout layout{ m_capacity };
+	byte* ptr = static_cast<byte*>(AlignedMalloc(layout.Size(), layout.Alignment()));
+	(SetComponentPtr<Components>(ptr + layout.template OffsetOf<Components>()), ...);
+	Deep_Assert((static_cast<const void*>(GetComponentPtr<TypeAt<0, Components...>>()) == static_cast<const void*>(ptr)),
+	            "First component ptr must be the same as the main storage pointer.");
+}
+
+FIXED_SIZE_ARCHETYPE_TEMPLATE
+inline void FIXED_SIZE_ARCHETYPE::DeallocateStorage() {
+	// The first component in the type list should be the main storage pointer
+	impl_SetBitArchetype::ComponentStorage<TypeAt<0, Components...>>& storage =
+		static_cast<impl_SetBitArchetype::ComponentStorage<TypeAt<0, Components...>>&>(*this);
+	AlignedFree(storage.m_data);
+
+	// Clear component pointers
+	(SetComponentPtr<Components>(nullptr), ...);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -118,14 +133,14 @@ FIXED_SIZE_ARCHETYPE_TEMPLATE
 FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(size_t in_capacity) :
 	m_activeMask{ 0 }, m_capacity{ in_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
-	(AllocateComponent<Components>(m_capacity), ...);
+	AllocateStorage();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype& in_other) :
 	m_activeMask{ 0 }, m_capacity{ in_other.m_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
-	(AllocateComponent<Components>(m_capacity), ...);
+	AllocateStorage();
 
 	// Copy active entities
 	BitMask remaining = in_other.m_activeMask;
@@ -138,7 +153,7 @@ FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype& i
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&& in_other) :
+FIXED_SIZE_ARCHETYPE::FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&& in_other) noexcept :
 	m_activeMask{ in_other.m_activeMask }, m_capacity{ in_other.m_capacity } {
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
 
@@ -162,11 +177,14 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeSetBitArche
 		}
 	}
 
-	// Reallocate buffers to maintain correct capacity
-	(DeallocateComponent<Components>(), ...);
+	// Free current buffer
+	DeallocateStorage();
+
 	m_capacity = in_other.m_capacity;
 	Deep_Assert(m_capacity <= k_maxCapacity, "Size must be smaller than k_maxCapacity.");
-	(AllocateComponent<Components>(m_capacity), ...);
+
+	// Allocate new buffer
+	AllocateStorage();
 
 	// Copy active entities
 	{
@@ -183,7 +201,7 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(const FixedSizeSetBitArche
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
-FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeSetBitArchetype&& in_other) {
+FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeSetBitArchetype&& in_other) noexcept {
 	if (this == &in_other) return *this;
 
 	// Destruct current entities
@@ -197,7 +215,7 @@ FIXED_SIZE_ARCHETYPE& FIXED_SIZE_ARCHETYPE::operator=(FixedSizeSetBitArchetype&&
 	}
 
 	// Deallocate existing buffers
-	(DeallocateComponent<Components>(), ...);
+	DeallocateStorage();
 
 	m_activeMask = in_other.m_activeMask;
 	m_capacity = in_other.m_capacity;
@@ -221,7 +239,7 @@ FIXED_SIZE_ARCHETYPE_TEMPLATE FIXED_SIZE_ARCHETYPE::~FixedSizeSetBitArchetype() 
 
 	m_activeMask = 0;
 	m_capacity = 0;
-	(DeallocateComponent<Components>(), ...);
+	DeallocateStorage();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE

@@ -7,7 +7,7 @@
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 	#include <immintrin.h>
 DEEP_SUPPRESS_WARNINGS_STD_END
-	#define DEEP_VEC_ALIGNMENT Deep_AlignOf(int64)
+	#define DEEP_VEC_ALIGNMENT alignof(int64)
 #elif defined(DEEP_USE_NEON)
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 	#ifdef DEEP_COMPILER_MSVC
@@ -17,9 +17,9 @@ DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 		#include <arm_neon.h>
 	#endif
 DEEP_SUPPRESS_WARNINGS_STD_END
-	#define DEEP_VEC_ALIGNMENT Deep_AlignOf(int32x2_t)
+	#define DEEP_VEC_ALIGNMENT alignof(int32x2_t)
 #else
-	#define DEEP_VEC_ALIGNMENT Deep_AlignOf(int64)
+	#define DEEP_VEC_ALIGNMENT alignof(int64)
 #endif
 
 #include <type_traits>

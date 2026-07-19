@@ -8,7 +8,7 @@
 DEEP_NAMESPACE_BEGIN
 
 struct DEEP_EXPORT Sphere {
-	alignas(Deep_AlignOf(Vec3)) Float3 m_center;
+	alignas(alignof(Vec3)) Float3 m_center;
 	float32 m_radius;
 
 	// Returns `m_center` and `m_radius` as a packed Vec3.

@@ -59,7 +59,7 @@ struct [[nodiscard]] alignas(Float32x4) Vec3 {
 	//   // As a result, `m_normal` and `m_distance` form a full Vec4 - and can be loaded as a Vec3.
 	//   //
 	//   // When writing to m_normal as a Vec3, use Vec3::XYZ to prevent overwriting m_distance.
-	//   alignas(Deep_AlignOf(Vec3)) Float3 m_normal;
+	//   alignas(alignof(Vec3)) Float3 m_normal;
 	//   float32 m_distance;
 	// };
 	// ```

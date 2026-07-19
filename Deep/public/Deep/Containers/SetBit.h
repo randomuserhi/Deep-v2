@@ -3,8 +3,8 @@
 #include "Deep.h"
 #include "Deep/Bit/IntegerBitMask.h"
 #include "Deep/ConstructWith.h"
+#include "Deep/Templates/SoALayout.h"
 
-#include <iterator>
 #include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
@@ -112,22 +112,24 @@ struct ComponentStorage {
 // ```
 //
 // NOTE(randomuserhi): Currently does not support components with constructors or copy that can throw
-// TODO(randomuserhi): Support components that throw on copy or construct
-// TODO(randomuserhi): Allocate all components in a single allocation rather than separate buffers for each
-//                     [ComponentA array][padding][ComponentB array][padding][ComponentC array]
+// TODO(randomuserhi): Support components that throw on copy or construction
 template<c_BitMask in_BitMask, typename... Components>
 class FixedSizeSetBitArchetype : private impl_SetBitArchetype::ComponentStorage<Components>... {
+	static_assert(sizeof...(Components) > 0, "Must have atleast one component");
+
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
 	              "Components must be non-volatile and non-const value types.");
+
+	using Layout = SoALayout<Components...>;
 
 public:
 	using BitMask = in_BitMask;
 
 public:
 	inline FixedSizeSetBitArchetype(const FixedSizeSetBitArchetype&);
-	inline FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&&);
+	inline FixedSizeSetBitArchetype(FixedSizeSetBitArchetype&&) noexcept;
 	inline FixedSizeSetBitArchetype& operator=(const FixedSizeSetBitArchetype&);
-	inline FixedSizeSetBitArchetype& operator=(FixedSizeSetBitArchetype&&);
+	inline FixedSizeSetBitArchetype& operator=(FixedSizeSetBitArchetype&&) noexcept;
 
 	explicit inline FixedSizeSetBitArchetype(size_t in_capacity);
 
@@ -200,13 +202,9 @@ private:
 	template<typename T>
 	inline T* GetComponentPtr();
 
-	// Utility that allocates memory for a given component, `T`, buffer.
+	// Utility that assigns a component ptr.
 	template<typename T>
-	inline void AllocateComponent(size_t in_size);
-
-	// Utility that deallocates memory for a given component, `T`, buffer.
-	template<typename T>
-	inline void DeallocateComponent();
+	inline void SetComponentPtr(void* in_ptr);
 
 	// Utility that moves the component buffer `T` from one archetype to another.
 	// The move sets the given component buffer `T` in `in_other` to nullptr.
@@ -238,6 +236,12 @@ private:
 	// Used by `DestructEntity` to destruct components.
 	template<typename T>
 	inline void DestructComponent(size_t in_index);
+
+	// Allocates component storage for the current `m_capacity`
+	inline void AllocateStorage();
+
+	// Deallocates component storage
+	inline void DeallocateStorage();
 
 	//
 

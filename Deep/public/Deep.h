@@ -155,7 +155,6 @@
 #if defined(DEEP_COMPILER_CLANG)
 	#define Deep_ForceInline inline __attribute__((always_inline))
 	#define Deep_NoInline __attribute__((noinline))
-	#define Deep_AlignOf(type) __alignof__(type)
 
 	#define Deep_PushPack
 	#define Deep_PopPack __attribute__((__packed__))
@@ -171,7 +170,6 @@
 #elif defined(DEEP_COMPILER_GCC)
 	#define Deep_ForceInline inline __attribute__((always_inline))
 	#define Deep_NoInline __attribute__((noinline))
-	#define Deep_AlignOf(type) __alignof__(type)
 
 	#define Deep_PushPack
 	#define Deep_PopPack __attribute__((__packed__))
@@ -187,7 +185,6 @@
 #elif defined(DEEP_COMPILER_MSVC)
 	#define Deep_ForceInline inline __forceinline
 	#define Deep_NoInline __declspec(noinline)
-	#define Deep_AlignOf(type) alignof(type)
 
 	#define Deep_PushPack __pragma(pack(push, 1))
 	#define Deep_PopPack __pragma(pack(pop))

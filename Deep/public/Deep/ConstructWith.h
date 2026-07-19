@@ -122,10 +122,6 @@ template<typename T, typename... Args>
 template<typename T, c_ConstructorArgs... in_args>
 [[nodiscard]] constexpr static inline size_t CountConstructorArgs();
 
-// Count the number of times `T` appears in `Ts`.
-template<typename T, typename... in_Ts>
-[[nodiscard]] constexpr static inline size_t CountTypeOccurences();
-
 DEEP_NAMESPACE_END
 
 #include "Deep/Containers/Tuple.h" // IWYU pragma: export

@@ -42,11 +42,6 @@ template<typename T, c_ConstructorArgs... in_Args>
 	return (0 + ... + std::is_same_v<T, typename std::decay_t<in_Args>::Type>);
 }
 
-template<typename T, typename... in_Args>
-[[nodiscard]] constexpr static inline size_t CountTypeOccurences() {
-	return (0 + ... + std::is_same_v<T, in_Args>);
-}
-
 #undef CONSTRUCTOR_ARGS_TEMPLATE
 #undef CONSTRUCTOR_ARGS
 
