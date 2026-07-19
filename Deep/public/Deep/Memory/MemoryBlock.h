@@ -34,15 +34,27 @@ Deep_ForceInline bool operator!=(void*, Arg_MemoryBlock<T, in_allocator>);
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-Deep_ForceInline T* operator+(Arg_MemoryBlock<T, in_allocator>, size_t);
+Deep_ForceInline const T* operator+(Arg_MemoryBlock<T, in_allocator>, size_t);
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-Deep_ForceInline T* operator+(size_t, Arg_MemoryBlock<T, in_allocator>);
+Deep_ForceInline const T* operator+(size_t, Arg_MemoryBlock<T, in_allocator>);
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-Deep_ForceInline T* operator-(Arg_MemoryBlock<T, in_allocator>, size_t);
+Deep_ForceInline const T* operator-(Arg_MemoryBlock<T, in_allocator>, size_t);
+
+template<typename T, typename in_allocator>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator+(MemoryBlock<T, in_allocator>&, size_t);
+
+template<typename T, typename in_allocator>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator+(size_t, MemoryBlock<T, in_allocator>&);
+
+template<typename T, typename in_allocator>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+Deep_ForceInline T* operator-(MemoryBlock<T, in_allocator>&, size_t);
 
 // Light weight wrapper around a memory block (ptr + size)
 template<typename T, typename in_allocator>
@@ -87,9 +99,13 @@ public:
 	friend bool operator== <T, in_allocator>(void*, Arg_MemoryBlock<T, in_allocator>);
 	friend bool operator!= <T, in_allocator>(void*, Arg_MemoryBlock<T, in_allocator>);
 
-	friend T* operator+ <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, size_t);
-	friend T* operator+ <T, in_allocator>(size_t, Arg_MemoryBlock<T, in_allocator>);
-	friend T* operator- <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, size_t);
+	friend const T* operator+ <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, size_t);
+	friend const T* operator+ <T, in_allocator>(size_t, Arg_MemoryBlock<T, in_allocator>);
+	friend const T* operator- <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, size_t);
+
+	friend T* operator+ <T, in_allocator>(MemoryBlock<T, in_allocator>&, size_t);
+	friend T* operator+ <T, in_allocator>(size_t, MemoryBlock<T, in_allocator>&);
+	friend T* operator- <T, in_allocator>(MemoryBlock<T, in_allocator>&, size_t);
 
 	//
 

@@ -233,19 +233,37 @@ bool operator==(void* in_a, Arg_MemoryBlock<T, in_allocator> in_b) {
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-T* operator+(Arg_MemoryBlock<T, in_allocator> in_block, size_t in_value) {
+const T* operator+(Arg_MemoryBlock<T, in_allocator> in_block, size_t in_value) {
 	return in_block.m_ptr + in_value;
 }
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-T* operator+(size_t in_value, Arg_MemoryBlock<T, in_allocator> in_block) {
+const T* operator+(size_t in_value, Arg_MemoryBlock<T, in_allocator> in_block) {
 	return in_value + in_block.m_ptr;
 }
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-T* operator-(Arg_MemoryBlock<T, in_allocator> in_block, size_t in_value) {
+const T* operator-(Arg_MemoryBlock<T, in_allocator> in_block, size_t in_value) {
+	return in_block.m_ptr - in_value;
+}
+
+template<typename T, typename in_allocator>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+T* operator+(MemoryBlock<T, in_allocator>& in_block, size_t in_value) {
+	return in_block.m_ptr + in_value;
+}
+
+template<typename T, typename in_allocator>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+T* operator+(size_t in_value, MemoryBlock<T, in_allocator>& in_block) {
+	return in_value + in_block.m_ptr;
+}
+
+template<typename T, typename in_allocator>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+T* operator-(MemoryBlock<T, in_allocator>& in_block, size_t in_value) {
 	return in_block.m_ptr - in_value;
 }
 

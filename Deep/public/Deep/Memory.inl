@@ -73,6 +73,12 @@ T* TMalloc(size_t in_size) DEEP_ALLOC_NOEXCEPT {
 template<typename T>
 T* TRealloc(T* in_old, size_t in_size) DEEP_ALLOC_NOEXCEPT {
 	static_assert(alignof(T) <= alignof(std::max_align_t), "Realloc is not supported for the given type 'T'.");
+
+	// Prevent integer overflow of `in_size * sizeof(T)`
+	if (in_size > std::numeric_limits<size_t>::max() / sizeof(T)) {
+		OnAllocationFail();
+	}
+
 	return static_cast<T*>(Realloc(in_old, in_size * sizeof(T)));
 }
 
