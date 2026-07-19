@@ -81,15 +81,15 @@ public:
 	Deep_ForceInline T& operator[](size_t);
 	Deep_ForceInline const T& operator[](size_t) const;
 
-	friend bool operator== <>(Arg_MemoryBlock<T, in_allocator>, void*);
-	friend bool operator!= <>(Arg_MemoryBlock<T, in_allocator>, void*);
-	friend bool operator== <>(void*, Arg_MemoryBlock<T, in_allocator>);
-	friend bool operator!= <>(void*, Arg_MemoryBlock<T, in_allocator>);
+	friend bool operator== <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, void*);
+	friend bool operator!= <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, void*);
+	friend bool operator== <T, in_allocator>(void*, Arg_MemoryBlock<T, in_allocator>);
+	friend bool operator!= <T, in_allocator>(void*, Arg_MemoryBlock<T, in_allocator>);
 
-	friend T* operator+ <>(Arg_MemoryBlock<T, in_allocator>, size_t);
-	friend T* operator+ <>(size_t, Arg_MemoryBlock<T, in_allocator>);
-	friend T* operator- <>(Arg_MemoryBlock<T, in_allocator>, size_t);
-	friend T* operator- <>(size_t, Arg_MemoryBlock<T, in_allocator>);
+	friend T* operator+ <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, size_t);
+	friend T* operator+ <T, in_allocator>(size_t, Arg_MemoryBlock<T, in_allocator>);
+	friend T* operator- <T, in_allocator>(Arg_MemoryBlock<T, in_allocator>, size_t);
+	friend T* operator- <T, in_allocator>(size_t, Arg_MemoryBlock<T, in_allocator>);
 
 	//
 
