@@ -10,84 +10,104 @@ DEEP_NAMESPACE_BEGIN
 // TODO(randomuserhi): Address nullptr `in_data` and 0 `in_size`.
 //                     `HasBytesRemaining` has undefined behaviour in that case `nullptr + 0`.
 
-PacketReader::PacketReader(const uint8* in_data, size_t in_size) :
+template<std::endian in_Endian>
+PacketReader<in_Endian>::PacketReader(const uint8* in_data, size_t in_size) :
 	m_head{ in_data }, m_tail{ in_data + in_size }, m_data{ in_data }, m_size{ in_size } {}
 
-bool PacketReader::HasBytesRemaining(size_t in_count) {
+template<std::endian in_Endian>
+bool PacketReader<in_Endian>::HasBytesRemaining(size_t in_count) {
 	return (m_head + in_count) <= m_tail;
 }
 
-uint8 PacketReader::ReadUInt8() {
+template<std::endian in_Endian>
+uint8 PacketReader<in_Endian>::ReadUInt8() {
 	uint8 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	value = *m_head;
 	m_head += sizeof value;
 	return value;
 }
-uint16 PacketReader::ReadUInt16() {
+
+template<std::endian in_Endian>
+uint16 PacketReader<in_Endian>::ReadUInt16() {
 	uint16 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return ntoh(value);
+	return WireToHost<in_Endian>(value);
 }
-uint32 PacketReader::ReadUInt32() {
+
+template<std::endian in_Endian>
+uint32 PacketReader<in_Endian>::ReadUInt32() {
 	uint32 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return ntoh(value);
+	return WireToHost<in_Endian>(value);
 }
-uint64 PacketReader::ReadUInt64() {
+
+template<std::endian in_Endian>
+uint64 PacketReader<in_Endian>::ReadUInt64() {
 	uint64 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return ntoh(value);
+	return WireToHost<in_Endian>(value);
 }
 
-int16 PacketReader::ReadInt16() {
+template<std::endian in_Endian>
+int16 PacketReader<in_Endian>::ReadInt16() {
 	int16 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return ntoh(value);
+	return WireToHost<in_Endian>(value);
 }
-int32 PacketReader::ReadInt32() {
+
+template<std::endian in_Endian>
+int32 PacketReader<in_Endian>::ReadInt32() {
 	int32 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return ntoh(value);
+	return WireToHost<in_Endian>(value);
 }
-int64 PacketReader::ReadInt64() {
+
+template<std::endian in_Endian>
+int64 PacketReader<in_Endian>::ReadInt64() {
 	int64 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return ntoh(value);
+	return WireToHost<in_Endian>(value);
 }
 
-float32 PacketReader::ReadFloat16() {
+template<std::endian in_Endian>
+float32 PacketReader<in_Endian>::ReadFloat16() {
 	uint16 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return HalfToFloat(ntoh(value));
+	return HalfToFloat(WireToHost<in_Endian>(value));
 }
-float32 PacketReader::ReadFloat32() {
+
+template<std::endian in_Endian>
+float32 PacketReader<in_Endian>::ReadFloat32() {
 	uint32 value;
 	Deep_Assert(HasBytesRemaining(sizeof value), "Reached end of byte buffer.");
 	Memcpy(&value, m_head, sizeof value);
 	m_head += sizeof value;
-	return AsFloat(ntoh(value));
+	return AsFloat(WireToHost<in_Endian>(value));
 }
 
-Vec3 PacketReader::ReadVec3() {
+template<std::endian in_Endian>
+Vec3 PacketReader<in_Endian>::ReadVec3() {
 	Deep_Assert(HasBytesRemaining(sizeof(float32) * 3), "Reached end of byte buffer.");
 	return Vec3{ ReadFloat32(), ReadFloat32(), ReadFloat32() };
 }
-Vec3 PacketReader::ReadHalfVec3() {
+
+template<std::endian in_Endian>
+Vec3 PacketReader<in_Endian>::ReadHalfVec3() {
 	Deep_Assert(HasBytesRemaining(sizeof(float16) * 3), "Reached end of byte buffer.");
 	return Vec3{ ReadFloat16(), ReadFloat16(), ReadFloat16() };
 }

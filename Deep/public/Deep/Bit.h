@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Deep.h"
+#include "Deep/Concepts.h"
 
 #include <concepts>
+#include <bit>
 
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
@@ -37,9 +39,6 @@ constexpr inline To BitCast(const From& in_value);
 template<typename Container, typename Member>
 constexpr inline Container* ContainerOf(Member* in_memberAddr, Member Container::* in_memberPtr) noexcept;
 
-// Returns true on a system that uses BigEndian
-constexpr inline bool IsBigEndian();
-
 // Check if value is a power of 2.
 template<typename T>
 constexpr bool IsPowerOf2(T in_value);
@@ -58,18 +57,21 @@ constexpr inline int32 CountSetBits(T in_value);
 template<std::integral T>
 constexpr inline int32 NumBits();
 
-inline uint32 RotateLeft(const uint32 in_value, const int32 in_offset);
-inline uint32 RotateRight(const uint32 in_value, const int32 in_offset);
+template<std::unsigned_integral T>
+constexpr inline T RotateLeft(const T in_value, const int32 in_offset) noexcept;
 
-inline uint16 ReverseEndianness(const uint16 in_value);
-inline uint32 ReverseEndianness(const uint32 in_value);
-inline uint64 ReverseEndianness(const uint64 in_value);
-inline int16 ReverseEndianness(const int16 in_value);
-inline int32 ReverseEndianness(const int32 in_value);
-inline int64 ReverseEndianness(const int64 in_value);
+template<std::unsigned_integral T>
+constexpr inline T RotateRight(const T in_value, const int32 in_offset) noexcept;
 
-inline uint32 AsUInt(const float32 in_value);
-inline float32 AsFloat(const uint32 in_value);
+constexpr inline uint16 ReverseEndianness(const uint16 in_value) noexcept;
+constexpr inline uint32 ReverseEndianness(const uint32 in_value) noexcept;
+constexpr inline uint64 ReverseEndianness(const uint64 in_value) noexcept;
+constexpr inline int16 ReverseEndianness(const int16 in_value) noexcept;
+constexpr inline int32 ReverseEndianness(const int32 in_value) noexcept;
+constexpr inline int64 ReverseEndianness(const int64 in_value) noexcept;
+
+Deep_ForceInline uint32 AsUInt(const float32 in_value);
+Deep_ForceInline float32 AsFloat(const uint32 in_value);
 
 // IEEE-754 16-bit floating-point format (without infinity): 1-5-10,
 // exp-15, +-131008.0, +-6.1035156E-5, +-5.9604645E-8, 3.311 digits
@@ -79,25 +81,11 @@ inline float32 HalfToFloat(const uint16 in_value);
 // exp-15, +-131008.0, +-6.1035156E-5, +-5.9604645E-8, 3.311 digits
 inline float16 FloatToHalf(const float32 in_value);
 
-// Host to Network conversion methods
-// NOTE(randomuserhi) This uses little endian as the network byte order as majority of x86 systems
-//                    use little endian.
+template<std::endian WireEndian, c_Integer T>
+constexpr inline T HostToWire(T in_value) noexcept;
 
-inline uint16 hton(const uint16 in_value);
-inline uint32 hton(const uint32 in_value);
-inline uint64 hton(const uint64 in_value);
-inline int16 hton(const int16 in_value);
-inline int32 hton(const int32 in_value);
-inline int64 hton(const int64 in_value);
-
-// Network to Host conversion methods
-
-inline uint16 ntoh(const uint16 in_value);
-inline uint32 ntoh(const uint32 in_value);
-inline uint64 ntoh(const uint64 in_value);
-inline int16 ntoh(const int16 in_value);
-inline int32 ntoh(const int32 in_value);
-inline int64 ntoh(const int64 in_value);
+template<std::endian WireEndian, c_Integer T>
+constexpr inline T WireToHost(T in_value) noexcept;
 
 DEEP_NAMESPACE_END
 

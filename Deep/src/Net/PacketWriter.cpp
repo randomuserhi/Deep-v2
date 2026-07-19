@@ -7,7 +7,8 @@
 
 DEEP_NAMESPACE_BEGIN
 
-void PacketWriter::Write(Quat in_Quat) {
+template<std::endian in_Endian>
+void PacketWriter<in_Endian>::Write(Quat in_Quat) {
 	m_buffer.reserve(m_buffer.size() + sizeof(uint8) + sizeof(float32) * 3);
 
 	float32 largest = Abs(in_Quat.x);
@@ -73,7 +74,9 @@ void PacketWriter::Write(Quat in_Quat) {
 		break;
 	}
 }
-void PacketWriter::WriteHalfQuat(Quat in_Quat) {
+
+template<std::endian in_Endian>
+void PacketWriter<in_Endian>::WriteHalfQuat(Quat in_Quat) {
 	m_buffer.reserve(m_buffer.size() + sizeof(uint8) + sizeof(float16) * 3);
 
 	float32 largest = Abs(in_Quat.x);
@@ -139,5 +142,8 @@ void PacketWriter::WriteHalfQuat(Quat in_Quat) {
 		break;
 	}
 }
+
+template struct DEEP_EXPORT PacketWriter<std::endian::big>;
+template struct DEEP_EXPORT PacketWriter<std::endian::little>;
 
 DEEP_NAMESPACE_END

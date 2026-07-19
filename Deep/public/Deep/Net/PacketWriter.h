@@ -13,15 +13,17 @@ DEEP_SUPPRESS_WARNINGS_STD_END
 
 DEEP_NAMESPACE_BEGIN
 
+template<std::endian in_Endian>
 struct PacketWriter {
-	//
+	static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+	              "Mixed-endian architectures are not supported.");
 
+public:
 	inline PacketWriter();
 	inline explicit PacketWriter(size_t in_size);
 
 	//
 
-	// TODO(randomuserhi): https://stackoverflow.com/a/51615364/9642458
 	Deep_ForceInline const uint8* m_Data() const;
 	Deep_ForceInline size_t m_Size() const;
 
@@ -54,6 +56,9 @@ private:
 
 	//
 };
+
+extern template struct PacketWriter<std::endian::big>;
+extern template struct PacketWriter<std::endian::little>;
 
 DEEP_NAMESPACE_END
 

@@ -8,7 +8,8 @@
 
 DEEP_NAMESPACE_BEGIN
 
-Quat PacketReader::ReadQuaternion() {
+template<std::endian in_Endian>
+Quat PacketReader<in_Endian>::ReadQuaternion() {
 	Deep_Assert(HasBytesRemaining(sizeof(uint8) + sizeof(float32) * 3), "Reached end of byte buffer.");
 
 	uint8 i = ReadUInt8();
@@ -47,7 +48,8 @@ Quat PacketReader::ReadQuaternion() {
 	return q;
 }
 
-Quat PacketReader::ReadHalfQuaternion() {
+template<std::endian in_Endian>
+Quat PacketReader<in_Endian>::ReadHalfQuaternion() {
 	Deep_Assert(HasBytesRemaining(sizeof(uint8) + sizeof(float16) * 3), "Reached end of byte buffer.");
 
 	uint8 i = ReadUInt8();
@@ -85,5 +87,8 @@ Quat PacketReader::ReadHalfQuaternion() {
 	}
 	return q;
 }
+
+template struct DEEP_EXPORT PacketReader<std::endian::big>;
+template struct DEEP_EXPORT PacketReader<std::endian::little>;
 
 DEEP_NAMESPACE_END

@@ -9,9 +9,12 @@
 
 DEEP_NAMESPACE_BEGIN
 
+template<std::endian in_Endian>
 struct PacketReader {
-	//
+	static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+	              "Mixed-endian architectures are not supported.");
 
+public:
 	inline PacketReader(const uint8* in_data, size_t in_size);
 
 	//
@@ -54,6 +57,9 @@ private:
 
 	//
 };
+
+extern template struct PacketReader<std::endian::big>;
+extern template struct PacketReader<std::endian::little>;
 
 DEEP_NAMESPACE_END
 
