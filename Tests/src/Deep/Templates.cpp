@@ -1,6 +1,5 @@
 #include "Tests.h"
 
-#define DEEP_USE_TYPE_ALIASES
 #include "Deep.h"
 #include "Deep/Memory.h"
 #include "Deep/ConstructWith.h"

@@ -1,6 +1,5 @@
 #include "Tests.h"
 
-#define DEEP_USE_TYPE_ALIASES
 #include "Deep/Math/Vec2.h"
 
 // TODO(randomuserhi): Test Vec2::Rotate and Vec2::Angle

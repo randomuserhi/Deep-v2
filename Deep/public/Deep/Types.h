@@ -27,7 +27,7 @@ using float64 = double;
 
 } // namespace Deep
 
-#ifdef DEEP_USE_TYPE_ALIASES
+#ifndef DEEP_NO_TYPE_ALIASES
 
 using byte = Deep::byte;
 

@@ -1,6 +1,5 @@
 #include "Tests.h"
 
-#define DEEP_USE_TYPE_ALIASES
 #include "Deep/Math/Constants.h"
 #include "Deep/Math/Quat.h"
 
