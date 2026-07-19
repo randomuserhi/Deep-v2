@@ -41,4 +41,4 @@ static_assert(std::is_standard_layout<Int2>(), "Is supposed to be standard layou
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Int2.inl" // IWYU pragma: export
+#include "./Int2.inl" // IWYU pragma: export

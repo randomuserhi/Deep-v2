@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Containers/Vector.h"
+#include "./Vector.h"
 
 DEEP_NAMESPACE_BEGIN
 

@@ -138,4 +138,4 @@ inline std::ostream& operator<<(std::ostream& in_os, const Vec3& in_vec);
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Vec3.inl" // IWYU pragma: export
+#include "./Vec3.inl" // IWYU pragma: export

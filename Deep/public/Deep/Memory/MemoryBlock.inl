@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Memory/MemoryBlock.h"
+#include "./MemoryBlock.h"
+
 #include <type_traits>
 
 DEEP_NAMESPACE_BEGIN

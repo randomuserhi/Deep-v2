@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Time.h"
+#include "./Time.h"
 
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #include <chrono>

@@ -1,7 +1,8 @@
 #pragma once
 
+#include "./PacketReader.h"
+
 #include "Deep/Memory.h"
-#include "Deep/Net/PacketReader.h"
 #include "Deep/Bit.h"
 
 DEEP_NAMESPACE_BEGIN

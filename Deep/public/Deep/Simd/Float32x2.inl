@@ -1,7 +1,8 @@
 #pragma once
 
+#include "./Float32x2.h"
+
 #include "Deep/Simd/Float32x4.h"
-#include "Deep/Simd/Float32x2.h"
 #include "Deep/Simd/Int32x2.h"
 #include "Deep/Bit.h"
 

@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Math/Vec3.h"
-#include "Deep/Physics3D/Colliders/Sphere.h"
+#include "./Sphere.h"
 
 DEEP_NAMESPACE_BEGIN
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Float3.h"
+#include "./Float3.h"
+
 #include "Deep/Math/Vec3.h"
 
 DEEP_NAMESPACE_BEGIN

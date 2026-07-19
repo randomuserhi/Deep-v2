@@ -7,14 +7,14 @@
 
 DEEP_NAMESPACE_BEGIN
 
-namespace impl_SoALayout {
+namespace detail::_SoALayout {
 
 // Increase an offset the nearest alignment boundary
 constexpr size_t AlignUp(size_t in_offset, size_t in_alignment) {
 	return ((in_offset + in_alignment - 1) / in_alignment) * in_alignment;
 }
 
-} // namespace impl_SoALayout
+} // namespace detail::_SoALayout
 
 // Utility for managing a single allocation for multiple arrays, where each array stores `in_size` elements.
 //
@@ -25,7 +25,7 @@ constexpr size_t AlignUp(size_t in_offset, size_t in_alignment) {
 template<typename... Ts>
 class SoALayout {
 public:
-	explicit constexpr SoALayout(size_t in_itemSize);
+	explicit constexpr SoALayout(size_t in_itemCount);
 
 	// Number of items each array contains
 	[[nodiscard]] constexpr Deep_ForceInline const size_t& ItemCount() const;
@@ -63,4 +63,4 @@ private:
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Templates/SoALayout.inl" // IWYU pragma: export
+#include "./SoALayout.inl" // IWYU pragma: export

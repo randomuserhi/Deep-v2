@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Deep.h"
+#include "./Aabb.h"
+
 #include "Deep/Math/Vec2.h"
-#include "Deep/Physics2D/Colliders/Aabb.h"
 
 DEEP_NAMESPACE_BEGIN
 

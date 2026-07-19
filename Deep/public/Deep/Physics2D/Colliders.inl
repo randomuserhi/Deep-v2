@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Physics2D/Colliders.h"
+#include "./Colliders.h"
 
 DEEP_NAMESPACE_BEGIN
 

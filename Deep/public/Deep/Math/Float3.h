@@ -42,4 +42,4 @@ static_assert(std::is_standard_layout<Float3>(), "Is supposed to be standard lay
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Float3.inl" // IWYU pragma: export
+#include "./Float3.inl" // IWYU pragma: export

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Vec2i.h"
+#include "./Vec2i.h"
+
 #include "Deep/Math/Vec2.h"
 #include "Deep/Math/Vec4i.h"
 

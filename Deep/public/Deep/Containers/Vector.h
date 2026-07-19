@@ -9,4 +9,4 @@ class Vector {};
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Containers/Vector.inl" // IWYU pragma: export
+#include "./Vector.inl" // IWYU pragma: export

@@ -2,7 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Bit/IntegerBitMask.h"
-#include "Deep/ConstructWith.h"
+#include "Deep/Templates/ConstructWith.h"
 #include "Deep/Templates/SoALayout.h"
 
 #include <type_traits>
@@ -74,7 +74,7 @@ private:
 	Tuple<Components*...> m_components;
 };
 
-namespace impl_SetBitArchetype {
+namespace detail::_SetBitArchetype {
 
 // Utility object to generate inheritance chain for archetype storage
 template<typename T>
@@ -85,7 +85,7 @@ struct ComponentStorage {
 	inline T* Get();
 };
 
-} // namespace impl_SetBitArchetype
+} // namespace detail::_SetBitArchetype
 
 // Fixed size, set-bit variant of the Archetype container.
 //
@@ -114,7 +114,7 @@ struct ComponentStorage {
 // NOTE(randomuserhi): Currently does not support components with constructors or copy that can throw
 // TODO(randomuserhi): Support components that throw on copy or construction
 template<c_BitMask in_BitMask, typename... Components>
-class FixedSizeSetBitArchetype : private impl_SetBitArchetype::ComponentStorage<Components>... {
+class FixedSizeSetBitArchetype : private detail::_SetBitArchetype::ComponentStorage<Components>... {
 	static_assert(sizeof...(Components) > 0, "Must have atleast one component");
 
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
@@ -260,4 +260,4 @@ private:
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Containers/SetBit.inl" // IWYU pragma: export
+#include "./SetBit.inl" // IWYU pragma: export

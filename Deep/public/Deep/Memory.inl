@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Memory.h"
+#include "./Memory.h"
 
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #include <cstddef>

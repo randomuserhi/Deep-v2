@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Int3.h"
+#include "./Int3.h"
+
 #include "Deep/Math/Vec3i.h"
 
 DEEP_NAMESPACE_BEGIN

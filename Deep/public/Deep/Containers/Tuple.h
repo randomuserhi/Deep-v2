@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/ConstructWith.h"
+#include "Deep/Templates/ConstructWith.h"
 
 #include <functional>
 #include <type_traits>
@@ -9,7 +9,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-namespace impl_Tuple {
+namespace detail::_Tuple {
 
 template<typename T>
 struct TupleStorage {
@@ -88,8 +88,8 @@ constexpr inline decltype(auto) ApplyImpl(F&& in_function, TupleType&& in_tuple,
 	noexcept(std::invoke(std::forward<F>(in_function), std::forward<TupleType>(in_tuple).template Get<Is>()...)));
 
 template<typename... Ts>
-struct Tuple : impl_Tuple::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...> {
-	using BaseType = typename impl_Tuple::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...>;
+struct Tuple : detail::_Tuple::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...> {
+	using BaseType = typename detail::_Tuple::TupleImpl<std::make_index_sequence<sizeof...(Ts)>, Ts...>;
 	using BaseType::BaseType;
 };
 
@@ -153,12 +153,12 @@ template<typename... LeftTs, typename... RightTs>
 [[nodiscard]] constexpr inline bool operator==(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(
 	noexcept(TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{})));
 
-} // namespace impl_Tuple
+} // namespace detail::_Tuple
 
 // Custom tuple class that is actually zero cost :
 // https://stackoverflow.com/questions/63719249/why-does-stdtuple-break-small-size-struct-calling-convention-optimization-in-c
 template<typename... Ts>
-using Tuple = impl_Tuple::Tuple<Ts...>;
+using Tuple = detail::_Tuple::Tuple<Ts...>;
 
 // Get an item by index from a tuple
 template<std::size_t I, typename... Ts>
@@ -188,19 +188,19 @@ template<typename... Ts>
 
 template<typename F, typename... Ts>
 constexpr inline decltype(auto) Apply(F&& in_function, Tuple<Ts...>& in_tuple) noexcept(
-	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{})));
+	noexcept(detail::_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{})));
 
 template<typename F, typename... Ts>
 constexpr inline decltype(auto) Apply(F&& in_function, const Tuple<Ts...>& in_tuple) noexcept(
-	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{})));
+	noexcept(detail::_Tuple::ApplyImpl(std::forward<F>(in_function), in_tuple, std::index_sequence_for<Ts...>{})));
 
 template<typename F, typename... Ts>
-constexpr inline decltype(auto) Apply(F&& in_function, Tuple<Ts...>&& in_tuple) noexcept(
-	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{})));
+constexpr inline decltype(auto) Apply(F&& in_function, Tuple<Ts...>&& in_tuple) noexcept(noexcept(
+	detail::_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{})));
 
 template<typename F, typename... Ts>
-constexpr inline decltype(auto) Apply(F&& in_function, const Tuple<Ts...>&& in_tuple) noexcept(
-	noexcept(impl_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{})));
+constexpr inline decltype(auto) Apply(F&& in_function, const Tuple<Ts...>&& in_tuple) noexcept(noexcept(
+	detail::_Tuple::ApplyImpl(std::forward<F>(in_function), std::move(in_tuple), std::index_sequence_for<Ts...>{})));
 
 DEEP_NAMESPACE_END
 
@@ -211,7 +211,7 @@ struct tuple_size<::Deep::Tuple<Ts...>> : std::integral_constant<std::size_t, si
 
 template<std::size_t I, typename... Ts>
 struct tuple_element<I, ::Deep::Tuple<Ts...>> {
-	using type = typename ::Deep::impl_Tuple::TupleTypeAtIndex<I, Ts...>::type;
+	using type = typename ::Deep::detail::_Tuple::TupleTypeAtIndex<I, Ts...>::type;
 };
 
 } // namespace std

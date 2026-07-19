@@ -14,4 +14,4 @@ using Arg_ContactInfo = const ContactInfo&;
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Physics2D/ContactInfo.inl" // IWYU pragma: export
+#include "./ContactInfo.inl" // IWYU pragma: export

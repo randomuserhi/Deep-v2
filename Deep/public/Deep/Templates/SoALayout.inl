@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Templates/SoALayout.h"
+#include "./SoALayout.h"
 
 DEEP_NAMESPACE_BEGIN
 
@@ -11,7 +10,7 @@ constexpr SoALayout<Ts...>::SoALayout(size_t in_itemSize) :
 	size_t offset = 0;
 
 	for (size_t i = 0; i < k_numArrays; ++i) {
-		offset = impl_SoALayout::AlignUp(offset, k_alignments[i]);
+		offset = detail::_SoALayout::AlignUp(offset, k_alignments[i]);
 
 		m_offsets[i] = offset;
 

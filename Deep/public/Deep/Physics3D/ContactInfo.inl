@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Math/VecArgs.h"
-#include "Deep/Physics3D/ContactInfo.h"
+#include "./ContactInfo.h"
 
 DEEP_NAMESPACE_BEGIN
 

@@ -166,4 +166,4 @@ DEEP_NAMESPACE_END
 
 #undef DEEP_VEC_ALIGNMENT
 
-#include "Deep/Simd/Int32x4.inl" // IWYU pragma: export
+#include "./Int32x4.inl" // IWYU pragma: export

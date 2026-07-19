@@ -94,4 +94,4 @@ static_assert(std::is_standard_layout<Vec2i>(), "Is supposed to be standard layo
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Vec2i.inl" // IWYU pragma: export
+#include "./Vec2i.inl" // IWYU pragma: export

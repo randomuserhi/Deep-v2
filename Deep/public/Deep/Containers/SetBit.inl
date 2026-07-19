@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Deep.h"
+#include "./SetBit.h"
+
 #include "Deep/Memory.h"
-#include "Deep/ConstructWith.h"
-#include "Deep/Containers/SetBit.h"
+#include "Deep/Templates/ConstructWith.h"
 #include "Deep/Templates/TypeLists.h"
 
 #include <malloc.h>
@@ -80,12 +80,12 @@ Sentinel ARCHETYPE_VIEW::end() const {
 #undef ARCHETYPE_VIEW
 
 template<typename T>
-const T* impl_SetBitArchetype::ComponentStorage<T>::Get() const {
+const T* detail::_SetBitArchetype::ComponentStorage<T>::Get() const {
 	return m_data;
 }
 
 template<typename T>
-T* impl_SetBitArchetype::ComponentStorage<T>::Get() {
+T* detail::_SetBitArchetype::ComponentStorage<T>::Get() {
 	return m_data;
 }
 
@@ -95,7 +95,7 @@ T* impl_SetBitArchetype::ComponentStorage<T>::Get() {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::SetComponentPtr(void* in_ptr) {
-	static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this).m_data = static_cast<T*>(in_ptr);
+	static_cast<detail::_SetBitArchetype::ComponentStorage<T>&>(*this).m_data = static_cast<T*>(in_ptr);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -110,8 +110,8 @@ inline void FIXED_SIZE_ARCHETYPE::AllocateStorage() {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 inline void FIXED_SIZE_ARCHETYPE::DeallocateStorage() {
 	// The first component in the type list should be the main storage pointer
-	impl_SetBitArchetype::ComponentStorage<TypeAt<0, Components...>>& storage =
-		static_cast<impl_SetBitArchetype::ComponentStorage<TypeAt<0, Components...>>&>(*this);
+	detail::_SetBitArchetype::ComponentStorage<TypeAt<0, Components...>>& storage =
+		static_cast<detail::_SetBitArchetype::ComponentStorage<TypeAt<0, Components...>>&>(*this);
 	AlignedFree(storage.m_data);
 
 	// Clear component pointers
@@ -121,8 +121,10 @@ inline void FIXED_SIZE_ARCHETYPE::DeallocateStorage() {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 inline void FIXED_SIZE_ARCHETYPE::MoveComponent(FixedSizeSetBitArchetype&& in_other) {
-	impl_SetBitArchetype::ComponentStorage<T>& storage = static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this);
-	impl_SetBitArchetype::ComponentStorage<T>& other = static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(in_other);
+	detail::_SetBitArchetype::ComponentStorage<T>& storage =
+		static_cast<detail::_SetBitArchetype::ComponentStorage<T>&>(*this);
+	detail::_SetBitArchetype::ComponentStorage<T>& other =
+		static_cast<detail::_SetBitArchetype::ComponentStorage<T>&>(in_other);
 
 	storage.m_data = other.m_data;
 	other.m_data = nullptr;
@@ -245,14 +247,14 @@ FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 const T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() const {
 	static_assert(s_validComponent<T>, "Component type not in archetype");
-	return static_cast<const impl_SetBitArchetype::ComponentStorage<T>&>(*this).Get();
+	return static_cast<const detail::_SetBitArchetype::ComponentStorage<T>&>(*this).Get();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename T>
 T* FIXED_SIZE_ARCHETYPE::GetComponentPtr() {
 	static_assert(s_validComponent<T>, "Component type not in archetype");
-	return static_cast<impl_SetBitArchetype::ComponentStorage<T>&>(*this).Get();
+	return static_cast<detail::_SetBitArchetype::ComponentStorage<T>&>(*this).Get();
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE

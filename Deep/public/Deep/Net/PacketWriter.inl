@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Net/PacketWriter.h"
+#include "./PacketWriter.h"
+
 #include "Deep/Bit.h"
 #include "Deep/Memory.h"
 

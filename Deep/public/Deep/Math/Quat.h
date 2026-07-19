@@ -99,4 +99,4 @@ static_assert(std::is_standard_layout<Quat>(), "Is supposed to be standard layou
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Math/Quat.inl" // IWYU pragma: export
+#include "./Quat.inl" // IWYU pragma: export

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "./Vec4.h"
+
 #include "Deep/Math/Ops.h"
 #include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec4i.h"
-#include "Deep/Math/Vec4.h"
 
 DEEP_NAMESPACE_BEGIN
 

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Deep.h"
+#include "./Vec3.h"
+
 #include "Deep/Math/Ops.h"
 #include "Deep/Math/VecArgs.h"
 #include "Deep/Simd/Float32x4.h"
-#include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec3i.h"
 #include "Deep/Math/Vec4.h"
 

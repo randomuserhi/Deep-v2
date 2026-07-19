@@ -31,7 +31,7 @@ struct TypeIndex<T> {
 	static_assert(!std::is_same_v<T, T>, "Type is not present in the type list");
 };
 
-namespace impl_TypeAt {
+namespace detail::_TypeAt {
 
 template<size_t I, typename... Ts>
 struct TypeAt;
@@ -52,11 +52,11 @@ struct TypeAt<I> {
 	static_assert(I != I, "Index is out of bounds for the type list");
 };
 
-} // namespace impl_TypeAt
+} // namespace detail::_TypeAt
 
 // Utility to get the type at index I in a type list `Ts`
 template<size_t I, typename... Ts>
-using TypeAt = typename impl_TypeAt::TypeAt<I, Ts...>::Value;
+using TypeAt = typename detail::_TypeAt::TypeAt<I, Ts...>::Value;
 
 // Utility to find the maximum alignment from a type list `Ts`
 template<typename... Ts>

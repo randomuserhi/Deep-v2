@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Quat.h"
+#include "./Quat.h"
+
 #include "Deep/Math/Mat4.h" // IWYU pragma: export
 
 DEEP_NAMESPACE_BEGIN

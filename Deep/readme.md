@@ -27,7 +27,9 @@ cmake --build build
 - `io_camelCase` for in-out arguments
 - `c_CamelCase` for concepts
 - `CamelCase` for namespaces
-- `impl_CamelCase` for implementation specific namespaces often used to hide implementation specific templates used in meta-programming.
+
+- `namespace::detail` The `detail` namespace within another namespace is reserved for implementation details commonly for templates used in meta-programming.
+  - It's common to group implementation details together, these groups follow the naming scheme `_CamelCase`, for example `detail::_Tuple`.
 
 For templates where the template parameter acts more like a function parameter as opposed to a type declaration, use `in_CamelCase` name scheme:
 ```cpp

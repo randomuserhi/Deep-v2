@@ -1,14 +1,16 @@
 #pragma once
 
+#include "./Int32x4.h"
+
 #include "Deep/Simd/Int32x2.h"
-#include "Deep/Simd/Int32x4.h"
 #include "Deep/Simd/Float32x4.h"
 #include "Deep/Bit.h"
-#include <smmintrin.h>
 
 #if !defined(DEEP_USE_SSE)
 	#include "Deep/Math/Ops.h"
 #endif
+
+#include <smmintrin.h>
 
 DEEP_NAMESPACE_BEGIN
 

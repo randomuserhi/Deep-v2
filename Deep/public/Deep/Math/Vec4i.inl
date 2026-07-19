@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Vec4i.h"
+#include "./Vec4i.h"
+
 #include "Deep/Math/Vec4.h"
 
 DEEP_NAMESPACE_BEGIN

@@ -14,4 +14,4 @@ Deep_ForceInline int IsOverlapping(Arg_Sphere in_sphere, Arg_Aabb3D in_box, Cont
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Physics3D/Colliders.inl" // IWYU pragma: export
+#include "./Colliders.inl" // IWYU pragma: export

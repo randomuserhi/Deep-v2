@@ -13,7 +13,7 @@ DEEP_NAMESPACE_BEGIN
 struct Sentinel {};
 
 // Tuple declaration
-namespace impl_Tuple {
+namespace detail::_Tuple {
 template<typename... Ts>
 struct Tuple;
 }
@@ -21,7 +21,7 @@ struct Tuple;
 template<typename T, typename... Args>
 class ConstructorArgs;
 
-namespace impl_ConstructorArgs {
+namespace detail::_ConstructorArgs {
 
 template<typename T>
 struct IsConstructorArgs : std::false_type {};
@@ -29,10 +29,10 @@ struct IsConstructorArgs : std::false_type {};
 template<typename T, typename... Args>
 struct IsConstructorArgs<ConstructorArgs<T, Args...>> : std::true_type {};
 
-} // namespace impl_ConstructorArgs
+} // namespace detail::_ConstructorArgs
 
 template<typename T>
-concept c_ConstructorArgs = impl_ConstructorArgs::IsConstructorArgs<std::remove_cvref_t<T>>::value;
+concept c_ConstructorArgs = detail::_ConstructorArgs::IsConstructorArgs<std::remove_cvref_t<T>>::value;
 
 // A non-owning single use container for constructor arguments.
 //
@@ -77,7 +77,7 @@ class ConstructorArgs final {
 
 public:
 	using Type = T;
-	using ArgumentsTuple = impl_Tuple::Tuple<Args&&...>;
+	using ArgumentsTuple = detail::_Tuple::Tuple<Args&&...>;
 
 	constexpr explicit ConstructorArgs(Args&&... in_args) noexcept(
 		std::is_nothrow_constructible_v<ArgumentsTuple, Args&&...>) :
@@ -125,4 +125,4 @@ template<typename T, c_ConstructorArgs... in_args>
 DEEP_NAMESPACE_END
 
 #include "Deep/Containers/Tuple.h" // IWYU pragma: export
-#include "Deep/ConstructWith.inl"  // IWYU pragma: export
+#include "./ConstructWith.inl"     // IWYU pragma: export

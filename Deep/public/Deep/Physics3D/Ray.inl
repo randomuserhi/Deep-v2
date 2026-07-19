@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Physics3D/Ray.h"
+#include "./Ray.h"
 
 DEEP_NAMESPACE_BEGIN
 

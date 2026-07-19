@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Deep/Math/Mat4.h"
+#include "./Mat4.h"
+
 #include "Deep/Math/Quat.h"
 
 DEEP_NAMESPACE_BEGIN

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/Bit/IntegerBitMask.h"
+#include "./IntegerBitMask.h"
 
 DEEP_NAMESPACE_BEGIN
 

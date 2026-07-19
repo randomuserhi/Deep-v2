@@ -7,4 +7,4 @@ DEEP_NAMESPACE_BEGIN
 
 DEEP_NAMESPACE_END
 
-#include "Deep/Physics2D/Colliders.inl" // IWYU pragma: export
+#include "./Colliders.inl" // IWYU pragma: export

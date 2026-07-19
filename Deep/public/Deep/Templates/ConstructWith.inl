@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Deep.h"
-#include "Deep/ConstructWith.h"
+#include "./ConstructWith.h"
 
 DEEP_NAMESPACE_BEGIN
 
