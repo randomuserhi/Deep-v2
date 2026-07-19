@@ -2,6 +2,7 @@
  * Packet
  */
 
+#include "Deep.h"
 #include "Deep/Net/PacketReader.h"
 #include "Deep/Math.h"
 
@@ -37,6 +38,11 @@ Quat PacketReader::ReadQuaternion() {
 		q.z = ReadFloat32();
 		q.w = Sqrt(Clamp01(1.0f - q.x * q.x - q.y * q.y - q.z * q.z));
 		break;
+	default:
+		Deep_Assert(false, "Unreachable, malformed quarternion.");
+		// move head as if read was successful to place head at correct position.
+		m_head += sizeof(float32) * 3;
+		break;
 	}
 	return q;
 }
@@ -70,6 +76,11 @@ Quat PacketReader::ReadHalfQuaternion() {
 		q.y = ReadFloat16();
 		q.z = ReadFloat16();
 		q.w = Sqrt(Clamp01(1.0f - q.x * q.x - q.y * q.y - q.z * q.z));
+		break;
+	default:
+		Deep_Assert(false, "Unreachable, malformed quarternion.");
+		// move head as if read was successful to place head at correct position.
+		m_head += sizeof(float16) * 3;
 		break;
 	}
 	return q;

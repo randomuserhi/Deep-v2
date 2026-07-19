@@ -6,6 +6,9 @@
 
 DEEP_NAMESPACE_BEGIN
 
+// TODO(randomuserhi): Address nullptr `in_data` and 0 `in_size`.
+//                     `HasBytesRemaining` has undefined behaviour in that case `nullptr + 0`.
+
 PacketReader::PacketReader(const uint8* in_data, size_t in_size) :
 	m_head{ in_data }, m_tail{ in_data + in_size }, m_data{ in_data }, m_size{ in_size } {}
 

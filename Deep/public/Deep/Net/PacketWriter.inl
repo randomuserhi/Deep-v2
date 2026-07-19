@@ -72,9 +72,7 @@ void PacketWriter::WriteInt64(int64 in_value) {
 }
 
 void PacketWriter::WriteFloat32(float32 in_value) {
-	size_t old = m_buffer.size();
-	m_buffer.resize(m_buffer.size() + sizeof in_value);
-	Memcpy(m_buffer.data() + old, &in_value, sizeof in_value);
+	WriteUInt32(BitCast<uint32>(in_value));
 }
 void PacketWriter::WriteFloat16(float32 in_value) {
 	float16 half = FloatToHalf(in_value);

@@ -7,134 +7,134 @@
 
 DEEP_NAMESPACE_BEGIN
 
-void PacketWriter::Write(Quat roQuat) {
-	m_buffer.resize(m_buffer.size() + sizeof(uint8) + sizeof(float32) * 3);
+void PacketWriter::Write(Quat in_Quat) {
+	m_buffer.reserve(m_buffer.size() + sizeof(uint8) + sizeof(float32) * 3);
 
-	float32 largest = roQuat.x;
+	float32 largest = Abs(in_Quat.x);
 	uint8 i = 0;
-	if (roQuat.y > largest) {
-		largest = roQuat.y;
+	if (float32 temp = Abs(in_Quat.y); temp > largest) {
+		largest = temp;
 		i = 1;
 	}
-	if (roQuat.z > largest) {
-		largest = roQuat.z;
+	if (float32 temp = Abs(in_Quat.z); temp > largest) {
+		largest = temp;
 		i = 2;
 	}
-	if (roQuat.w > largest) {
-		largest = roQuat.w;
+	if (float32 temp = Abs(in_Quat.w); temp > largest) {
+		largest = temp;
 		i = 3;
 	}
 
 	WriteUInt8(i);
 	switch (i) {
 	case 0:
-		if (roQuat.x >= 0) {
-			WriteFloat32(roQuat.y);
-			WriteFloat32(roQuat.z);
-			WriteFloat32(roQuat.w);
+		if (in_Quat.x >= 0) {
+			WriteFloat32(in_Quat.y);
+			WriteFloat32(in_Quat.z);
+			WriteFloat32(in_Quat.w);
 		} else {
-			WriteFloat32(-roQuat.y);
-			WriteFloat32(-roQuat.z);
-			WriteFloat32(-roQuat.w);
+			WriteFloat32(-in_Quat.y);
+			WriteFloat32(-in_Quat.z);
+			WriteFloat32(-in_Quat.w);
 		}
 		break;
 	case 1:
-		if (roQuat.y >= 0) {
-			WriteFloat32(roQuat.x);
-			WriteFloat32(roQuat.z);
-			WriteFloat32(roQuat.w);
+		if (in_Quat.y >= 0) {
+			WriteFloat32(in_Quat.x);
+			WriteFloat32(in_Quat.z);
+			WriteFloat32(in_Quat.w);
 		} else {
-			WriteFloat32(-roQuat.x);
-			WriteFloat32(-roQuat.z);
-			WriteFloat32(-roQuat.w);
+			WriteFloat32(-in_Quat.x);
+			WriteFloat32(-in_Quat.z);
+			WriteFloat32(-in_Quat.w);
 		}
 		break;
 	case 2:
-		if (roQuat.z >= 0) {
-			WriteFloat32(roQuat.x);
-			WriteFloat32(roQuat.y);
-			WriteFloat32(roQuat.w);
+		if (in_Quat.z >= 0) {
+			WriteFloat32(in_Quat.x);
+			WriteFloat32(in_Quat.y);
+			WriteFloat32(in_Quat.w);
 		} else {
-			WriteFloat32(-roQuat.x);
-			WriteFloat32(-roQuat.y);
-			WriteFloat32(-roQuat.w);
+			WriteFloat32(-in_Quat.x);
+			WriteFloat32(-in_Quat.y);
+			WriteFloat32(-in_Quat.w);
 		}
 		break;
 	case 3:
-		if (roQuat.w >= 0) {
-			WriteFloat32(roQuat.x);
-			WriteFloat32(roQuat.y);
-			WriteFloat32(roQuat.z);
+		if (in_Quat.w >= 0) {
+			WriteFloat32(in_Quat.x);
+			WriteFloat32(in_Quat.y);
+			WriteFloat32(in_Quat.z);
 		} else {
-			WriteFloat32(-roQuat.x);
-			WriteFloat32(-roQuat.y);
-			WriteFloat32(-roQuat.z);
+			WriteFloat32(-in_Quat.x);
+			WriteFloat32(-in_Quat.y);
+			WriteFloat32(-in_Quat.z);
 		}
 		break;
 	}
 }
-void PacketWriter::WriteHalfQuat(Quat roQuat) {
-	m_buffer.resize(m_buffer.size() + sizeof(uint8) + sizeof(float16) * 3);
+void PacketWriter::WriteHalfQuat(Quat in_Quat) {
+	m_buffer.reserve(m_buffer.size() + sizeof(uint8) + sizeof(float16) * 3);
 
-	float32 largest = roQuat.x;
+	float32 largest = Abs(in_Quat.x);
 	uint8 i = 0;
-	if (roQuat.y > largest) {
-		largest = roQuat.y;
+	if (float32 temp = Abs(in_Quat.y); temp > largest) {
+		largest = temp;
 		i = 1;
 	}
-	if (roQuat.z > largest) {
-		largest = roQuat.z;
+	if (float32 temp = Abs(in_Quat.z); temp > largest) {
+		largest = temp;
 		i = 2;
 	}
-	if (roQuat.w > largest) {
-		largest = roQuat.w;
+	if (float32 temp = Abs(in_Quat.w); temp > largest) {
+		largest = temp;
 		i = 3;
 	}
 
 	WriteUInt8(i);
 	switch (i) {
 	case 0:
-		if (roQuat.x >= 0) {
-			WriteFloat16(roQuat.y);
-			WriteFloat16(roQuat.z);
-			WriteFloat16(roQuat.w);
+		if (in_Quat.x >= 0) {
+			WriteFloat16(in_Quat.y);
+			WriteFloat16(in_Quat.z);
+			WriteFloat16(in_Quat.w);
 		} else {
-			WriteFloat16(-roQuat.y);
-			WriteFloat16(-roQuat.z);
-			WriteFloat16(-roQuat.w);
+			WriteFloat16(-in_Quat.y);
+			WriteFloat16(-in_Quat.z);
+			WriteFloat16(-in_Quat.w);
 		}
 		break;
 	case 1:
-		if (roQuat.y >= 0) {
-			WriteFloat16(roQuat.x);
-			WriteFloat16(roQuat.z);
-			WriteFloat16(roQuat.w);
+		if (in_Quat.y >= 0) {
+			WriteFloat16(in_Quat.x);
+			WriteFloat16(in_Quat.z);
+			WriteFloat16(in_Quat.w);
 		} else {
-			WriteFloat16(-roQuat.x);
-			WriteFloat16(-roQuat.z);
-			WriteFloat16(-roQuat.w);
+			WriteFloat16(-in_Quat.x);
+			WriteFloat16(-in_Quat.z);
+			WriteFloat16(-in_Quat.w);
 		}
 		break;
 	case 2:
-		if (roQuat.z >= 0) {
-			WriteFloat16(roQuat.x);
-			WriteFloat16(roQuat.y);
-			WriteFloat16(roQuat.w);
+		if (in_Quat.z >= 0) {
+			WriteFloat16(in_Quat.x);
+			WriteFloat16(in_Quat.y);
+			WriteFloat16(in_Quat.w);
 		} else {
-			WriteFloat16(-roQuat.x);
-			WriteFloat16(-roQuat.y);
-			WriteFloat16(-roQuat.w);
+			WriteFloat16(-in_Quat.x);
+			WriteFloat16(-in_Quat.y);
+			WriteFloat16(-in_Quat.w);
 		}
 		break;
 	case 3:
-		if (roQuat.w >= 0) {
-			WriteFloat16(roQuat.x);
-			WriteFloat16(roQuat.y);
-			WriteFloat16(roQuat.z);
+		if (in_Quat.w >= 0) {
+			WriteFloat16(in_Quat.x);
+			WriteFloat16(in_Quat.y);
+			WriteFloat16(in_Quat.z);
 		} else {
-			WriteFloat16(-roQuat.x);
-			WriteFloat16(-roQuat.y);
-			WriteFloat16(-roQuat.z);
+			WriteFloat16(-in_Quat.x);
+			WriteFloat16(-in_Quat.y);
+			WriteFloat16(-in_Quat.z);
 		}
 		break;
 	}
