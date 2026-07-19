@@ -21,7 +21,6 @@ public:
 	using BitMask = in_BitMask;
 
 	using reference = Tuple<Components&...>;
-	using iterator_category = std::forward_iterator_tag;
 
 public:
 	inline SetBitArchetypeIterator(BitMask in_mask, Components*... in_components);
@@ -111,6 +110,11 @@ struct ComponentStorage {
 //   // Iterate the transforms of all entities that can move
 // }
 // ```
+//
+// NOTE(randomuserhi): Currently does not support components with constructors or copy that can throw
+// TODO(randomuserhi): Support components that throw on copy or construct
+// TODO(randomuserhi): Allocate all components in a single allocation rather than separate buffers for each
+//                     [ComponentA array][padding][ComponentB array][padding][ComponentC array]
 template<c_BitMask in_BitMask, typename... Components>
 class FixedSizeSetBitArchetype : private impl_SetBitArchetype::ComponentStorage<Components>... {
 	static_assert(((std::is_object_v<Components> && !std::is_volatile_v<Components> && !std::is_const_v<Components>) && ...),
@@ -140,7 +144,7 @@ public:
 	inline size_t Size() const;
 
 	// Get the max number of entities
-	inline const size_t& m_Capacity() const;
+	Deep_ForceInline const size_t& m_Capacity() const;
 
 	// Get component of an entity
 	template<typename T>

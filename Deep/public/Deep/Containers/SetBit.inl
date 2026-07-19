@@ -21,7 +21,8 @@ ARCHETYPE_ITERATOR_TEMPLATE
 template<std::size_t... Is>
 ARCHETYPE_ITERATOR::reference ARCHETYPE_ITERATOR::Deref(std::index_sequence<Is...>) const {
 	Deep_Assert(*this != Sentinel{}, "End of iterator.");
-	return reference{ Get<Is>(m_components)[m_remaining.IndexOfLowestSetBit()]... };
+	const size_t index = m_remaining.IndexOfLowestSetBit();
+	return reference{ Get<Is>(m_components)[index]... };
 }
 
 ARCHETYPE_ITERATOR_TEMPLATE
