@@ -237,6 +237,8 @@ TEST(SetBit, Move) {
 
 		EXPECT_TRUE(isComponentNullPtr.template operator()<A>(a));
 		EXPECT_TRUE(isComponentNullPtr.template operator()<B>(a));
+		EXPECT_FALSE(a.m_activeMask.Any());
+		EXPECT_EQ(a.m_capacity, 0);
 
 		EXPECT_FALSE(isComponentNullPtr.template operator()<A>(b));
 		EXPECT_FALSE(isComponentNullPtr.template operator()<B>(b));
@@ -266,6 +268,8 @@ TEST(SetBit, Move) {
 
 		EXPECT_TRUE(isComponentNullPtr.template operator()<A>(a));
 		EXPECT_TRUE(isComponentNullPtr.template operator()<B>(a));
+		EXPECT_FALSE(a.m_activeMask.Any());
+		EXPECT_EQ(a.m_capacity, 0);
 
 		EXPECT_FALSE(isComponentNullPtr.template operator()<A>(b));
 		EXPECT_FALSE(isComponentNullPtr.template operator()<B>(b));
