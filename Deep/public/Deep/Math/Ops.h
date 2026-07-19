@@ -33,8 +33,8 @@ inline constexpr const T& Clamp(const T& in_val, const T& in_lower, const T& in_
 }
 
 template<typename T>
-inline constexpr const T& Clamp01(const T& in_val) {
-	return Clamp(in_val, 0.0f, 1.0f);
+inline constexpr T Clamp01(const T& in_val) {
+	return Clamp(in_val, T{ 0 }, T{ 1 });
 }
 
 template<typename T>
