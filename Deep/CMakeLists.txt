@@ -237,9 +237,10 @@ elseif (CLANG)
 	# Enable/Disable exceptions
 	message(STATUS "${MESSAGE_PREFIX} CPP_EXCEPTIONS_ENABLED: ${DEEP_CPP_EXCEPTIONS_ENABLED}")
 	if (NOT DEEP_CPP_EXCEPTIONS_ENABLED)
+	target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED=0)
 		target_compile_options(Deep PRIVATE -fno-exceptions)
 	else()
-		target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED)
+		target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED=1)
 		target_compile_options(Deep PRIVATE -fexceptions)
 	endif()
 

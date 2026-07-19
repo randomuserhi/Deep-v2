@@ -9,44 +9,44 @@
 DEEP_NAMESPACE_BEGIN
 
 template<typename T, typename in_allocator = RawAllocator<T>>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 class MemoryBlock;
 
 template<typename T, typename in_allocator = RawAllocator<T>>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 using Arg_MemoryBlock = const MemoryBlock<T, in_allocator>&;
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline bool operator==(Arg_MemoryBlock<T, in_allocator>, void*);
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline bool operator!=(Arg_MemoryBlock<T, in_allocator>, void*);
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline bool operator==(void*, Arg_MemoryBlock<T, in_allocator>);
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline bool operator!=(void*, Arg_MemoryBlock<T, in_allocator>);
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline T* operator+(Arg_MemoryBlock<T, in_allocator>, size_t);
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline T* operator+(size_t, Arg_MemoryBlock<T, in_allocator>);
 
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 Deep_ForceInline T* operator-(Arg_MemoryBlock<T, in_allocator>, size_t);
 
 // Light weight wrapper around a memory block (ptr + size)
 template<typename T, typename in_allocator>
-	requires std::default_initializable<T> && std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
+	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 class MemoryBlock {
 public:
 	inline MemoryBlock(const MemoryBlock&) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
@@ -74,7 +74,8 @@ public:
 
 	//
 
-	inline operator T*() const;
+	inline operator T*();
+	inline operator const T*() const;
 
 	//
 

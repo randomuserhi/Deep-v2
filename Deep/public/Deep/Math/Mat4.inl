@@ -399,7 +399,7 @@ Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b) {
 
 Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
 	Vec3 _v;
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	_v.m_float32x4 =
 		_mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(0, 0, 0, 0)));
 	_v.m_float32x4 = _mm_add_ps(
@@ -409,18 +409,20 @@ Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
 		_v.m_float32x4,
 		_mm_mul_ps(in_mat.m_cols[2], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(2, 2, 2, 2))));
 	_v.m_float32x4 = _mm_add_ps(_v.m_float32x4, in_mat.m_cols[3]);
+	const __m128 w = _mm_shuffle_ps(_v.m_float32x4, _v.m_float32x4, _MM_SHUFFLE(3, 3, 3, 3));
+	_v.m_float32x4 = _mm_div_ps(_v.m_float32x4, w);
 #else
 	float32 invW = 1.0f / (in_mat.m30 * in_vec.x + in_mat.m31 * in_vec.y + in_mat.m32 * in_vec.z + in_mat.m33);
 	_v.x = (in_mat.m00 * in_vec.x + in_mat.m01 * in_vec.y + in_mat.m02 * in_vec.z + in_mat.m03) * invW;
 	_v.y = (in_mat.m10 * in_vec.x + in_mat.m11 * in_vec.y + in_mat.m12 * in_vec.z + in_mat.m13) * invW;
 	_v.z = (in_mat.m20 * in_vec.x + in_mat.m21 * in_vec.y + in_mat.m22 * in_vec.z + in_mat.m23) * invW;
 #endif
-	return _v;
+	return Vec3::s_FixW(_v);
 }
 
 Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec) {
 	Vec4 _v;
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE
 	_v.m_float32x4 =
 		_mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(0, 0, 0, 0)));
 	_v.m_float32x4 = _mm_add_ps(

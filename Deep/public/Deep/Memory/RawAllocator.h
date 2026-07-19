@@ -11,7 +11,7 @@ DEEP_NAMESPACE_BEGIN
 template<typename T, typename Type>
 concept c_RawAllocator = requires {
 	{ T::s_Malloc } -> std::convertible_to<Type * (*)(size_t)>;
-	{ T::s_Free } -> std::convertible_to<void (*)(Type*)>;
+	{ T::s_Free } -> std::convertible_to<void (*)(Type*) noexcept>;
 };
 
 template<typename T>

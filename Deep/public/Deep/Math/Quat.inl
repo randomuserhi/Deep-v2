@@ -78,8 +78,7 @@ Quat Quat::m_Conjugated() const {
 }
 
 Quat& Quat::Inverse() {
-	float32 magnitude = vec.m_Magnitude();
-	return Conjugate() /= (magnitude * magnitude);
+	return Conjugate() /= vec.m_SqrdMagnitude();
 }
 Quat Quat::m_Inversed() const {
 	Quat q = *this;

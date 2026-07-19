@@ -2,22 +2,51 @@
 
 #include "./Memory.h"
 
+#include "Deep.h"
+#include "Deep/Bit.h"
+
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+
+#if DEEP_CPP_EXCEPTIONS_ENABLED
+	#include <new>
+#endif
 DEEP_SUPPRESS_WARNINGS_STD_END
 
 DEEP_NAMESPACE_BEGIN
 
-void* Malloc(size_t in_size) noexcept {
-	Deep_Assert(in_size > 0, "Size must be greater than 0.");
-	return std::malloc(in_size);
+[[noreturn]] Deep_ForceInline void OnAllocationFail() DEEP_ALLOC_NOEXCEPT {
+#if DEEP_CPP_EXCEPTIONS_ENABLED
+	throw std::bad_alloc{};
+#else
+	std::abort();
+#endif
 }
 
-void* Realloc(void* in_old, size_t in_size) noexcept {
-	Deep_Assert(in_size > 0, "Size must be greater than 0.");
-	return std::realloc(in_old, in_size);
+void* Malloc(size_t in_size) DEEP_ALLOC_NOEXCEPT {
+	Deep_Assert(in_size > 0, "Allocation size must be greater than zero.");
+
+	void* ptr = std::malloc(in_size);
+
+	if (ptr == nullptr) {
+		OnAllocationFail();
+	}
+
+	return ptr;
+}
+
+void* Realloc(void* in_old, size_t in_size) DEEP_ALLOC_NOEXCEPT {
+	Deep_Assert(in_size > 0, "Allocation size must be greater than zero.");
+
+	void* ptr = std::realloc(in_old, in_size);
+
+	if (ptr == nullptr) {
+		OnAllocationFail();
+	}
+
+	return ptr;
 }
 
 void Free(void* in_ptr) noexcept {
@@ -25,22 +54,24 @@ void Free(void* in_ptr) noexcept {
 }
 
 template<typename T>
-T* TMalloc(size_t in_size) noexcept {
+T* TMalloc(size_t in_size) DEEP_ALLOC_NOEXCEPT {
 	constexpr size_t alignment = alignof(T);
 	constexpr size_t defaultAlignment = alignof(std::max_align_t);
 
-	void* ptr;
-	if constexpr (alignment > defaultAlignment) {
-		ptr = AlignedMalloc(in_size * sizeof(T), alignment);
-	} else {
-		ptr = Malloc(in_size * sizeof(T));
+	// Prevent integer overflow of `in_size * sizeof(T)`
+	if (in_size > std::numeric_limits<size_t>::max() / sizeof(T)) {
+		OnAllocationFail();
 	}
 
-	return static_cast<T*>(ptr);
+	if constexpr (alignment > defaultAlignment) {
+		return static_cast<T*>(AlignedMalloc(in_size * sizeof(T), alignment));
+	} else {
+		return static_cast<T*>(Malloc(in_size * sizeof(T)));
+	}
 }
 
 template<typename T>
-T* TRealloc(T* in_old, size_t in_size) noexcept {
+T* TRealloc(T* in_old, size_t in_size) DEEP_ALLOC_NOEXCEPT {
 	static_assert(alignof(T) <= alignof(std::max_align_t), "Realloc is not supported for the given type 'T'.");
 	return static_cast<T*>(Realloc(in_old, in_size * sizeof(T)));
 }
@@ -57,16 +88,28 @@ void TFree(T* in_ptr) noexcept {
 	}
 }
 
-void* AlignedMalloc(size_t in_size, size_t in_alignment) noexcept {
-	Deep_Assert(in_size > 0 && in_alignment > 0, "Size and alignment must be greater than 0.");
+void* AlignedMalloc(size_t in_size, size_t in_alignment) DEEP_ALLOC_NOEXCEPT {
+	Deep_Assert(in_size > 0, "Allocation size must be greater than zero.");
+	Deep_Assert(IsPowerOf2(in_alignment), "Alignment must be a power of 2.");
 
-#ifdef DEEP_PLATFORM_WINDOWS
-	return _aligned_malloc(in_size, in_alignment);
+	in_alignment = in_alignment < alignof(void*) ? alignof(void*) : in_alignment;
+	void* ptr = nullptr;
+
+#if defined(DEEP_PLATFORM_WINDOWS)
+	ptr = _aligned_malloc(in_size, in_alignment);
+#elif defined(DEEP_PLATFORM_UNIX) || defined(DEEP_PLATFORM_MAC)
+	if (posix_memalign(&ptr, in_alignment, in_size) != 0) {
+		ptr = nullptr;
+	}
 #else
-	void* block = nullptr;
-	const int32 result = posix_memalign(&block, in_alignment, in_size);
-	return result == 0 ? block : nullptr;
+	#error Unsupported platform
 #endif
+
+	if (ptr == nullptr) {
+		OnAllocationFail();
+	}
+
+	return ptr;
 }
 
 void AlignedFree(void* in_ptr) noexcept {

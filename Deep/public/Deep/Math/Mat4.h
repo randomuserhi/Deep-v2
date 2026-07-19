@@ -36,6 +36,8 @@ struct [[nodiscard]] alignas(Float32x4) Mat4 {
 	inline Mat4& Transpose();
 	[[nodiscard]] inline Mat4 transposed() const;
 
+	// TODO(randomuserhi): Add API to check determinant != 0 when computing inverse
+	//                     - `UncheckedInverse` and `TryInverse`
 	inline Mat4& Inverse();
 	[[nodiscard]] inline Mat4 inversed() const;
 
