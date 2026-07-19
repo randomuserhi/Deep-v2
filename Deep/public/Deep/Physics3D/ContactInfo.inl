@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Deep.h"
+#include "Deep/Math/VecArgs.h"
 #include "Deep/Physics3D/ContactInfo.h"
 
 DEEP_NAMESPACE_BEGIN
@@ -15,6 +16,10 @@ const Vec3& ContactInfo::m_Normal4() const {
 
 Vec3 ContactInfo::m_Normal() const {
 	return Vec3::s_FixW(m_Normal4());
+}
+
+void ContactInfo::m_Normal(Arg_Vec3 in_normal) {
+	m_Normal4().XYZ(in_normal);
 }
 
 DEEP_NAMESPACE_END

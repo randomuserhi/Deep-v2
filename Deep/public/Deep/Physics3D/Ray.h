@@ -2,6 +2,7 @@
 
 #include "Deep.h"
 #include "Deep/Math.h"
+#include "Deep/Math/VecArgs.h"
 
 #if !defined(DEEP_RAYCAST_DEFAULT_TYPE)
 	#define DEEP_RAYCAST_DEFAULT_TYPE e_startsOutside
@@ -31,6 +32,7 @@ struct RayHit3D {
 	inline const Vec3& m_Normal4() const;
 
 	inline Vec3 m_Normal() const;
+	inline void m_Normal(Arg_Vec3 in_normal);
 };
 
 using Arg_RayHit3D = const RayHit3D&;

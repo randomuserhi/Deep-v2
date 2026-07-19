@@ -18,6 +18,7 @@ struct ContactInfo {
 	inline const Vec3& m_Normal4() const;
 
 	inline Vec3 m_Normal() const;
+	inline void m_Normal(Arg_Vec3 in_normal);
 };
 
 using Arg_ContactInfo = const ContactInfo&;
