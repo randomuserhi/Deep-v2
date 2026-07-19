@@ -6,7 +6,6 @@
 #include "Deep/Containers/SetBit.h"
 #include "Deep/Templates/TypeLists.h"
 
-#include <cstdint>
 #include <malloc.h>
 #include <type_traits>
 #include <utility>
