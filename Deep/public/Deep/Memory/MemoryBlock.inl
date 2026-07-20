@@ -12,9 +12,12 @@ MemoryBlock<T, in_allocator>::MemoryBlock() noexcept :
 	m_ptr{ nullptr }, m_size{ 0 } {}
 
 template<typename T, typename in_allocator>
-	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
-                                                                   && std::is_nothrow_default_constructible_v<T>) :
+	requires std::copy_constructible<T>
+             && c_RawAllocator<in_allocator, T>
+             MemoryBlock<T, in_allocator>::MemoryBlock(size_t in_size) noexcept(
+				 noexcept(in_allocator::s_Malloc(std::declval<size_t>())) && std::is_nothrow_default_constructible_v<T>)
+                 requires std::default_initializable<T>
+	:
 	m_size{ in_size } {
 	if (m_size == 0) {
 		m_ptr = nullptr;

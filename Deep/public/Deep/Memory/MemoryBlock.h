@@ -71,7 +71,8 @@ public:
 
 	// Allocates a block of size `in_size`.
 	explicit inline MemoryBlock(size_t in_size) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
-	                                                     && std::is_nothrow_default_constructible_v<T>);
+	                                                     && std::is_nothrow_default_constructible_v<T>)
+		requires std::default_initializable<T>;
 
 	// Take ownership of an existing block.
 	//
