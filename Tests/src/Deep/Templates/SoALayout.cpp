@@ -22,5 +22,5 @@ TEST(Templates, SoALayout) {
 	EXPECT_EQ(layout.SizeOf<A>(), size * sizeof(A));
 	EXPECT_EQ(layout.SizeOf<B>(), size * sizeof(B));
 
-	EXPECT_EQ(layout.Size(), size * sizeof(A) + size * sizeof(B));
+	EXPECT_EQ(layout.m_Size(), size * sizeof(A) + size * sizeof(B));
 }

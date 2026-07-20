@@ -21,17 +21,17 @@ constexpr SoALayout<Ts...>::SoALayout(size_t in_itemSize) :
 }
 
 template<typename... Ts>
-constexpr const size_t& SoALayout<Ts...>::ItemCount() const {
+constexpr const size_t& SoALayout<Ts...>::m_ItemCount() const {
 	return m_itemCount;
 }
 
 template<typename... Ts>
-constexpr const size_t& SoALayout<Ts...>::Size() const {
+constexpr const size_t& SoALayout<Ts...>::m_Size() const {
 	return m_size;
 }
 
 template<typename... Ts>
-constexpr const size_t& SoALayout<Ts...>::Alignment() const {
+constexpr const size_t& SoALayout<Ts...>::m_Alignment() const {
 	return k_alignment;
 }
 

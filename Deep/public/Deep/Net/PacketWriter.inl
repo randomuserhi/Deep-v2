@@ -30,10 +30,6 @@ void PacketWriter<in_Endian>::WriteUInt8(uint8 in_byte) {
 	m_buffer.push_back(in_byte);
 }
 
-// NOTE(randomuserhi): This writes raw bytes to the buffer and does not account
-//                     for endianess. For ASCII strings or formats where data only
-//                     spans 1 byte, this works fine:
-//                     https://stackoverflow.com/questions/63974853/explaining-lack-of-endianness-as-it-applies-to-a-string
 template<std::endian in_Endian>
 void PacketWriter<in_Endian>::WriteBytes(const uint8* in_bytes, size_t in_numBytes) {
 	size_t old = m_buffer.size();

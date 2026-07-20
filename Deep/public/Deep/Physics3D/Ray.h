@@ -34,6 +34,7 @@ struct RayHit3D {
 	inline Vec3 m_Normal() const;
 	inline void m_Normal(Arg_Vec3 in_normal);
 };
+DEEP_ASSERT_PACKED_VEC3(RayHit3D, m_normal, m_distance);
 
 using Arg_RayHit3D = const RayHit3D&;
 

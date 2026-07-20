@@ -102,7 +102,7 @@ inline void FIXED_SIZE_ARCHETYPE::SetComponentPtr(void* in_ptr) {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 inline void FIXED_SIZE_ARCHETYPE::AllocateStorage() {
 	Layout layout{ m_capacity };
-	byte* ptr = static_cast<byte*>(AlignedMalloc(layout.Size(), layout.Alignment()));
+	byte* ptr = static_cast<byte*>(AlignedMalloc(layout.m_Size(), layout.m_Alignment()));
 	(SetComponentPtr<Components>(ptr + layout.template OffsetOf<Components>()), ...);
 	Deep_Assert((static_cast<const void*>(GetComponentPtr<TypeAt<0, Components...>>()) == static_cast<const void*>(ptr)),
 	            "First component ptr must be the same as the main storage pointer.");

@@ -11,7 +11,7 @@ DEEP_NAMESPACE_BEGIN
 
 template<std::endian in_Endian>
 struct PacketReader {
-	static_assert(std::endian::native == std::endian::little || std::endian::native == std::endian::big,
+	static_assert(in_Endian == std::endian::little || in_Endian == std::endian::big,
 	              "Mixed-endian architectures are not supported.");
 
 public:
@@ -19,7 +19,7 @@ public:
 
 	//
 
-	inline bool HasBytesRemaining(size_t in_count);
+	inline bool HasBytesRemaining(size_t in_count) const;
 
 	inline uint8 ReadUInt8();
 

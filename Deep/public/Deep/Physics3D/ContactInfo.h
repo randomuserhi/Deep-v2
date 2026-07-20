@@ -20,6 +20,7 @@ struct ContactInfo {
 	inline Vec3 m_Normal() const;
 	inline void m_Normal(Arg_Vec3 in_normal);
 };
+DEEP_ASSERT_PACKED_VEC3(ContactInfo, m_normal, m_penetrationDistance);
 
 using Arg_ContactInfo = const ContactInfo&;
 

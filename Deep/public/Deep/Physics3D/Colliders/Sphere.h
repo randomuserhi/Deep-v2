@@ -18,7 +18,9 @@ struct DEEP_EXPORT Sphere {
 	inline const Vec3& m_Center4() const;
 
 	inline Vec3 m_Center() const;
+	inline void m_Center(Arg_Vec3);
 };
+DEEP_ASSERT_PACKED_VEC3(Sphere, m_center, m_radius);
 
 using Arg_Sphere = const Sphere&;
 

@@ -27,8 +27,15 @@ public:
 	Deep_ForceInline const uint8* m_Data() const;
 	Deep_ForceInline size_t m_Size() const;
 
-	inline void WriteUInt8(uint8 in_byte);
+	// The `in_bytes` buffer must not alias or overlap with the internal writers buffer.
+	//
+	// NOTE(randomuserhi): This writes raw bytes to the buffer and does not account
+	//                     for endianess. For ASCII strings or formats where data only
+	//                     spans 1 byte, this works fine:
+	//                     https://stackoverflow.com/questions/63974853/explaining-lack-of-endianness-as-it-applies-to-a-string
 	inline void WriteBytes(const uint8* in_bytes, size_t in_numBytes);
+
+	inline void WriteUInt8(uint8 in_byte);
 	inline void WriteUInt16(uint16 in_value);
 	inline void WriteInt16(int16 in_value);
 	inline void WriteUInt32(uint32 in_value);

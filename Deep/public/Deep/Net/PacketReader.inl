@@ -15,8 +15,8 @@ PacketReader<in_Endian>::PacketReader(const uint8* in_data, size_t in_size) :
 	m_head{ in_data }, m_tail{ in_data + in_size }, m_data{ in_data }, m_size{ in_size } {}
 
 template<std::endian in_Endian>
-bool PacketReader<in_Endian>::HasBytesRemaining(size_t in_count) {
-	return (m_head + in_count) <= m_tail;
+bool PacketReader<in_Endian>::HasBytesRemaining(size_t in_count) const {
+	return in_count <= static_cast<size_t>(m_tail - m_head);
 }
 
 template<std::endian in_Endian>

@@ -133,9 +133,31 @@ struct [[nodiscard]] alignas(Float32x4) Vec3 {
 
 static_assert(std::is_trivial<Vec3>(), "Is supposed to be a trivial type!");
 static_assert(std::is_standard_layout<Vec3>(), "Is supposed to be standard layout!");
+static_assert(sizeof(Vec3) == sizeof(float32) * 4);
 
 inline std::ostream& operator<<(std::ostream& in_os, const Vec3& in_vec);
 
 DEEP_NAMESPACE_END
 
 #include "./Vec3.inl" // IWYU pragma: export
+
+// Static assert that verifies that a packed combination of `Float3 + float32` is well formed and can be accessed as a Vec3.
+// ```cpp
+// struct Ray {
+//   alignas(alignof(Deep::Vec3)) Deep::Float3 m_direction
+//   Deep::float32 m_magnitude
+// }
+// DEEP_ASSERT_PACKED_VEC3(A, m_direction, m_magnitude);
+// ```
+#define DEEP_ASSERT_PACKED_VEC3(in_type, in_float3Member, in_floatMember)                                                   \
+	static_assert(std::same_as<std::remove_cvref_t<decltype(std::declval<in_type>().in_float3Member)>, ::Deep::Float3>,     \
+	              "float3 member was not of type ::Deep::Float3");                                                          \
+	static_assert(std::same_as<std::remove_cvref_t<decltype(std::declval<in_type>().in_floatMember)>, ::Deep::float32>,     \
+	              "float member was not of type ::Deep::float32");                                                          \
+	static_assert(offsetof(in_type, in_float3Member) + sizeof(::Deep::Vec3) <= sizeof(in_type),                             \
+	              "Packed Vec3 extends beyond containing object");                                                          \
+	static_assert(alignof(in_type) >= alignof(::Deep::Vec3), "Type is not aligned to support a Vec3 load");                 \
+	static_assert(offsetof(in_type, in_float3Member) % alignof(::Deep::Vec3) == 0,                                          \
+	              "Float3 member is not aligned to support a Vec3 load");                                                   \
+	static_assert(offsetof(in_type, in_floatMember) == offsetof(in_type, in_float3Member) + sizeof(::Deep::Float3),         \
+	              "float member is not positioned directly after the float3");

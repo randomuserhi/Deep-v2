@@ -28,13 +28,13 @@ public:
 	explicit constexpr SoALayout(size_t in_itemCount);
 
 	// Number of items each array contains
-	[[nodiscard]] constexpr Deep_ForceInline const size_t& ItemCount() const;
+	[[nodiscard]] constexpr Deep_ForceInline const size_t& m_ItemCount() const;
 
 	// Size in bytes required to store a SoA of this layout
-	[[nodiscard]] constexpr Deep_ForceInline const size_t& Size() const;
+	[[nodiscard]] constexpr Deep_ForceInline const size_t& m_Size() const;
 
 	// Alignment memory required to store a SoA of this layout
-	[[nodiscard]] constexpr Deep_ForceInline const size_t& Alignment() const;
+	[[nodiscard]] constexpr Deep_ForceInline const size_t& m_Alignment() const;
 
 	template<typename T>
 	[[nodiscard]] constexpr size_t OffsetOf() const;
