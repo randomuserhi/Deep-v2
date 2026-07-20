@@ -111,6 +111,28 @@ template<std::size_t I, typename... Ts>
 	return std::move(in_tuple).template Get<I>();
 }
 
+//
+
+template<typename TupleType, size_t... Is>
+constexpr void TupleSwapImpl(TupleType& in_left, TupleType& in_right, std::index_sequence<Is...>) noexcept(
+	(std::is_nothrow_swappable_v<decltype(in_left.template Get<Is>())> && ...))
+	requires(std::is_swappable_v<decltype(in_left.template Get<Is>())> && ...)
+{
+	using std::swap;
+	(swap(in_left.template Get<Is>(), in_right.template Get<Is>()), ...);
+}
+
+template<typename... Ts>
+constexpr void
+swap(Tuple<Ts...>& in_left,
+     Tuple<Ts...>& in_right) noexcept(noexcept(TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{})))
+	requires requires { TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{}); }
+{
+	TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{});
+}
+
+//
+
 template<typename LeftTuple, typename RightTuple, std::size_t... Is>
 [[nodiscard]] constexpr inline bool
 TupleEqualImpl(const LeftTuple& in_left, const RightTuple& in_right, std::index_sequence<Is...>) noexcept(
@@ -125,6 +147,43 @@ template<typename... LeftTs, typename... RightTs>
 [[nodiscard]] constexpr inline bool operator==(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(
 	noexcept(TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{}))) {
 	return TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{});
+}
+
+//
+
+template<size_t I, typename Result, typename LeftTuple, typename RightTuple, size_t... Is>
+[[nodiscard]]
+constexpr Result TupleCompareSpaceshipImpl(
+	const LeftTuple& in_left, const RightTuple& in_right,
+	std::index_sequence<Is...> in_sequence) noexcept((noexcept(in_left.template Get<Is>() <=> in_right.template Get<Is>())
+                                                      && ...)) {
+	if constexpr (I == sizeof...(Is)) {
+		return Result::equivalent;
+	} else {
+		auto comparison = in_left.template Get<I>() <=> in_right.template Get<I>();
+
+		if (comparison != 0) {
+			return static_cast<Result>(comparison);
+		}
+
+		return TupleCompareSpaceshipImpl<I + 1, Result>(in_left, in_right, in_sequence);
+	}
+}
+
+template<typename... LeftTs, typename... RightTs>
+	requires(
+		sizeof...(LeftTs) == sizeof...(RightTs)
+		&& TupleSpaceshipComparable<Tuple<LeftTs...>, Tuple<RightTs...>, std::make_index_sequence<sizeof...(LeftTs)>>::value)
+[[nodiscard]]
+constexpr auto operator<=>(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(noexcept(
+	TupleCompareSpaceshipImpl<0, typename TupleSpaceshipCategory<Tuple<LeftTs...>, Tuple<RightTs...>,
+                                                                 std::make_index_sequence<sizeof...(LeftTs)>>::Type>(
+		in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{}))) {
+	using Sequence = std::make_index_sequence<sizeof...(LeftTs)>;
+
+	using Result = typename TupleSpaceshipCategory<Tuple<LeftTs...>, Tuple<RightTs...>, Sequence>::Type;
+
+	return TupleCompareSpaceshipImpl<0, Result>(in_left, in_right, Sequence{});
 }
 
 } // namespace detail::_Tuple
@@ -147,6 +206,14 @@ template<std::size_t I, typename... Ts>
 template<std::size_t I, typename... Ts>
 [[nodiscard]] constexpr decltype(auto) Get(const Tuple<Ts...>&& in_tuple) {
 	return detail::_Tuple::get<I, Ts...>(std::move(in_tuple));
+}
+
+template<typename... Ts>
+constexpr void Swap(Tuple<Ts...>& in_left, Tuple<Ts...>& in_right) noexcept(
+	noexcept(detail::_Tuple::TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{})))
+	requires requires { detail::_Tuple::TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{}); }
+{
+	return detail::_Tuple::swap<Ts...>(in_left, in_right);
 }
 
 template<typename... Ts>

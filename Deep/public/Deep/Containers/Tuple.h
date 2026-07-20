@@ -40,12 +40,12 @@ private:
 	Type m_data;
 };
 
-template<std::size_t I, typename T>
+template<size_t I, typename T>
 struct TupleIndexTag {
 	using Type = T;
 };
 
-template<std::size_t I, typename T, typename... Rest>
+template<size_t I, typename T, typename... Rest>
 struct TupleTypeAtIndex : TupleTypeAtIndex<I - 1, Rest...> {};
 
 template<typename T, typename... Rest>
@@ -56,7 +56,7 @@ struct TupleTypeAtIndex<0, T, Rest...> {
 template<typename IndexSequence, typename... Ts>
 struct TupleImpl;
 
-template<std::size_t... Is, typename... Ts>
+template<size_t... Is, typename... Ts>
 struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag<Is, Ts>>... {
 	constexpr TupleImpl() = default;
 	constexpr TupleImpl(const TupleImpl&) = default;
@@ -70,20 +70,20 @@ struct TupleImpl<std::index_sequence<Is...>, Ts...> : TupleStorage<TupleIndexTag
 	constexpr inline explicit TupleImpl(Args&&... in_args) noexcept(
 		(std::is_nothrow_constructible_v<TupleStorage<TupleIndexTag<Is, Ts>>, Args&&> && ...));
 
-	template<std::size_t I>
+	template<size_t I>
 	[[nodiscard]] constexpr inline decltype(auto) Get() &;
 
-	template<std::size_t I>
+	template<size_t I>
 	[[nodiscard]] constexpr inline decltype(auto) Get() const&;
 
-	template<std::size_t I>
+	template<size_t I>
 	[[nodiscard]] constexpr inline decltype(auto) Get() &&;
 
-	template<std::size_t I>
+	template<size_t I>
 	[[nodiscard]] constexpr inline decltype(auto) Get() const&&;
 };
 
-template<typename F, typename TupleType, std::size_t... Is>
+template<typename F, typename TupleType, size_t... Is>
 constexpr inline decltype(auto) ApplyImpl(F&& in_function, TupleType&& in_tuple, std::index_sequence<Is...>) noexcept(
 	noexcept(std::invoke(std::forward<F>(in_function), std::forward<TupleType>(in_tuple).template Get<Is>()...)));
 
@@ -99,7 +99,7 @@ struct Tuple : detail::_Tuple::TupleImpl<std::make_index_sequence<sizeof...(Ts)>
 // ```cpp
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) get(Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
@@ -108,7 +108,7 @@ template<std::size_t I, typename... Ts>
 // ```cpp
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) get(const Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
@@ -117,7 +117,7 @@ template<std::size_t I, typename... Ts>
 // ```cpp
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) get(Tuple<Ts...>&& in_tuple);
 
 // Get an item by index from a tuple
@@ -126,22 +126,37 @@ template<std::size_t I, typename... Ts>
 // ```cpp
 // auto [x, y] = Deep::Tuple<int32, int32>(1, 1);
 // ```
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) get(const Tuple<Ts...>&& in_tuple);
+
+//
+
+template<typename TupleType, size_t... Is>
+constexpr void TupleSwapImpl(TupleType& in_left, TupleType& in_right, std::index_sequence<Is...>) noexcept(
+	(std::is_nothrow_swappable_v<decltype(in_left.template Get<Is>())> && ...))
+	requires(std::is_swappable_v<decltype(in_left.template Get<Is>())> && ...);
+
+template<typename... Ts>
+constexpr void
+swap(Tuple<Ts...>& in_left,
+     Tuple<Ts...>& in_right) noexcept(noexcept(TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{})))
+	requires requires { TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{}); };
+
+//
 
 template<typename LeftTuple, typename RightTuple, typename IndexSequence>
 struct TupleEqualityComparable;
 
-template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+template<typename LeftTuple, typename RightTuple, size_t... Is>
 using TupleEqualityComparableBoolConstant = std::bool_constant<(requires(const LeftTuple& lhs, const RightTuple& rhs) {
 	static_cast<bool>(lhs.template Get<Is>() == rhs.template Get<Is>());
 } && ...)>;
 
-template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+template<typename LeftTuple, typename RightTuple, size_t... Is>
 struct TupleEqualityComparable<LeftTuple, RightTuple, std::index_sequence<Is...>>
 	: TupleEqualityComparableBoolConstant<LeftTuple, RightTuple, Is...> {};
 
-template<typename LeftTuple, typename RightTuple, std::size_t... Is>
+template<typename LeftTuple, typename RightTuple, size_t... Is>
 [[nodiscard]] constexpr inline bool
 TupleEqualImpl(const LeftTuple& in_left, const RightTuple& in_right, std::index_sequence<Is...>) noexcept(
 	(noexcept(static_cast<bool>(in_left.template Get<Is>() == in_right.template Get<Is>())) && ...));
@@ -153,6 +168,45 @@ template<typename... LeftTs, typename... RightTs>
 [[nodiscard]] constexpr inline bool operator==(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(
 	noexcept(TupleEqualImpl(in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{})));
 
+//
+
+template<typename LeftTuple, typename RightTuple, typename IndexSequence>
+struct TupleSpaceshipComparable;
+
+template<typename LeftTuple, typename RightTuple, size_t... Is>
+using TupleSpaceshipComparableBoolConstant = std::bool_constant<(
+	requires(const LeftTuple& lhs, const RightTuple& rhs) { lhs.template Get<Is>() <=> rhs.template Get<Is>(); } && ...)>;
+
+template<typename LeftTuple, typename RightTuple, size_t... Is>
+struct TupleSpaceshipComparable<LeftTuple, RightTuple, std::index_sequence<Is...>>
+	: TupleSpaceshipComparableBoolConstant<LeftTuple, RightTuple, Is...> {};
+
+template<typename LeftTuple, typename RightTuple, typename IndexSequence>
+struct TupleSpaceshipCategory;
+
+template<typename LeftTuple, typename RightTuple, size_t... Is>
+struct TupleSpaceshipCategory<LeftTuple, RightTuple, std::index_sequence<Is...>> {
+	using Type = std::common_comparison_category_t<decltype(std::declval<const LeftTuple&>().template Get<Is>()
+	                                                        <=> std::declval<const RightTuple&>().template Get<Is>())...>;
+};
+
+template<size_t I = 0, typename Result, typename LeftTuple, typename RightTuple, size_t... Is>
+[[nodiscard]]
+constexpr Result TupleCompareSpaceshipImpl(
+	const LeftTuple& in_left, const RightTuple& in_right,
+	std::index_sequence<Is...> in_sequence) noexcept((noexcept(in_left.template Get<Is>() <=> in_right.template Get<Is>())
+                                                      && ...));
+
+template<typename... LeftTs, typename... RightTs>
+	requires(
+		sizeof...(LeftTs) == sizeof...(RightTs)
+		&& TupleSpaceshipComparable<Tuple<LeftTs...>, Tuple<RightTs...>, std::make_index_sequence<sizeof...(LeftTs)>>::value)
+[[nodiscard]]
+constexpr auto operator<=>(const Tuple<LeftTs...>& in_left, const Tuple<RightTs...>& in_right) noexcept(noexcept(
+	TupleCompareSpaceshipImpl<0, typename TupleSpaceshipCategory<Tuple<LeftTs...>, Tuple<RightTs...>,
+                                                                 std::make_index_sequence<sizeof...(LeftTs)>>::Type>(
+		in_left, in_right, std::make_index_sequence<sizeof...(LeftTs)>{})));
+
 } // namespace detail::_Tuple
 
 // Custom tuple class that is actually zero cost :
@@ -161,20 +215,26 @@ template<typename... Ts>
 using Tuple = detail::_Tuple::Tuple<Ts...>;
 
 // Get an item by index from a tuple
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) Get(Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) Get(const Tuple<Ts...>& in_tuple);
 
 // Get an item by index from a tuple
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) Get(Tuple<Ts...>&& in_tuple);
 
 // Get an item by index from a tuple
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 [[nodiscard]] constexpr inline decltype(auto) Get(const Tuple<Ts...>&& in_tuple);
+
+// Swap tuples
+template<typename... Ts>
+constexpr inline void Swap(Tuple<Ts...>& in_left, Tuple<Ts...>& in_right) noexcept(
+	noexcept(detail::_Tuple::TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{})))
+	requires requires { detail::_Tuple::TupleSwapImpl(in_left, in_right, std::index_sequence_for<Ts...>{}); };
 
 template<typename... Ts>
 [[nodiscard]] constexpr inline auto MakeTuple(Ts&&... in_args);
@@ -207,9 +267,9 @@ DEEP_NAMESPACE_END
 namespace std {
 
 template<typename... Ts>
-struct tuple_size<::Deep::Tuple<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
+struct tuple_size<::Deep::Tuple<Ts...>> : std::integral_constant<size_t, sizeof...(Ts)> {};
 
-template<std::size_t I, typename... Ts>
+template<size_t I, typename... Ts>
 struct tuple_element<I, ::Deep::Tuple<Ts...>> {
 	using type = typename ::Deep::detail::_Tuple::TupleTypeAtIndex<I, Ts...>::type;
 };

@@ -188,3 +188,53 @@ TEST(Tuple, Equality) {
 		EXPECT_NE(a, b);
 	}
 }
+
+TEST(Tuple, Swap) {
+	TEST_CASE(Value) {
+		Deep::Tuple<int, int> a{ 13, 24 };
+		Deep::Tuple<int, int> b{ 42, 32 };
+
+		Deep::Swap(a, b);
+
+		EXPECT_EQ(Deep::Get<0>(a), 42);
+		EXPECT_EQ(Deep::Get<1>(a), 32);
+
+		EXPECT_EQ(Deep::Get<0>(b), 13);
+		EXPECT_EQ(Deep::Get<1>(b), 24);
+	}
+
+	TEST_CASE(Reference) {
+		int a0 = 13;
+		int a1 = 24;
+
+		int b0 = 42;
+		int b1 = 32;
+
+		Deep::Tuple<int&, int&> a = Deep::Tie(a0, a1);
+		Deep::Tuple<int&, int&> b = Deep::Tie(b0, b1);
+
+		Deep::Swap(a, b);
+
+		EXPECT_EQ(a0, 42);
+		EXPECT_EQ(a1, 32);
+
+		EXPECT_EQ(b0, 13);
+		EXPECT_EQ(b1, 24);
+	}
+}
+
+TEST(Tuple, Spaceship) {
+	TEST_CASE(FirstItem) {
+		Deep::Tuple<int, int> a{ 13, 24 };
+		Deep::Tuple<int, int> b{ 42, 32 };
+
+		EXPECT_TRUE(a < b);
+	}
+
+	TEST_CASE(NotFirstItem) {
+		Deep::Tuple<int, int> a{ 42, 24 };
+		Deep::Tuple<int, int> b{ 42, 32 };
+
+		EXPECT_TRUE(a < b);
+	}
+}
