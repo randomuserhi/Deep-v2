@@ -145,20 +145,31 @@ T* TMemset(T* in_dest, int32 in_value, size_t in_size) noexcept {
 }
 
 template<typename A, typename B>
-constexpr bool DoBuffersOverlap(A* in_a, size_t in_sizeA, B* in_b, size_t in_sizeB) noexcept {
-	if (in_a == nullptr || in_b == nullptr) return false;
+bool DoBuffersOverlap(const A* in_a, size_t in_sizeA, const B* in_b, size_t in_sizeB) noexcept {
 	if (in_sizeA == 0 || in_sizeB == 0) return false;
 
-	byte* a_begin = reinterpret_cast<byte*>(in_a);
-	byte* b_begin = reinterpret_cast<byte*>(in_b);
+	if (in_a == nullptr || in_b == nullptr) {
+		Deep_Assert(false, "Non-empty buffers cannot have null pointers.");
+		return true;
+	}
 
-	size_t a_bytes = in_sizeA * sizeof(A);
-	size_t b_bytes = in_sizeB * sizeof(B);
+	constexpr size_t maxSize = std::numeric_limits<size_t>::max();
+	if (in_sizeA > maxSize / sizeof(A) || in_sizeB > maxSize / sizeof(B)) {
+		Deep_Assert(false, "Buffer size overflow.");
+		return true;
+	}
 
-	byte* a_end = a_begin + a_bytes;
-	byte* b_end = b_begin + b_bytes;
+	const size_t sizeA = in_sizeA * sizeof(A);
+	const size_t sizeB = in_sizeB * sizeof(B);
 
-	return (a_begin < b_end) && (b_begin < a_end);
+	const uintptr_t addressA = reinterpret_cast<uintptr_t>(in_a);
+	const uintptr_t addressB = reinterpret_cast<uintptr_t>(in_b);
+
+	if (addressA <= addressB) {
+		return addressB - addressA < sizeA;
+	}
+
+	return addressA - addressB < sizeB;
 }
 
 DEEP_NAMESPACE_END
