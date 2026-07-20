@@ -33,11 +33,17 @@ concept c_BitMask = std::copyable<T> && requires(T a, const T ca, std::size_t i,
 	// Undefined behaviour when no bits are set.
 	{ ca.IndexOfLowestSetBit() } -> std::same_as<size_t>;
 
-	// Pops the lowest set bit of the mask and returns its index.
+	// Clears the lowest set bit of the mask and returns its index.
 	// E.g 0b1010 will become 0b1000 and return 1.
 	//
 	// Undefined behaviour when no bits are set.
 	{ a.PopLowestSetBit() } -> std::same_as<size_t>;
+
+	// Clears the lowest set bit of the mask.
+	// E.g 0b1010 will become 0b1000 and return 1.
+	//
+	// Undefined behaviour when no bits are set.
+	{ a.ClearLowestSetBit() } -> std::same_as<void>;
 
 	// Union & Intersect operators
 	{ a |= ca } -> std::same_as<T&>;
@@ -76,19 +82,21 @@ public:
 	IntegerBitMask() = default;
 	IntegerBitMask(T in_value);
 
-	constexpr Deep_ForceInline bool operator[](size_t in_index) const;
+	[[nodiscard]] constexpr Deep_ForceInline bool operator[](size_t in_index) const;
 
-	constexpr Deep_ForceInline bool Any() const;
+	[[nodiscard]] constexpr Deep_ForceInline bool Any() const;
 
-	constexpr Deep_ForceInline size_t NumSetBits() const;
+	[[nodiscard]] constexpr Deep_ForceInline size_t NumSetBits() const;
 
 	constexpr Deep_ForceInline void Set(size_t in_index, bool in_value);
 
 	constexpr Deep_ForceInline void Inverse();
 
-	constexpr Deep_ForceInline size_t IndexOfLowestSetBit() const;
+	[[nodiscard]] constexpr Deep_ForceInline size_t IndexOfLowestSetBit() const;
 
-	constexpr Deep_ForceInline size_t PopLowestSetBit();
+	constexpr Deep_ForceInline void ClearLowestSetBit();
+
+	[[nodiscard]] constexpr Deep_ForceInline size_t PopLowestSetBit();
 
 	friend constexpr bool operator== <T>(Arg_IntegerBitMask<T>, Arg_IntegerBitMask<T>);
 

@@ -178,9 +178,13 @@ public:
 	// A mask can be provided to skip certain entities. Note that only active (constructed) entities are iterated regardless
 	// of the mask value.
 	template<typename... Ts>
-	inline SetBitArchetypeView<BitMask, Ts...> View(BitMask in_mask = ~0);
+	inline SetBitArchetypeView<BitMask, Ts...> View(BitMask in_mask);
 	template<typename... Ts>
-	inline SetBitArchetypeView<BitMask, const Ts...> View(BitMask in_mask = ~0) const;
+	inline SetBitArchetypeView<BitMask, const Ts...> View(BitMask in_mask) const;
+	template<typename... Ts>
+	inline SetBitArchetypeView<BitMask, Ts...> View();
+	template<typename... Ts>
+	inline SetBitArchetypeView<BitMask, const Ts...> View() const;
 
 	// Range iterator begin/end implementation
 	inline SetBitArchetypeIterator<BitMask, Components...> begin();

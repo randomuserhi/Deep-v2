@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./IntegerBitMask.h"
+#include "Deep.h"
 
 DEEP_NAMESPACE_BEGIN
 
@@ -53,8 +54,14 @@ constexpr size_t INTEGER_BITMASK::IndexOfLowestSetBit() const {
 INTEGER_BITMASK_TEMPLATE
 constexpr size_t INTEGER_BITMASK::PopLowestSetBit() {
 	const size_t index = IndexOfLowestSetBit();
-	m_bits &= m_bits - 1;
+	ClearLowestSetBit();
 	return index;
+}
+
+INTEGER_BITMASK_TEMPLATE
+constexpr void INTEGER_BITMASK::ClearLowestSetBit() {
+	Deep_Assert(Any(), "No bits are set, cannot clear lowest set bit.");
+	m_bits &= m_bits - 1;
 }
 
 INTEGER_BITMASK_TEMPLATE
