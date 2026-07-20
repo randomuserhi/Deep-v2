@@ -26,8 +26,12 @@ struct RayHit3D {
 	float32 m_distance;
 
 	// Returns `m_normal` and `m_distance` as a packed Vec3.
-	// NOTE(randomuserhi): Writing to this may effect `m_penetrationDistance` which is stored in the `._w` component, use
-	//                     with caution.
+	// Writing to this may effect `m_distance` which is stored in the `._w` component.
+	//
+	// Vec3 is implemented with the invariant that `z == _w` so use this only if you know what you are doing!
+	//
+	// Prefer `m_Normal()` and `m_Normal(Arg_Vec3)` functions which return a copy of the Vec3 and handle storing
+	// just XYZ for you.
 	inline Vec3& m_Normal4();
 	inline const Vec3& m_Normal4() const;
 

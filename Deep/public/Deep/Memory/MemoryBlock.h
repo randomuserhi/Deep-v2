@@ -57,6 +57,11 @@ template<typename T, typename in_allocator>
 Deep_ForceInline T* operator-(MemoryBlock<T, in_allocator>&, size_t);
 
 // Light weight wrapper around a memory block (ptr + size)
+//
+// TODO(randomuserhi): Provide an implicit conversion into Deep::Span or some other non-owning memory view
+//                     datastructure. This allows you to pass the memory block using short-struct optimization
+//                     through registers rather than via `const MemorBlock<T>&` which isn't guaranteed to optimize.
+//
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 class MemoryBlock {

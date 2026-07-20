@@ -12,8 +12,8 @@ DEEP_NAMESPACE_BEGIN
 // Iterator for set-bit archetypes.
 // Uses a bitmask to skip over entities via set-bit iteration, allowing for fast sparse iteration over small blocks.
 //
-// NOTE(randomuserhi): `operator*()` always calls `Deep::CountTrailingZeros` to get the iterator item. As a result,
-//                     repeatedly dereferencing the iterator for the same item is not advised, always cache the
+// NOTE(randomuserhi): `operator*()` always calls `BitMask::IndexOfLowestSetBit` to get the iterator item. As a result,
+//                     repeatedly dereferencing the iterator for the same item can result in extra work, always cache the
 //                     dereferenced item and reuse it.
 template<c_BitMask in_BitMask, typename... Components>
 class SetBitArchetypeIterator {
@@ -49,7 +49,7 @@ private:
 //
 // Can also be constructed to treat a set of buffers as an archetype view.
 //
-// The mask represents the currently active members of the archetype view.
+// The mask represents the currently active members (or a subset of them).
 template<c_BitMask in_BitMask, typename... Components>
 class SetBitArchetypeView {
 public:

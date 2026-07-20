@@ -33,17 +33,17 @@ concept c_BitMask = std::copyable<T> && requires(T a, const T ca, std::size_t i,
 	// Undefined behaviour when no bits are set.
 	{ ca.IndexOfLowestSetBit() } -> std::same_as<size_t>;
 
-	// Clears the lowest set bit of the mask and returns its index.
-	// E.g 0b1010 will become 0b1000 and return 1.
-	//
-	// Undefined behaviour when no bits are set.
-	{ a.PopLowestSetBit() } -> std::same_as<size_t>;
-
 	// Clears the lowest set bit of the mask.
 	// E.g 0b1010 will become 0b1000 and return 1.
 	//
 	// Undefined behaviour when no bits are set.
 	{ a.ClearLowestSetBit() } -> std::same_as<void>;
+
+	// Clears the lowest set bit of the mask and returns its index.
+	// E.g 0b1010 will become 0b1000 and return 1.
+	//
+	// Undefined behaviour when no bits are set.
+	{ a.PopLowestSetBit() } -> std::same_as<size_t>;
 
 	// Union & Intersect operators
 	{ a |= ca } -> std::same_as<T&>;
