@@ -45,7 +45,7 @@ Deep_ForceInline T* TMemset(T* in_dest, int32 in_value, size_t in_size) noexcept
 
 // Determines whether two buffers overlap
 template<typename A, typename B = A>
-inline bool DoBuffersOverlap(A* in_a, size_t in_sizeA, B* in_b, size_t in_sizeB) noexcept;
+inline bool DoBuffersOverlap(const A* in_a, size_t in_sizeA, const B* in_b, size_t in_sizeB) noexcept;
 
 DEEP_NAMESPACE_END
 
