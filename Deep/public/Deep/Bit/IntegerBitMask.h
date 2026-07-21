@@ -22,11 +22,11 @@ concept c_BitMask = std::copyable<T> && requires(T a, const T ca, std::size_t i,
 	// Return the number of set bits
 	{ ca.NumSetBits() } -> std::same_as<size_t>;
 
-	// Return true if the bit at position i is set, otherwise false.
-	{ ca[i] } -> std::same_as<bool>;
-
 	// Set/Unset a bit
 	{ a.Set(i, v) } -> std::same_as<void>;
+
+	// Return true if the bit at position i is set, otherwise false.
+	{ a.Test(i) } -> std::same_as<bool>;
 
 	// Gets the index of the lowest set bit.
 	//
@@ -82,9 +82,13 @@ public:
 	IntegerBitMask() = default;
 	IntegerBitMask(T in_value);
 
-	[[nodiscard]] constexpr Deep_ForceInline bool operator[](size_t in_index) const;
+	// TODO(randomuserhi): Implement a bit accessor reference to support references, refer to std::vector<bool>
+	//                     specialization
+	// [[nodiscard]] constexpr Deep_ForceInline bool operator[](size_t in_index) const;
 
 	[[nodiscard]] constexpr Deep_ForceInline bool Any() const;
+
+	[[nodiscard]] constexpr Deep_ForceInline bool Test(size_t in_index) const;
 
 	[[nodiscard]] constexpr Deep_ForceInline size_t NumSetBits() const;
 

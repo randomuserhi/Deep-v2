@@ -13,7 +13,7 @@ INTEGER_BITMASK::IntegerBitMask(T in_value) :
 	m_bits{ in_value } {};
 
 INTEGER_BITMASK_TEMPLATE
-constexpr bool INTEGER_BITMASK::operator[](size_t in_index) const {
+constexpr bool INTEGER_BITMASK::Test(size_t in_index) const {
 	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
 
 	T flag = T{ 1 } << in_index;

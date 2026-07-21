@@ -325,7 +325,7 @@ void FIXED_SIZE_ARCHETYPE::DestructEntity(size_t in_index) {
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 bool FIXED_SIZE_ARCHETYPE::IsActive(size_t in_index) const {
-	return m_activeMask[in_index];
+	return m_activeMask.Test(in_index);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
