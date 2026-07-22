@@ -365,7 +365,9 @@ Tuple<const Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(size_t in_index) const {
 	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
-	return Tuple<const Ts&...>(GetComponentPtr<Ts>()[in_index]...);
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	//                     to generate const views of components from non-const archetypes.
+	return Tuple<const Ts&...>(GetComponentPtr<std::remove_const_t<Ts>>()[in_index]...);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -374,7 +376,9 @@ Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(size_t in_index) {
 	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
-	return Tuple<Ts&...>(GetComponentPtr<Ts>()[in_index]...);
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	//                     to generate const views of components from non-const archetypes.
+	return Tuple<Ts&...>(GetComponentPtr<std::remove_const_t<Ts>>()[in_index]...);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
