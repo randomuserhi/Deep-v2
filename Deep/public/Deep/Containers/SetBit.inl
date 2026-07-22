@@ -343,7 +343,9 @@ const T& FIXED_SIZE_ARCHETYPE::GetComponent(size_t in_index) const {
 	static_assert(s_validComponent<T>, "Archetype must contain component 'T'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
-	return GetComponentPtr<T>()[in_index];
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	//                     to generate const views of components from non-const archetypes.
+	return GetComponentPtr<std::remove_const_t<T>>()[in_index];
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -352,7 +354,9 @@ T& FIXED_SIZE_ARCHETYPE::GetComponent(size_t in_index) {
 	static_assert(s_validComponent<T>, "Archetype must contain component 'T'.");
 	Deep_Assert(IsActive(in_index), "Cannot get a component that is not active. Construct it first with 'ConstructEntity'.");
 
-	return GetComponentPtr<T>()[in_index];
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	//                     to generate const views of components from non-const archetypes.
+	return GetComponentPtr<std::remove_const_t<T>>()[in_index];
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -376,7 +380,7 @@ Tuple<Ts&...> FIXED_SIZE_ARCHETYPE::GetComponents(size_t in_index) {
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
 SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) {
-	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
@@ -386,7 +390,7 @@ SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_AR
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
 SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) const {
-	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
 	//                     version.
@@ -398,7 +402,7 @@ SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_S
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
 SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View() {
-	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	return SetBitArchetypeView<BitMask, Ts...>{ m_activeMask, GetComponentPtr<typename std::remove_const_t<Ts>>()... };
@@ -407,7 +411,7 @@ SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_AR
 FIXED_SIZE_ARCHETYPE_TEMPLATE
 template<typename... Ts>
 SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_SIZE_ARCHETYPE::View() const {
-	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
+	// NOTE(randomuserhi): We `std::remove_const_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
 	//                     version.
