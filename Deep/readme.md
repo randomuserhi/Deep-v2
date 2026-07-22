@@ -40,7 +40,7 @@ class Vector {};
 // `T` and `in_TypeList` are used like function parameters
 template<typename in_T, typename... in_TypeList>
 constexpr static inline size_t CountOccurences() {
-	return (0 + ... + std::is_same_v<T, in_TypeList>);
+	return (0 + ... + std::is_same_v<in_T, in_TypeList>);
 }
 ```
 
