@@ -250,7 +250,7 @@ private:
 	//
 
 	template<typename T>
-	constexpr static bool s_validComponent = (std::is_same_v<T, Components> || ...);
+	constexpr static bool s_validComponent = (std::is_same_v<typename std::remove_const_t<T>, Components> || ...);
 
 	//
 

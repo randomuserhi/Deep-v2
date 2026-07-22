@@ -378,9 +378,9 @@ template<typename... Ts>
 SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View(BitMask in_mask) {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
-	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
+	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
-	return SetBitArchetypeView<BitMask, Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	return SetBitArchetypeView<BitMask, Ts...>{ in_mask, GetComponentPtr<typename std::remove_const_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -390,9 +390,9 @@ SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_S
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
 	//                     version.
-	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
+	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
 	in_mask &= m_activeMask;
-	return SetBitArchetypeView<BitMask, const Ts...>{ in_mask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	return SetBitArchetypeView<BitMask, const Ts...>{ in_mask, GetComponentPtr<typename std::remove_const_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -400,8 +400,8 @@ template<typename... Ts>
 SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, Ts...> FIXED_SIZE_ARCHETYPE::View() {
 	// NOTE(randomuserhi): We `std::decay_t` the component type in views as we allow promotion of `Ts` to `const Ts`
 	//                     to generate const views of components from non-const archetypes.
-	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
-	return SetBitArchetypeView<BitMask, Ts...>{ m_activeMask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
+	return SetBitArchetypeView<BitMask, Ts...>{ m_activeMask, GetComponentPtr<typename std::remove_const_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
@@ -411,8 +411,8 @@ SetBitArchetypeView<typename FIXED_SIZE_ARCHETYPE::BitMask, const Ts...> FIXED_S
 	//                     to generate const views of components from non-const archetypes.
 	//                     Although this is the const version, we still allow it to keep syntax consistent with the non-const
 	//                     version.
-	static_assert((s_validComponent<typename std::decay_t<Ts>> && ...), "Archetype must contain all component 'Ts'.");
-	return SetBitArchetypeView<BitMask, const Ts...>{ m_activeMask, GetComponentPtr<typename std::decay_t<Ts>>()... };
+	static_assert((s_validComponent<Ts> && ...), "Archetype must contain all component 'Ts'.");
+	return SetBitArchetypeView<BitMask, const Ts...>{ m_activeMask, GetComponentPtr<typename std::remove_const_t<Ts>>()... };
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE
