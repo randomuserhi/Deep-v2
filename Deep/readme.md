@@ -37,7 +37,7 @@ For templates where the template parameter acts more like a function parameter a
 template<typename T>
 class Vector {};
 
-// But `T` and `in_TypeList` are used like function parameters
+// `T` and `in_TypeList` are used like function parameters
 template<typename in_T, typename... in_TypeList>
 constexpr static inline size_t CountOccurences() {
 	return (0 + ... + std::is_same_v<T, in_TypeList>);
