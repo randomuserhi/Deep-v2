@@ -24,6 +24,8 @@ concept c_BitMask = std::copyable<T> && requires(T a, const T ca, std::size_t i,
 
 	// Set/Unset a bit
 	{ a.Set(i, v) } -> std::same_as<void>;
+	{ a.template Set<true>(i) } -> std::same_as<void>;
+	{ a.template Set<false>(i) } -> std::same_as<void>;
 
 	// Return true if the bit at position i is set, otherwise false.
 	{ a.Test(i) } -> std::same_as<bool>;
@@ -92,6 +94,8 @@ public:
 
 	[[nodiscard]] constexpr Deep_ForceInline size_t NumSetBits() const;
 
+	template<bool in_value>
+	constexpr Deep_ForceInline void Set(size_t in_index);
 	constexpr Deep_ForceInline void Set(size_t in_index, bool in_value);
 
 	constexpr Deep_ForceInline void Inverse();

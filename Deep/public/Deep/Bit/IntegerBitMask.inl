@@ -40,6 +40,18 @@ constexpr void INTEGER_BITMASK::Set(size_t in_index, bool in_value) {
 }
 
 INTEGER_BITMASK_TEMPLATE
+template<bool in_value>
+constexpr void INTEGER_BITMASK::Set(size_t in_index) {
+	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
+
+	if constexpr (in_value) {
+		m_bits |= (T{ 1 } << in_index);
+	} else {
+		m_bits &= ~(T{ 1 } << in_index);
+	}
+}
+
+INTEGER_BITMASK_TEMPLATE
 constexpr void INTEGER_BITMASK::Inverse() {
 	m_bits = ~m_bits;
 }
