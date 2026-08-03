@@ -252,7 +252,7 @@ DEEP_NAMESPACE_END
  * Vectorised Instructions
  */
 
-#if !defined(DEEP_DONT_USE_SIMD_INTRINSICS)
+#if !defined(DEEP_NO_SIMD_INTRINSICS)
 	#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
 		#define DEEP_CPU_X86
 		#define DEEP_USE_SSE
@@ -280,14 +280,14 @@ DEEP_NAMESPACE_END
 		#if (defined(__BMI__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_TZCNT)
 			#define DEEP_USE_TZCNT
 		#endif
+	#elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
+		// ARM CPU architecture
+		#define DEEP_CPU_ARM
+		#if defined(__aarch64__) || defined(_M_ARM64)
+			#define DEEP_USE_NEON
+		#endif
 	#else
 		#error Unsupported CPU architecture
-	#endif
-#elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
-// ARM CPU architecture
-	#define DEEP_CPU_ARM
-	#if defined(__aarch64__) || defined(_M_ARM64)
-		#define DEEP_USE_NEON
 	#endif
 #endif
 
