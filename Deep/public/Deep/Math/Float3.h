@@ -14,11 +14,11 @@ struct [[nodiscard]] Float3 {
 	Float3(const Float3&) = default;
 	Float3& operator=(const Float3&) = default;
 	inline Float3(float32 in_x, float32 in_y, float32 in_z);
-	explicit inline Float3(Arg_Vec3 in_vec);
+	inline Float3(Arg_Vec3 in_vec);
 
 	//
 
-	explicit inline operator Vec3() const;
+	inline operator Vec3() const;
 
 	//
 

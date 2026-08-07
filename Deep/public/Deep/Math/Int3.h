@@ -14,11 +14,11 @@ struct [[nodiscard]] Int3 {
 	Int3(const Int3&) = default;
 	Int3& operator=(const Int3&) = default;
 	inline Int3(int32 in_x, int32 in_y, int32 in_z);
-	explicit inline Int3(Arg_Vec3i in_vec);
+	inline Int3(Arg_Vec3i in_vec);
 
 	//
 
-	explicit inline operator Vec3i() const;
+	inline operator Vec3i() const;
 
 	//
 

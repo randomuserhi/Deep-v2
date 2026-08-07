@@ -53,10 +53,6 @@ option(DEEP_CPP_EXCEPTIONS_ENABLED "Enable C++ exceptions" OFF)
 # When turning this on, the library will not use any SIMD intrinsics
 option(DEEP_NO_SIMD_INTRINSICS "Disable SIMD intrinsics" OFF)
 
-# When turning this on, the library will not use type-punning tricks to abide by strict-aliasing rules and fallback to either
-# memcpy or bitcast to avoid strict aliasing issues.
-option(DEEP_USE_STRICT_ALIASING "Abide by strict aliasing rules" OFF)
-
 # When turned on, the library will use floating point exceptions
 option(DEEP_USE_FLOATING_POINT_EXCEPTIONS "Enable floating point exceptions" OFF)
 
@@ -295,11 +291,6 @@ endif()
 # Emit floating point exceptions
 if (DEEP_USE_FLOATING_POINT_EXCEPTIONS)
 	target_compile_definitions(Deep PUBLIC DEEP_USE_FLOATING_POINT_EXCEPTIONS)
-endif()
-
-# Emit Strict Aliasing
-if (DEEP_USE_STRICT_ALIASING)
-	target_compile_definitions(Deep PUBLIC DEEP_USE_STRICT_ALIASING)
 endif()
 
 # Emit Asserts
