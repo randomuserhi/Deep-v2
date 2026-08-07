@@ -75,8 +75,8 @@ const imports = {
                 (message ? ` — ${message}` : "")
             );
 
-            // Change to 1 if Deep should trap/break afterward.
-            return 0;
+            // Change to 0 to not trigger trap on assertion fail
+            return 1;
         },
     },
 };

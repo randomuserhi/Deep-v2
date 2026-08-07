@@ -23,11 +23,6 @@ TEST(Quat, Conjugate) {
 TEST(Quat, FromAxisAngle) {
 	const Deep::Quat a{ Deep::Vec3{ 0.0f, 1.0f, 0.0f }, Deep::k_pi };
 
-	std::cout << a.x << "\n";
-	std::cout << a.y << "\n";
-	std::cout << a.z << "\n";
-	std::cout << a.w << "\n";
-
 	EXPECT_TRUE(Deep::IsClose(a.x, 0.0f));
 	EXPECT_TRUE(Deep::IsClose(a.y, 1.0f));
 	EXPECT_TRUE(Deep::IsClose(a.z, 0.0f));
