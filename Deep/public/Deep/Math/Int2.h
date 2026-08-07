@@ -36,8 +36,8 @@ struct [[nodiscard]] Int2 {
 	};
 };
 
-static_assert(std::is_trivial<Int2>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Int2>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Int2>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Int2>, "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
 

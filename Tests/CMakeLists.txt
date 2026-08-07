@@ -25,6 +25,13 @@ endif()
 
 include(CMakeDependentOption)
 
+# Detect wasm targets
+if(CMAKE_SYSTEM_NAME STREQUAL "WASI")
+    set(TEST_TARGET_WASM ON)
+else()
+    set(TEST_TARGET_WASM OFF)
+endif()
+
 # When turning this option on, the library will be compiled with interprocedural optimizations enabled, also known as link-time optimizations or link-time code generation.
 # Note that if you turn this on you need to use SET_INTERPROCEDURAL_OPTIMIZATION() or set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON) to enable LTO specifically for your own project as well.
 # If you don't do this you may get an error: /usr/bin/ld: libDeep.a: error adding symbols: file format not recognized
@@ -97,6 +104,22 @@ file(GLOB_RECURSE TEST_SRC_FILES CONFIGURE_DEPENDS "${TEST_ROOT}/src/*.cpp")
 
 # Test executable
 add_executable(Tests ${TEST_SRC_FILES})
+if (TEST_TARGET_WASM)
+	set_target_properties(Tests PROPERTIES
+		SUFFIX ".wasm"
+	)
+	target_link_options(Tests PRIVATE
+        -Wl,--export-memory
+    )
+
+	# Copy node script to run the wasm module
+	add_custom_command(TARGET Tests POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			"${TEST_ROOT}/wasm/test.js"
+			"$<TARGET_FILE_DIR:Tests>/test.js"
+		COMMENT "Copying test.js build directory..."
+	)
+endif()
 
 target_include_directories(Tests PUBLIC "${TEST_ROOT}/src")
 

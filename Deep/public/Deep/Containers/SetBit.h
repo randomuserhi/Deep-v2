@@ -111,7 +111,8 @@ struct ComponentStorage {
 // }
 // ```
 //
-// NOTE(randomuserhi): Currently does not support components with constructors or copy that can throw
+// NOTE(randomuserhi): Container is not thread safe
+// NOTE(randomuserhi): Currently does not support components with constructors or copy constructors that can throw
 // TODO(randomuserhi): Support components that throw on copy or construction
 template<c_BitMask in_BitMask, typename... Components>
 class FixedSizeSetBitArchetype : private detail::_SetBitArchetype::ComponentStorage<Components>... {

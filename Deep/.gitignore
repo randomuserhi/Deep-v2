@@ -1,5 +1,6 @@
 bin/
 build/
+build-wasm/
 /.vs
 .idea/
 .cache/

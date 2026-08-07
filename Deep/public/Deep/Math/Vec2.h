@@ -105,8 +105,8 @@ struct [[nodiscard]] alignas(Float32x2) Vec2 {
 	DEEP_EXPORT static const Vec2 k_axis[k_numAxis];
 };
 
-static_assert(std::is_trivial<Vec2>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Vec2>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Vec2>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Vec2>, "Is supposed to be standard layout!");
 
 inline std::ostream& operator<<(std::ostream& in_os, const Vec2& in_vec);
 

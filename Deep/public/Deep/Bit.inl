@@ -4,6 +4,7 @@
 
 #include <bit>
 #include <limits>
+#include <type_traits>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -23,7 +24,7 @@ constexpr inline To BitCast(const From& in_value) {
 
 template<typename Container, typename Member>
 constexpr inline Container* ContainerOf(Member* in_memberAddr, Member Container::* in_memberPtr) noexcept {
-	static_assert(std::is_standard_layout<Container>(), "Container type must be of standard layout.");
+	static_assert(std::is_standard_layout_v<Container>, "Container type must be of standard layout.");
 	const char* base = reinterpret_cast<const char*>(&(reinterpret_cast<Container*>(0)->*in_memberPtr));
 	const char* memberAddr = reinterpret_cast<const char*>(in_memberAddr);
 	return reinterpret_cast<Container*>(memberAddr - base);
@@ -36,7 +37,7 @@ constexpr bool IsPowerOf2(T in_value) {
 
 template<typename T>
 inline bool IsAligned(T in_pointer, uint64 in_alignment) {
-	static_assert(std::is_pointer<T>(), "Expected type T to be a pointer.");
+	static_assert(std::is_pointer_v<T>, "Expected type T to be a pointer.");
 	Deep_Assert(IsPowerOf2(in_alignment), "Alignment should be a power of 2.");
 	return (BitCast<std::uintptr_t>(in_pointer) & (in_alignment - 1)) == 0;
 }

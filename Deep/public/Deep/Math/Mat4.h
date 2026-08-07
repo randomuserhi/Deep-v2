@@ -107,8 +107,8 @@ struct [[nodiscard]] alignas(Float32x4) Mat4 {
 	DEEP_EXPORT static const Mat4 k_identity;
 };
 
-static_assert(std::is_trivial<Mat4>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Mat4>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Mat4>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Mat4>, "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
 

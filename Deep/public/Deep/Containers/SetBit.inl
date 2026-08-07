@@ -304,11 +304,11 @@ void FIXED_SIZE_ARCHETYPE::ConstructEntity(size_t in_index, TaggedArgs&&... in_c
 	Deep_Assert(in_index < m_capacity, "Invalid index.");
 	Deep_Assert(!IsActive(in_index), "An entity is already constructed here.");
 
-	// Mark entity as active
-	m_activeMask.Set(in_index, true);
-
 	// Construct components
 	(ConstructComponent<Components, TaggedArgs...>(in_index, std::forward<TaggedArgs>(in_componentArgs)...), ...);
+
+	// Mark entity as active
+	m_activeMask.Set(in_index, true);
 }
 
 FIXED_SIZE_ARCHETYPE_TEMPLATE

@@ -37,8 +37,8 @@ struct [[nodiscard]] Float3 {
 	};
 };
 
-static_assert(std::is_trivial<Float3>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Float3>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Float3>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Float3>, "Is supposed to be standard layout!");
 static_assert(sizeof(Float3) == sizeof(float32) * 3);
 
 DEEP_NAMESPACE_END

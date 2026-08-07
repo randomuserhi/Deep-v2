@@ -115,8 +115,8 @@ struct [[nodiscard]] alignas(Int32x4) Vec3i {
 	DEEP_EXPORT static const Vec3i k_backwards;
 };
 
-static_assert(std::is_trivial<Vec3i>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Vec3i>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Vec3i>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Vec3i>, "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
 

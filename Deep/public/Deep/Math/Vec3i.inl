@@ -2,12 +2,10 @@
 
 #include "./Vec3i.h"
 
+#include "Deep/Asm/Intrinsics.h"
 #include "Deep/Simd/Int32x4.h"
 #include "Deep/Math/Vec3.h"
 #include "Deep/Math/Vec4i.h"
-
-#include <emmintrin.h>
-#include <immintrin.h>
 
 DEEP_NAMESPACE_BEGIN
 

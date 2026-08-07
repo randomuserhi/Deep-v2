@@ -6,13 +6,6 @@
 #include <concepts>
 #include <bit>
 
-DEEP_SUPPRESS_WARNINGS_STD_BEGIN
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-	#include <immintrin.h>
-#endif
-
-DEEP_SUPPRESS_WARNINGS_STD_END
-
 DEEP_NAMESPACE_BEGIN
 
 template<typename T, size_t in_alignment>

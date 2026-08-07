@@ -103,7 +103,7 @@ void* AlignedMalloc(size_t in_size, size_t in_alignment) DEEP_ALLOC_NOEXCEPT {
 
 #if defined(DEEP_PLATFORM_WINDOWS)
 	ptr = _aligned_malloc(in_size, in_alignment);
-#elif defined(DEEP_PLATFORM_UNIX) || defined(DEEP_PLATFORM_MAC)
+#elif defined(DEEP_PLATFORM_UNIX) || defined(DEEP_PLATFORM_MAC) || defined(DEEP_PLATFORM_WASM)
 	if (posix_memalign(&ptr, in_alignment, in_size) != 0) {
 		ptr = nullptr;
 	}

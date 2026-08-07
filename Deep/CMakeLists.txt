@@ -26,12 +26,23 @@ else()
 	message(FATAL_ERROR "${MESSAGE_PREFIX} Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
-# When turning this option on, the library will be compiled as a shared library.
-# Uses the value of BUILD_SHARED_LIBS if provided
-option(DEEP_BUILD_SHARED_LIBS "Compile Deep as a shared library" OFF)
-if (DEFINED BUILD_SHARED_LIBS)
-	set(DEEP_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+# Detect wasm targets
+if(CMAKE_SYSTEM_NAME STREQUAL "WASI")
+    set(DEEP_TARGET_WASM ON)
+else()
+    set(DEEP_TARGET_WASM OFF)
 endif()
+
+# The module named used for imports when targeting wasm
+set(DEEP_WASM_MODULE_NAME "deep_wasm" CACHE STRING "Name for the import wasm module")
+
+set(DEEP_BUILD_SHARED_LIBS_DEFAULT OFF)
+if(DEFINED BUILD_SHARED_LIBS AND NOT DEEP_TARGET_WASM)
+    set(DEEP_BUILD_SHARED_LIBS_DEFAULT ${BUILD_SHARED_LIBS})
+endif()
+# When turning this option on, the library will be compiled as a shared library.
+# Uses the value of BUILD_SHARED_LIBS if provided and is automatically set to OFF when targetting wasm.
+option(DEEP_BUILD_SHARED_LIBS "Compile Deep as a native shared library" ${DEEP_BUILD_SHARED_LIBS_DEFAULT})
 
 # When turning this option on, the library will be compiled using assertions. By default asserts are enabled in Debug build.
 option(DEEP_USE_ASSERTS "Enable asserts" ${DEEP_USE_ASSERTS_DEFAULT})
@@ -52,8 +63,6 @@ option(DEEP_USE_FLOATING_POINT_EXCEPTIONS "Enable floating point exceptions" OFF
 # When turned on, the library will be compiled with RTTI
 option(DEEP_USE_RTTI "Enable RTTI" OFF)
 
-option(DEEP_USE_WASM_SIMD "Enable WASM_SIMD" OFF)
-
 # Select X86 processor features to use (if everything is off it will be SSE2 compatible)
 option(DEEP_USE_SSE4_1 "Enable SSE4.1" ON)
 option(DEEP_USE_SSE4_2 "Enable SSE4.2" ON)
@@ -65,7 +74,13 @@ option(DEEP_USE_TZCNT "Enable TZCNT" ON)
 option(DEEP_USE_F16C "Enable F16C" ON)
 option(DEEP_USE_FMADD "Enable FMADD" ON)
 
-option(DEEP_USE_C_BINDINGS "Enable C Bindings" OFF)
+set(DEEP_USE_C_BINDINGS_DEFAULT OFF)
+if(DEEP_TARGET_WASM)
+    set(DEEP_USE_C_BINDINGS_DEFAULT ON)
+endif()
+# When turning this option on, C bindings are exported.
+# If wasm is being targeted, C bindings are enabled by default.
+option(DEEP_USE_C_BINDINGS "Enable C Bindings" ${DEEP_USE_C_BINDINGS_DEFAULT})
 
 include(CMakeDependentOption)
 
@@ -128,8 +143,20 @@ function(SET_INTERPROCEDURAL_OPTIMIZATION)
 endfunction()
 SET_INTERPROCEDURAL_OPTIMIZATION()
 
+# Validate options
+if (DEEP_TARGET_WASM)
+	if (DEEP_BUILD_SHARED_LIBS)
+		message(FATAL_ERROR "${MESSAGE_PREFIX} Deep does not support shared libraries for wasm targets")
+	endif()
+
+	if (DEEP_CPP_EXCEPTIONS_ENABLED)
+		message(FATAL_ERROR "${MESSAGE_PREFIX} Deep does not support exceptions for wasm targets")
+	endif()
+endif()
+
 # Root location
 set(DEEP_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(THIRD_PARTY_ROOT "${DEEP_ROOT}/../ThirdParty")
 
 # Obtain source files
 file(GLOB_RECURSE DEEP_SRC_FILES CONFIGURE_DEPENDS "${DEEP_ROOT}/src/*.cpp")
@@ -143,6 +170,12 @@ endif()
 
 # Add include directory
 target_include_directories(Deep PUBLIC "${DEEP_ROOT}/public")
+
+if (DEEP_TARGET_WASM)
+	# Add WASM intrinsics
+	set(LLVM_WASM_ROOT "${THIRD_PARTY_ROOT}/llvm_wasm")
+	target_include_directories(Deep PUBLIC "${LLVM_WASM_ROOT}/public")
+endif()
 
 # Handle shared library compilation
 if (DEEP_BUILD_SHARED_LIBS)
@@ -244,6 +277,13 @@ elseif (CLANG)
 		target_compile_options(Deep PRIVATE -fexceptions)
 	endif()
 
+	# Wasm Target
+	message(STATUS "${MESSAGE_PREFIX} DEEP_TARGET_WASM: ${DEEP_TARGET_WASM}")
+	if (DEEP_TARGET_WASM)
+		message(STATUS "${MESSAGE_PREFIX} DEEP_WASM_MODULE_NAME: ${DEEP_WASM_MODULE_NAME}")
+		target_compile_definitions(Deep PUBLIC DEEP_WASM_MODULE_NAME=\"${DEEP_WASM_MODULE_NAME}\")
+	endif()
+
 	# Remove buffer protections in release mode
 	target_compile_options(Deep PRIVATE
 		$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-fno-stack-protector>
@@ -275,33 +315,37 @@ if (DEEP_USE_C_BINDINGS)
 endif()
 
 # Emit the instruction set definitions to ensure that child projects use the same settings even if they override the used instruction sets (a mismatch causes link errors)
-function(EMIT_X86_INSTRUCTION_SET_DEFINITIONS)
-	if (DEEP_USE_AVX512)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_AVX512)
-	endif()
-	if (DEEP_USE_AVX2)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_AVX2)
-	endif()
-	if (DEEP_USE_AVX)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_AVX)
-	endif()
-	if (DEEP_USE_SSE4_1)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_SSE4_1)
-	endif()
-	if (DEEP_USE_SSE4_2)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_SSE4_2)
-	endif()
-	if (DEEP_USE_LZCNT)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_LZCNT)
-	endif()
-	if (DEEP_USE_TZCNT)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_TZCNT)
-	endif()
-	if (DEEP_USE_F16C)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_F16C)
-	endif()
-	if (DEEP_USE_FMADD)
-		target_compile_definitions(Deep PUBLIC DEEP_USE_FMADD)
+function(EMIT_INSTRUCTION_SET_DEFINITIONS)
+	if (DEEP_TARGET_WASM)
+		target_compile_definitions(Deep PUBLIC DEEP_USE_WASM_SIMD128)
+	else()
+		if (DEEP_USE_AVX512)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_AVX512)
+		endif()
+		if (DEEP_USE_AVX2)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_AVX2)
+		endif()
+		if (DEEP_USE_AVX)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_AVX)
+		endif()
+		if (DEEP_USE_SSE4_1)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_SSE4_1)
+		endif()
+		if (DEEP_USE_SSE4_2)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_SSE4_2)
+		endif()
+		if (DEEP_USE_LZCNT)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_LZCNT)
+		endif()
+		if (DEEP_USE_TZCNT)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_TZCNT)
+		endif()
+		if (DEEP_USE_F16C)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_F16C)
+		endif()
+		if (DEEP_USE_FMADD)
+			target_compile_definitions(Deep PUBLIC DEEP_USE_FMADD)
+		endif()
 	endif()
 endfunction()
 
@@ -317,13 +361,11 @@ if (NOT DEEP_NO_SIMD_INTRINSICS)
 		elseif (DEEP_USE_AVX)
 			target_compile_options(Deep PUBLIC /arch:AVX)
 		endif()
-		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
 	elseif (CLANG)
-		if (DEEP_USE_WASM_SIMD)
-			# Deep currently doesn't implement the WASM specific SIMD intrinsics so uses the SSE 4.2 intrinsics
-			# See: https://emscripten.org/docs/porting/simd.html#webassembly-simd-intrinsics
-			# Note that this does not require the browser to actually support SSE 4.2 it merely means that it can translate those instructions to WASM SIMD instructions
-			target_compile_options(Deep PUBLIC -msimd128 -msse4.2)
+		if (DEEP_TARGET_WASM)
+			# TODO(randomuserhi): Support emscripten, currently we support wasm on its own 
+			#                     https://emscripten.org/docs/porting/simd.html#webassembly-simd-intrinsics
+			target_compile_options(Deep PUBLIC -msimd128)
 		else()
 			if (DEEP_USE_AVX512)
 				target_compile_options(Deep PUBLIC -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl)
@@ -333,11 +375,12 @@ if (NOT DEEP_NO_SIMD_INTRINSICS)
 				target_compile_options(Deep PUBLIC -mavx)
 			endif()
 		endif()
-		EMIT_X86_INSTRUCTION_SET_DEFINITIONS()
 	else()
-		# TODO(randomuserhi)
+		# TODO(randomuserhi): GCC support
 		message(FATAL_ERROR "${MESSAGE_PREFIX} Unsupported compiler")
 	endif()
+	
+	EMIT_INSTRUCTION_SET_DEFINITIONS()
 else()
 	target_compile_definitions(Deep PUBLIC DEEP_NO_SIMD_INTRINSICS)
 endif()

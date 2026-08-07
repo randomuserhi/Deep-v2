@@ -1,4 +1,12 @@
 - [ ] SIMD support for ARM architectures (Arm Neon)
+  - [ ] `Simd/*`
+  - [ ] `Asm.h`
+  - [ ] `Physics2D/*`
+  - [ ] `Physics3D/*`
+  - [ ] `Math/*`
+
+- [ ] SIMD support for WASM architectures
+  - [x] `Simd/*`
   - [ ] `Asm.h`
   - [ ] `Physics2D/*`
   - [ ] `Physics3D/*`

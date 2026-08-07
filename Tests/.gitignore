@@ -1,9 +1,9 @@
 .cache/
 bin/
 build/
+build-wasm/
 all/
 /.vs
 .idea/
 Makefile
-
 CMakeSettings.json

@@ -94,8 +94,8 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 	DEEP_EXPORT static const Quat k_identity;
 };
 
-static_assert(std::is_trivial<Quat>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Quat>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Quat>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Quat>, "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
 

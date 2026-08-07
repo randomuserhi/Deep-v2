@@ -5,6 +5,10 @@ cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_EXPORT_COMPILE
 cmake --build build
 ```
 
+# Wasm builds
+
+Requires [wasi-sdk](https://github.com/WebAssembly/wasi-sdk/releases)
+
 # Naming convention shizzle
 
 - Prefer `{}` initializers (e.g `A a{ ... }`)

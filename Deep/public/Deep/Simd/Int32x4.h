@@ -1,23 +1,15 @@
 #pragma once
 
 #include "Deep.h"
+#include "Deep/Asm/Intrinsics.h"
 #include "Deep/Simd/SimdArgs.h"
 
 #if defined(DEEP_USE_SSE)
-DEEP_SUPPRESS_WARNINGS_STD_BEGIN
-	#include <immintrin.h>
-DEEP_SUPPRESS_WARNINGS_STD_END
 	#define DEEP_VEC_ALIGNMENT alignof(__m128i)
 #elif defined(DEEP_USE_NEON)
-DEEP_SUPPRESS_WARNINGS_STD_BEGIN
-	#ifdef DEEP_COMPILER_MSVC
-		#include <intrin.h>
-		#include <arm64_neon.h>
-	#else
-		#include <arm_neon.h>
-	#endif
-DEEP_SUPPRESS_WARNINGS_STD_END
 	#define DEEP_VEC_ALIGNMENT alignof(int32x4_t)
+#elif defined(DEEP_USE_WASM_SIMD128)
+	#define DEEP_VEC_ALIGNMENT alignof(v128_t)
 #else
 	#define DEEP_VEC_ALIGNMENT alignof(int32)
 #endif
@@ -34,6 +26,8 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	using Type = __m128i;
 #elif defined(DEEP_USE_NEON)
 	using Type = int32x4_t;
+#elif defined(DEEP_USE_WASM_SIMD128)
+	using Type = v128_t;
 #else
 	using Type = struct {
 		int32 m_values[4];
@@ -159,8 +153,8 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	};
 };
 
-static_assert(std::is_trivial<Int32x4>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Int32x4>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Int32x4>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Int32x4>, "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
 

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Deep.h"
-
-#include <immintrin.h>
+#include "Deep/Asm/Intrinsics.h"
 
 DEEP_NAMESPACE_BEGIN
 

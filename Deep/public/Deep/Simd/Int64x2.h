@@ -1,23 +1,15 @@
 #pragma once
 
 #include "Deep.h"
+#include "Deep/Asm/Intrinsics.h"
 #include "Deep/Simd/SimdArgs.h"
 
 #if defined(DEEP_USE_SSE)
-DEEP_SUPPRESS_WARNINGS_STD_BEGIN
-	#include <immintrin.h>
-DEEP_SUPPRESS_WARNINGS_STD_END
 	#define DEEP_VEC_ALIGNMENT alignof(__m128i)
 #elif defined(DEEP_USE_NEON)
-DEEP_SUPPRESS_WARNINGS_STD_BEGIN
-	#ifdef DEEP_COMPILER_MSVC
-		#include <intrin.h>
-		#include <arm64_neon.h>
-	#else
-		#include <arm_neon.h>
-	#endif
-DEEP_SUPPRESS_WARNINGS_STD_END
 	#define DEEP_VEC_ALIGNMENT alignof(int64x2_t)
+#elif defined(DEEP_USE_WASM_SIMD128)
+	#define DEEP_VEC_ALIGNMENT alignof(v128_t)
 #else
 	#define DEEP_VEC_ALIGNMENT alignof(int64)
 #endif
@@ -27,13 +19,14 @@ DEEP_SUPPRESS_WARNINGS_STD_END
 DEEP_NAMESPACE_BEGIN
 
 // Abstraction layer for __m128i SIMD type representing 2 independent values
-//
 
 struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 #if defined(DEEP_USE_SSE)
 	using Type = __m128i;
 #elif defined(DEEP_USE_NEON)
 	using Type = int64x2_t;
+#elif defined(DEEP_USE_WASM_SIMD128)
+	using Type = v128_t;
 #else
 	using Type = struct {
 		int64 m_values[2];
@@ -113,8 +106,8 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	};
 };
 
-static_assert(std::is_trivial<Int64x2>(), "Is supposed to be a trivial type!");
-static_assert(std::is_standard_layout<Int64x2>(), "Is supposed to be standard layout!");
+static_assert(std::is_trivial_v<Int64x2>, "Is supposed to be a trivial type!");
+static_assert(std::is_standard_layout_v<Int64x2>, "Is supposed to be standard layout!");
 
 DEEP_NAMESPACE_END
 

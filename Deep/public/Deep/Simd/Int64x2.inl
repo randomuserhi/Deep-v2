@@ -6,13 +6,14 @@
 	#include "Deep/Math/Ops.h"
 #endif
 
-#include <smmintrin.h>
-
 DEEP_NAMESPACE_BEGIN
 
 #ifdef DEEP_USE_SSE4_1
 Int64x2::Int64x2(int64 in_x, int64 in_y) :
 	m_internal{ _mm_set_epi64x(in_y, in_x) } {}
+#elif defined(DEEP_USE_WASM_SIMD_128)
+Int64x2::Int64x2(int64 in_x, int64 in_y) :
+	m_internal{ wasm_i64x2_make(in_x, in_y) } {}
 #else
 Int64x2::Int64x2(int64 in_x, int64 in_y) :
 	x{ in_x }, y{ in_y } {}
