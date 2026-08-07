@@ -182,13 +182,13 @@ MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const Memo
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-MemoryBlock<T, in_allocator>::~MemoryBlock() {
+MemoryBlock<T, in_allocator>::~MemoryBlock() noexcept {
 	Deallocate();
 }
 
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
-void MemoryBlock<T, in_allocator>::Deallocate() {
+void MemoryBlock<T, in_allocator>::Deallocate() noexcept {
 	if constexpr (!std::is_trivially_destructible_v<T>) {
 		Deep_Assert(m_ptr != nullptr || m_size == 0, "Invalid memory block state.");
 		for (size_t i = 0; i < m_size; ++i) {

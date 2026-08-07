@@ -90,7 +90,7 @@ public:
 
 	//
 
-	inline ~MemoryBlock();
+	inline ~MemoryBlock() noexcept;
 
 	//
 
@@ -126,7 +126,7 @@ private:
 	DEEP_PRIVATE_TESTABLE
 
 	// Destructs all items in the block and deallocates the memory ptr
-	inline void Deallocate();
+	inline void Deallocate() noexcept;
 
 	T* m_ptr;
 	size_t m_size;
