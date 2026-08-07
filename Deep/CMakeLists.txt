@@ -270,11 +270,11 @@ elseif (CLANG)
 	# Enable/Disable exceptions
 	message(STATUS "${MESSAGE_PREFIX} CPP_EXCEPTIONS_ENABLED: ${DEEP_CPP_EXCEPTIONS_ENABLED}")
 	if (NOT DEEP_CPP_EXCEPTIONS_ENABLED)
-	target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED=0)
-		target_compile_options(Deep PRIVATE -fno-exceptions)
+		target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED=0)
+		target_compile_options(Deep PUBLIC -fno-exceptions)
 	else()
 		target_compile_definitions(Deep PUBLIC DEEP_CPP_EXCEPTIONS_ENABLED=1)
-		target_compile_options(Deep PRIVATE -fexceptions)
+		target_compile_options(Deep PUBLIC -fexceptions)
 	endif()
 
 	# Wasm Target
@@ -284,7 +284,7 @@ elseif (CLANG)
 		target_compile_definitions(Deep PUBLIC DEEP_WASM_MODULE_NAME=\"${DEEP_WASM_MODULE_NAME}\")
 	endif()
 
-	# Remove buffer protections in release mode
+	# Remove buffer protections in release mode for maximum performance
 	target_compile_options(Deep PRIVATE
 		$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-fno-stack-protector>
 	)
