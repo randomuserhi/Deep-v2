@@ -29,8 +29,8 @@ TEST(MemoryBlock, Trivial) {
 }
 
 struct NonTrivialType {
-	NonTrivialType() {}
-	NonTrivialType(const NonTrivialType& in_other) {
+	NonTrivialType() noexcept {}
+	NonTrivialType(const NonTrivialType& in_other) noexcept {
 		m_value = in_other.m_value;
 	}
 	~NonTrivialType() {
