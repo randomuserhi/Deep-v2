@@ -65,6 +65,8 @@ Deep_ForceInline T* operator-(MemoryBlock<T, in_allocator>&, size_t);
 template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 class MemoryBlock {
+	static_assert(std::is_nothrow_destructible_v<T>, "MemoryBlock<T> requires T to have a non-throwing destructor.");
+
 public:
 	inline MemoryBlock(const MemoryBlock&) noexcept(noexcept(in_allocator::s_Malloc(std::declval<size_t>()))
 	                                                && std::is_nothrow_copy_constructible_v<T>);

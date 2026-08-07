@@ -19,6 +19,14 @@ template<typename T, typename in_allocator>
                  requires std::default_initializable<T>
 	:
 	m_size{ in_size } {
+	static_assert(DEEP_CPP_EXCEPTIONS_ENABLED || std::is_nothrow_default_constructible_v<T>,
+	              "MemoryBlock<T>(size) requires T to be nothrow default constructible "
+	              "when Deep is built without C++ exception support.");
+
+	static_assert(DEEP_CPP_EXCEPTIONS_ENABLED || noexcept(in_allocator::s_Malloc(std::declval<size_t>())),
+	              "MemoryBlock allocator must not throw when Deep is built without "
+	              "C++ exception support.");
+
 	if (m_size == 0) {
 		m_ptr = nullptr;
 		return;
@@ -49,6 +57,15 @@ template<typename T, typename in_allocator>
 MemoryBlock<T, in_allocator>::MemoryBlock(const MemoryBlock& in_other) noexcept(
 	noexcept(in_allocator::s_Malloc(std::declval<size_t>())) && std::is_nothrow_copy_constructible_v<T>) :
 	m_size{ in_other.m_size } {
+
+	static_assert(DEEP_CPP_EXCEPTIONS_ENABLED || std::is_nothrow_copy_constructible_v<T>,
+	              "MemoryBlock<T> copy construction requires T to be nothrow copy "
+	              "constructible when Deep is built without C++ exception support.");
+
+	static_assert(DEEP_CPP_EXCEPTIONS_ENABLED || noexcept(in_allocator::s_Malloc(std::declval<size_t>())),
+	              "MemoryBlock allocator must not throw when Deep is built without "
+	              "C++ exception support.");
+
 	if (m_size == 0) {
 		m_ptr = nullptr;
 		return;
@@ -129,6 +146,10 @@ template<typename T, typename in_allocator>
 	requires std::copy_constructible<T> && c_RawAllocator<in_allocator, T>
 MemoryBlock<T, in_allocator>& MemoryBlock<T, in_allocator>::operator=(const MemoryBlock& in_other) noexcept(
 	noexcept(in_allocator::s_Malloc(std::declval<size_t>())) && std::is_nothrow_copy_constructible_v<T>) {
+	static_assert(DEEP_CPP_EXCEPTIONS_ENABLED || std::is_nothrow_copy_constructible_v<T>,
+	              "MemoryBlock<T> copy assignment requires T to be nothrow copy "
+	              "constructible when Deep is built without C++ exception support.");
+
 	if (this == &in_other) {
 		return *this;
 	}

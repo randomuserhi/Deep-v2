@@ -12,7 +12,13 @@ concept c_RawAllocator = requires(Type* in_ptr, size_t in_size) {
 	{ T::s_Malloc(in_size) } -> std::same_as<Type*>;
 	{ T::s_Free(in_ptr) } noexcept;
 	{ T::s_Free(nullptr) } noexcept;
-};
+}
+#if !DEEP_CPP_EXCEPTIONS_ENABLED
+&& requires(size_t in_size) {
+    { T::s_Malloc(in_size) } noexcept;
+}
+#endif
+;
 
 template<typename T>
 struct RawAllocator {
