@@ -5,7 +5,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-struct ContactInfo {
+struct ContactInfo3D {
 	// For better packing, a Float3 (12 bytes) is used for the normal rather than a Vec3 (16 bytes).
 	// As a result, `m_normal` and `m_penetrationDistance` form a full Vec4 - and can be loaded as a Vec3.
 	alignas(alignof(Vec3)) Float3 m_normal;
@@ -24,9 +24,9 @@ struct ContactInfo {
 	inline Vec3 m_Normal() const;
 	inline void m_Normal(Arg_Vec3 in_normal);
 };
-DEEP_ASSERT_PACKED_VEC3(ContactInfo, m_normal, m_penetrationDistance);
+DEEP_ASSERT_PACKED_VEC3(ContactInfo3D, m_normal, m_penetrationDistance);
 
-using Arg_ContactInfo = const ContactInfo&;
+using Arg_ContactInfo3D = const ContactInfo3D&;
 
 DEEP_NAMESPACE_END
 

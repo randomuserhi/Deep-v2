@@ -25,8 +25,8 @@ using Arg_Vec4 = const Vec4;
 struct Quat;
 using Arg_Quat = const Quat;
 
-struct Mat4;
-using Arg_Mat4 = const Mat4&;
+struct Mat4x4;
+using Arg_Mat4x4 = const Mat4x4&;
 
 struct Int2;
 using Arg_Int2 = const Int2;

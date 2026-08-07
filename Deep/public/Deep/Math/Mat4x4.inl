@@ -1,14 +1,14 @@
 #pragma once
 
-#include "./Mat4.h"
+#include "./Mat4x4.h"
 
 #include "Deep/Math/Quat.h"
 
 DEEP_NAMESPACE_BEGIN
 
-Mat4::Mat4(Float32x4 in_col0, Float32x4 in_col1, Float32x4 in_col2, Float32x4 in_col3) :
+Mat4x4::Mat4x4(Float32x4 in_col0, Float32x4 in_col1, Float32x4 in_col2, Float32x4 in_col3) :
 	m_cols{ in_col0, in_col1, in_col2, in_col3 } {}
-Mat4::Mat4(                                                         //
+Mat4x4::Mat4x4(                                                     //
 	float32 in_m00, float32 in_m01, float32 in_m02, float32 in_m03, //
 	float32 in_m10, float32 in_m11, float32 in_m12, float32 in_m13, //
 	float32 in_m20, float32 in_m21, float32 in_m22, float32 in_m23, //
@@ -20,28 +20,28 @@ Mat4::Mat4(                                                         //
 		Float32x4(in_m02, in_m12, in_m22, in_m32), //
 		Float32x4(in_m03, in_m13, in_m23, in_m33)  //
 	} {}
-Mat4::Mat4(Vec4 in_col0, Vec4 in_col1, Vec4 in_col2, Vec4 in_col3) :
+Mat4x4::Mat4x4(Vec4 in_col0, Vec4 in_col1, Vec4 in_col2, Vec4 in_col3) :
 	m_vcols{ in_col0, in_col1, in_col2, in_col3 } {}
 
-Mat4& Mat4::Transpose() {
+Mat4x4& Mat4x4::Transpose() {
 	*this = transposed();
 	return *this;
 }
-Mat4 Mat4::transposed() const {
+Mat4x4 Mat4x4::transposed() const {
 #ifdef DEEP_USE_SSE
 	__m128 tmp1 = _mm_shuffle_ps(m_cols[0], m_cols[1], _MM_SHUFFLE(1, 0, 1, 0));
 	__m128 tmp3 = _mm_shuffle_ps(m_cols[0], m_cols[1], _MM_SHUFFLE(3, 2, 3, 2));
 	__m128 tmp2 = _mm_shuffle_ps(m_cols[2], m_cols[3], _MM_SHUFFLE(1, 0, 1, 0));
 	__m128 tmp4 = _mm_shuffle_ps(m_cols[2], m_cols[3], _MM_SHUFFLE(3, 2, 3, 2));
 
-	return Mat4{
+	return Mat4x4{
 		_mm_shuffle_ps(tmp1, tmp2, _MM_SHUFFLE(2, 0, 2, 0)), //
 		_mm_shuffle_ps(tmp1, tmp2, _MM_SHUFFLE(3, 1, 3, 1)), //
 		_mm_shuffle_ps(tmp3, tmp4, _MM_SHUFFLE(2, 0, 2, 0)), //
 		_mm_shuffle_ps(tmp3, tmp4, _MM_SHUFFLE(3, 1, 3, 1))  //
 	};
 #else
-	return Mat4{
+	return Mat4x4{
 		m00, m10, m20, m30, //
 		m01, m11, m21, m31, //
 		m02, m12, m22, m32, //
@@ -50,7 +50,7 @@ Mat4 Mat4::transposed() const {
 #endif
 }
 
-Mat4 Mat4::s_FromQuaternion(const Quat& in_quat) {
+Mat4x4 Mat4x4::s_FromQuaternion(const Quat& in_quat) {
 	Deep_Assert(in_quat.IsNormalized(), "Quaternion should be normalized");
 
 	// See: https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation section 'Quaternion-derived rotation matrix'
@@ -73,13 +73,13 @@ Mat4 Mat4::s_FromQuaternion(const Quat& in_quat) {
 	// in w not being 0 There doesn't appear to be a reliable way to turn this off in Clang
 	minus = _mm_insert_ps(minus, minus, 0b1000);
 
-	return Mat4{ _mm_blend_ps(_mm_blend_ps(plus, diagonal, 0b0001), minus,
-		                      0b1100), // (1 - 2 y^2 - 2 z^2, 2 xy + 2 zw, 2 xz - 2 yw, 0)
-		         _mm_blend_ps(_mm_blend_ps(diagonal, minus, 0b1001), plus,
-		                      0b0100), // (2 xy - 2 zw, 1 - 2 x^2 - 2 z^2, 2 yz + 2 xw, 0)
-		         _mm_blend_ps(_mm_blend_ps(minus, plus, 0b0001), diagonal,
-		                      0b0100), // (2 xz + 2 yw, 2 yz - 2 xw, 1 - 2 x^2 - 2 y^2, 0)
-		         _mm_set_ps(1, 0, 0, 0) };
+	return Mat4x4{ _mm_blend_ps(_mm_blend_ps(plus, diagonal, 0b0001), minus,
+		                        0b1100), // (1 - 2 y^2 - 2 z^2, 2 xy + 2 zw, 2 xz - 2 yw, 0)
+		           _mm_blend_ps(_mm_blend_ps(diagonal, minus, 0b1001), plus,
+		                        0b0100), // (2 xy - 2 zw, 1 - 2 x^2 - 2 z^2, 2 yz + 2 xw, 0)
+		           _mm_blend_ps(_mm_blend_ps(minus, plus, 0b0001), diagonal,
+		                        0b0100), // (2 xz + 2 yw, 2 yz - 2 xw, 1 - 2 x^2 - 2 y^2, 0)
+		           _mm_set_ps(1, 0, 0, 0) };
 #else
 	float32 x = in_quat.x;
 	float32 y = in_quat.y;
@@ -102,7 +102,7 @@ Mat4 Mat4::s_FromQuaternion(const Quat& in_quat) {
 	float32 zw = tz * w;
 
 	// NOTE(randomuserhi): Brackets to stay consistent with vectorised version
-	return Mat4{
+	return Mat4x4{
 		Float32x4((1.0f - yy) - zz, xy + zw, xz - yw, 0.0f), //
 		Float32x4(xy - zw, (1.0f - zz) - xx, yz + xw, 0.0f), //
 		Float32x4(xz + yw, yz - xw, (1.0f - xx) - yy, 0.0f), //
@@ -111,7 +111,7 @@ Mat4 Mat4::s_FromQuaternion(const Quat& in_quat) {
 #endif
 }
 
-float32 Mat4::determinant() const {
+float32 Mat4x4::determinant() const {
 #ifdef DEEP_USE_SSE
 	// TODO(randomuserhi): Optimize, there may be a lot of unnecessary calculations here
 	//                     as its stripped straight from Mat4::Inverse()
@@ -182,12 +182,12 @@ float32 Mat4::determinant() const {
 #endif
 }
 
-Mat4& Mat4::Inverse() {
+Mat4x4& Mat4x4::Inverse() {
 	*this = inversed();
 	return *this;
 }
 
-Mat4 Mat4::inversed() const {
+Mat4x4 Mat4x4::inversed() const {
 #ifdef DEEP_USE_SSE
 	// Algorithm from: http://download.intel.com/design/PentiumIII/sml/24504301.pdf
 	// Mirror: https://peertje.daanberg.net/drivers/intel/download.intel.com/design/PentiumIII/sml/24504301.pdf
@@ -263,7 +263,7 @@ Mat4 Mat4::inversed() const {
 	det = _mm_div_ss(_mm_set_ss(1.0f), det);
 	det = _mm_shuffle_ps(det, det, _MM_SHUFFLE(0, 0, 0, 0));
 
-	return Mat4{
+	return Mat4x4{
 		_mm_mul_ps(det, minor0), //
 		_mm_mul_ps(det, minor1), //
 		_mm_mul_ps(det, minor2), //
@@ -294,7 +294,7 @@ Mat4 Mat4::inversed() const {
 	float32 n12333213 = m12 * m33 - m32 * m13;
 	float32 n22333223 = m22 * m33 - m32 * m23;
 
-	Mat4 result{
+	Mat4x4 result{
 		Float32x4{ m11 * n22333223 - m21 * n12333213 + m31 * n12232213, -m01 * n22333223 + m21 * n02333203 - m31 * n02232203,
 		           m01 * n12333213 - m11 * n02333203 + m31 * n02131203,
 		           -m01 * n12232213 + m11 * n02232203 - m21 * n02131203 },
@@ -320,25 +320,25 @@ Mat4 Mat4::inversed() const {
 #endif
 }
 
-constexpr float32& Mat4::operator[](size_t in_index) {
+constexpr float32& Mat4x4::operator[](size_t in_index) {
 	return m_values[in_index];
 }
-constexpr const float32& Mat4::operator[](size_t in_index) const {
+constexpr const float32& Mat4x4::operator[](size_t in_index) const {
 	return m_values[in_index];
 }
 
-bool operator!=(Arg_Mat4 in_a, Arg_Mat4 in_b) {
+bool operator!=(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
 	return ((Float32x4::s_Equals(in_a.m_cols[0], in_b.m_cols[0]) & Float32x4::s_Equals(in_a.m_cols[1], in_b.m_cols[1]))
 	        & (Float32x4::s_Equals(in_a.m_cols[2], in_b.m_cols[2]) & Float32x4::s_Equals(in_a.m_cols[3], in_b.m_cols[3])))
 	           .ToBooleanBitMask()
 	       != 0b1111;
 }
-bool operator==(Arg_Mat4 in_a, Arg_Mat4 in_b) {
+bool operator==(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
 	return !(in_a != in_b);
 }
 
-Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b) {
-	Mat4 c;
+Mat4x4 operator*(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
+	Mat4x4 c;
 
 #ifdef DEEP_USE_SSE
 	c.m_cols[0] = _mm_mul_ps(in_a.m_cols[0], _mm_shuffle_ps(in_b.m_cols[0], in_b.m_cols[0], _MM_SHUFFLE(0, 0, 0, 0)));
@@ -397,7 +397,7 @@ Mat4 operator*(Arg_Mat4 in_a, Arg_Mat4 in_b) {
 	return c;
 }
 
-Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
+Vec3 operator*(Arg_Mat4x4 in_mat, Arg_Vec3 in_vec) {
 	Vec3 _v;
 #ifdef DEEP_USE_SSE
 	_v.m_float32x4 =
@@ -420,7 +420,7 @@ Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec) {
 	return Vec3::s_FixW(_v);
 }
 
-Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec) {
+Vec4 operator*(Arg_Mat4x4 in_mat, Arg_Vec4 in_vec) {
 	Vec4 _v;
 #ifdef DEEP_USE_SSE
 	_v.m_float32x4 =
@@ -443,7 +443,7 @@ Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec) {
 	return _v;
 }
 
-Mat4& Mat4::operator*=(float32 in_other) {
+Mat4x4& Mat4x4::operator*=(float32 in_other) {
 	m_cols[0] *= in_other;
 	m_cols[1] *= in_other;
 	m_cols[2] *= in_other;
@@ -451,8 +451,8 @@ Mat4& Mat4::operator*=(float32 in_other) {
 	return *this;
 }
 
-Mat4 operator*(Arg_Mat4 in_vec, float32 in_val) {
-	Mat4 result;
+Mat4x4 operator*(Arg_Mat4x4 in_vec, float32 in_val) {
+	Mat4x4 result;
 	result.m_cols[0] = in_vec.m_cols[0] * in_val;
 	result.m_cols[1] = in_vec.m_cols[1] * in_val;
 	result.m_cols[2] = in_vec.m_cols[2] * in_val;
@@ -460,8 +460,8 @@ Mat4 operator*(Arg_Mat4 in_vec, float32 in_val) {
 	return result;
 }
 
-Mat4 operator*(float32 in_val, Arg_Mat4 in_vec) {
-	Mat4 result;
+Mat4x4 operator*(float32 in_val, Arg_Mat4x4 in_vec) {
+	Mat4x4 result;
 	result.m_cols[0] = in_val * in_vec.m_cols[0];
 	result.m_cols[1] = in_val * in_vec.m_cols[1];
 	result.m_cols[2] = in_val * in_vec.m_cols[2];
@@ -469,7 +469,7 @@ Mat4 operator*(float32 in_val, Arg_Mat4 in_vec) {
 	return result;
 }
 
-Mat4& Mat4::operator/=(float32 in_other) {
+Mat4x4& Mat4x4::operator/=(float32 in_other) {
 	m_cols[0] /= in_other;
 	m_cols[1] /= in_other;
 	m_cols[2] /= in_other;
@@ -477,8 +477,8 @@ Mat4& Mat4::operator/=(float32 in_other) {
 	return *this;
 }
 
-Mat4 operator/(Arg_Mat4 in_vec, float32 in_val) {
-	Mat4 result;
+Mat4x4 operator/(Arg_Mat4x4 in_vec, float32 in_val) {
+	Mat4x4 result;
 	result.m_cols[0] = in_vec.m_cols[0] / in_val;
 	result.m_cols[1] = in_vec.m_cols[1] / in_val;
 	result.m_cols[2] = in_vec.m_cols[2] / in_val;
@@ -486,8 +486,8 @@ Mat4 operator/(Arg_Mat4 in_vec, float32 in_val) {
 	return result;
 }
 
-Mat4 operator/(float32 in_val, Arg_Mat4 in_vec) {
-	Mat4 result;
+Mat4x4 operator/(float32 in_val, Arg_Mat4x4 in_vec) {
+	Mat4x4 result;
 	result.m_cols[0] = in_val / in_vec.m_cols[0];
 	result.m_cols[1] = in_val / in_vec.m_cols[1];
 	result.m_cols[2] = in_val / in_vec.m_cols[2];

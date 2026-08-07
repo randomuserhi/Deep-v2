@@ -9,8 +9,8 @@ DEEP_NAMESPACE_BEGIN
 DEEP_EXPORT bool IsOverlapping(Arg_Aabb3D in_box, Arg_Sphere in_sphere);
 Deep_ForceInline bool IsOverlapping(Arg_Sphere in_sphere, Arg_Aabb3D in_box);
 
-DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_box, Arg_Sphere in_sphere, ContactInfo* out_contactInfo);
-Deep_ForceInline int IsOverlapping(Arg_Sphere in_sphere, Arg_Aabb3D in_box, ContactInfo* out_contactInfo);
+DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_box, Arg_Sphere in_sphere, ContactInfo3D* out_contactInfo);
+Deep_ForceInline int IsOverlapping(Arg_Sphere in_sphere, Arg_Aabb3D in_box, ContactInfo3D* out_contactInfo);
 
 DEEP_NAMESPACE_END
 

@@ -2,7 +2,7 @@
 
 #include "./Quat.h"
 
-#include "Deep/Math/Mat4.h" // IWYU pragma: export
+#include "Deep/Math/Mat4x4.h" // IWYU pragma: export
 
 DEEP_NAMESPACE_BEGIN
 
@@ -13,7 +13,7 @@ Quat::Quat(Float32x4 in_float32x4) :
 Quat::Quat(Vec4 in_vec) :
 	vec{ in_vec } {};
 
-Quat Quat::s_FromMat4(Arg_Mat4 in_mat) {
+Quat Quat::s_FromMat4(Arg_Mat4x4 in_mat) {
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
 	float trace = in_mat.m00 + in_mat.m11 + in_mat.m22;
@@ -61,8 +61,8 @@ bool Quat::IsNormalized(float in_tolerance) const {
 	return vec.IsNormalized(in_tolerance);
 }
 
-Mat4 Quat::ToMat4() const {
-	Mat4 m;
+Mat4x4 Quat::ToMat4() const {
+	Mat4x4 m;
 	return m.s_FromQuaternion(*this);
 }
 

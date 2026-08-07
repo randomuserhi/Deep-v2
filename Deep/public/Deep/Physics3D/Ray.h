@@ -42,7 +42,7 @@ DEEP_ASSERT_PACKED_VEC3(RayHit3D, m_normal, m_distance);
 
 using Arg_RayHit3D = const RayHit3D&;
 
-enum class RaycastType {
+enum class RaycastType3D {
 	e_startsInside,  // Rays will collide with colliders they start inside of
 	e_startsOutside, // Rays will not collide with colliders they start inside of
 	e_default = DEEP_RAYCAST_DEFAULT_TYPE

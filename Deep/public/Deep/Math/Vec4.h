@@ -74,7 +74,7 @@ struct [[nodiscard]] alignas(Float32x4) Vec4 {
 	friend inline Vec4 operator/(float32 in_val, Arg_Vec4 in_vec);
 
 	// Multiply a Matrix4x4 and Vector
-	friend inline Vec4 operator*(Arg_Mat4 in_mat, Arg_Vec4 in_vec);
+	friend inline Vec4 operator*(Arg_Mat4x4 in_mat, Arg_Vec4 in_vec);
 
 	//
 

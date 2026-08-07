@@ -5,14 +5,14 @@
 
 DEEP_NAMESPACE_BEGIN
 
-int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_contactInfo) {
+int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo3D* out_contactInfo) {
 	Deep_Assert(in_boxA.m_extents.x > 0 && in_boxA.m_extents.y > 0 && in_boxA.m_extents.z > 0,
 	            "Extents of box must be > 0.");
 	Deep_Assert(in_boxB.m_extents.x > 0 && in_boxB.m_extents.y > 0 && in_boxB.m_extents.z > 0,
 	            "Extents of box must be > 0.");
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
 
-	ContactInfo contactInfo;
+	ContactInfo3D contactInfo;
 
 	Vec3 minA = in_boxA.m_center - in_boxA.m_extents;
 	Vec3 maxA = in_boxA.m_center + in_boxA.m_extents;
@@ -48,7 +48,7 @@ int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_conta
 	return 1;
 }
 
-template<RaycastType in_queryType>
+template<RaycastType3D in_queryType>
 bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -76,15 +76,15 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box) {
 	float32 tEnter = Max(tmin.z, Max(tmin.y, tmin.x));
 	float32 tExit = Min(tmax.z, Min(tmax.y, tmax.x));
 
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
 		if (tEnter < 0.0f) return false;
 	}
 	return tEnter <= tExit && tExit > 0.0f;
 }
-template bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D);
-template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D);
+template bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Aabb3D);
+template bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D);
 
-template<RaycastType in_queryType>
+template<RaycastType3D in_queryType>
 bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -121,7 +121,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 	tExit = (tmax.z < tExit) ? tmax.z : tExit;
 
 	bool outside = tEnter >= 0;
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
 		if (!outside || tEnter > tExit || tExit <= 0.0f) return false;
 
 		const int32 axis = enterAxis;
@@ -145,10 +145,10 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit) {
 
 	return true;
 }
-template bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
-template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+template bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+template bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
 
-template<RaycastType in_queryType>
+template<RaycastType3D in_queryType>
 int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0 && in_box.m_extents.z > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -186,7 +186,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 
 	if (tEnter > tExit || tExit <= 0.0f) return 0;
 
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
 		if (tEnter < 0.0f) return 0;
 	}
 
@@ -214,7 +214,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits) {
 
 	return hitCount;
 }
-template int32 RaycastAll<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
-template int32 RaycastAll<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+template int32 RaycastAll<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+template int32 RaycastAll<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
 
 DEEP_NAMESPACE_END

@@ -16,22 +16,22 @@ using Arg_Aabb3D = const Aabb3D&;
 
 inline bool IsOverlapping(Arg_Vec3 in_point, Arg_Aabb3D in_box);
 inline bool IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB);
-DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo* out_contactInfo);
+DEEP_EXPORT int IsOverlapping(Arg_Aabb3D in_boxA, Arg_Aabb3D in_boxB, ContactInfo3D* out_contactInfo);
 
-template<RaycastType in_queryType = RaycastType::e_default>
+template<RaycastType3D in_queryType = RaycastType3D::e_default>
 bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box);
-extern template DEEP_EXPORT bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D);
-extern template DEEP_EXPORT bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D);
+extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Aabb3D);
+extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D);
 
-template<RaycastType in_queryType = RaycastType::e_default>
+template<RaycastType3D in_queryType = RaycastType3D::e_default>
 bool Raycast(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hit);
-extern template DEEP_EXPORT bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
-extern template DEEP_EXPORT bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
 
-template<RaycastType in_queryType = RaycastType::e_default>
+template<RaycastType3D in_queryType = RaycastType3D::e_default>
 int32 RaycastAll(Arg_Ray3D in_ray, Arg_Aabb3D in_box, RayHit3D* out_hits);
-extern template DEEP_EXPORT int32 RaycastAll<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
-extern template DEEP_EXPORT int32 RaycastAll<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+extern template DEEP_EXPORT int32 RaycastAll<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
+extern template DEEP_EXPORT int32 RaycastAll<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Aabb3D, RayHit3D*);
 
 DEEP_NAMESPACE_END
 

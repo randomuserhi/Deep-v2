@@ -1,9 +1,9 @@
-#include "Deep/Math/Mat4.h"
+#include "Deep/Math/Mat4x4.h"
 
 DEEP_NAMESPACE_BEGIN
 
 // TODO(randomuserhi): SIMD implementations + consider inlining?
-Mat4& Mat4::Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale) {
+Mat4x4& Mat4x4::Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scale) {
 	float32 x = in_rotation.x;
 	float32 y = in_rotation.y;
 	float32 z = in_rotation.z;
@@ -53,7 +53,7 @@ Mat4& Mat4::Compose(Arg_Vec3 in_position, Arg_Quat in_rotation, Arg_Vec3 in_scal
 	return *this;
 }
 
-const Mat4 Mat4::k_identity = Mat4{
+const Mat4x4 Mat4x4::k_identity = Mat4x4{
 	1.0f, 0.0f, 0.0f, 0.0f, //
 	0.0f, 1.0f, 0.0f, 0.0f, //
 	0.0f, 0.0f, 1.0f, 0.0f, //

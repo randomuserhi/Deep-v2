@@ -36,8 +36,8 @@ struct [[nodiscard]] alignas(Float32x4) Quat {
 	inline Quat& Inverse();
 	[[nodiscard]] inline Quat m_Inversed() const;
 
-	inline Mat4 ToMat4() const;
-	static inline Quat s_FromMat4(Arg_Mat4 in_mat);
+	inline Mat4x4 ToMat4() const;
+	static inline Quat s_FromMat4(Arg_Mat4x4 in_mat);
 
 	//
 

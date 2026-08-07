@@ -97,7 +97,7 @@ struct [[nodiscard]] alignas(Float32x4) Vec3 {
 	friend inline Vec3 operator/(float32 in_val, Arg_Vec3 in_vec);
 
 	// Multiply a Matrix4x4 and Vector
-	friend inline Vec3 operator*(Arg_Mat4 in_mat, Arg_Vec3 in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
+	friend inline Vec3 operator*(Arg_Mat4x4 in_mat, Arg_Vec3 in_vec); // NOTE(randomuserhi): Assumes Vec4 with w = 1
 
 	// Apply a quaternion to a vector
 	friend inline Vec3 operator*(Arg_Quat in_quat, Arg_Vec3 in_vec);

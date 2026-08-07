@@ -24,7 +24,7 @@ struct RayHit2D {
 
 using Arg_RayHit2D = const RayHit2D&;
 
-enum class RaycastType {
+enum class RaycastType2D {
 	e_startsInside,  // Rays will collide with colliders they start inside of
 	e_startsOutside, // Rays will not collide with colliders they start inside of
 	e_default = DEEP_RAYCAST_DEFAULT_TYPE

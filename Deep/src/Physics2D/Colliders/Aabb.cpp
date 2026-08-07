@@ -5,12 +5,12 @@
 
 DEEP_NAMESPACE_BEGIN
 
-int IsOverlapping(Arg_Aabb2D in_boxA, Arg_Aabb2D in_boxB, ContactInfo* out_contactInfo) {
+int IsOverlapping(Arg_Aabb2D in_boxA, Arg_Aabb2D in_boxB, ContactInfo2D* out_contactInfo) {
 	Deep_Assert(in_boxA.m_extents.x > 0 && in_boxA.m_extents.y > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_boxB.m_extents.x > 0 && in_boxB.m_extents.y > 0, "Extents of box must be > 0.");
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
 
-	ContactInfo contactInfo;
+	ContactInfo2D contactInfo;
 
 	Vec2 minA = in_boxA.m_center - in_boxA.m_extents;
 	Vec2 maxA = in_boxA.m_center + in_boxA.m_extents;
@@ -37,7 +37,7 @@ int IsOverlapping(Arg_Aabb2D in_boxA, Arg_Aabb2D in_boxB, ContactInfo* out_conta
 	return 1;
 }
 
-template<RaycastType in_queryType>
+template<RaycastType2D in_queryType>
 bool Raycast(Arg_Ray2D in_ray, Arg_Aabb2D in_box) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -65,15 +65,15 @@ bool Raycast(Arg_Ray2D in_ray, Arg_Aabb2D in_box) {
 	float32 tEnter = Max(tmin.y, tmin.x);
 	float32 tExit = Min(tmax.y, tmax.x);
 
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType2D::e_startsOutside) {
 		if (tEnter < 0.0f) return false;
 	}
 	return tEnter <= tExit && tExit > 0.0f;
 }
-template bool Raycast<RaycastType::e_startsInside>(Arg_Ray2D, Arg_Aabb2D);
-template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray2D, Arg_Aabb2D);
+template bool Raycast<RaycastType2D::e_startsInside>(Arg_Ray2D, Arg_Aabb2D);
+template bool Raycast<RaycastType2D::e_startsOutside>(Arg_Ray2D, Arg_Aabb2D);
 
-template<RaycastType in_queryType>
+template<RaycastType2D in_queryType>
 bool Raycast(Arg_Ray2D in_ray, Arg_Aabb2D in_box, RayHit2D* out_hit) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -106,7 +106,7 @@ bool Raycast(Arg_Ray2D in_ray, Arg_Aabb2D in_box, RayHit2D* out_hit) {
 	float32 tExit = (tmax.y < tmax.x) ? tmax.y : tmax.x;
 
 	bool outside = tEnter >= 0;
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType2D::e_startsOutside) {
 		if (!outside || tEnter > tExit || tExit <= 0.0f) return false;
 
 		const int32 axis = enterAxis;
@@ -130,10 +130,10 @@ bool Raycast(Arg_Ray2D in_ray, Arg_Aabb2D in_box, RayHit2D* out_hit) {
 
 	return true;
 }
-template bool Raycast<RaycastType::e_startsInside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
-template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
+template bool Raycast<RaycastType2D::e_startsInside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
+template bool Raycast<RaycastType2D::e_startsOutside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
 
-template<RaycastType in_queryType>
+template<RaycastType2D in_queryType>
 int32 RaycastAll(Arg_Ray2D in_ray, Arg_Aabb2D in_box, RayHit2D* out_hits) {
 	Deep_Assert(in_box.m_extents.x > 0 && in_box.m_extents.y > 0, "Extents of box must be > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -167,7 +167,7 @@ int32 RaycastAll(Arg_Ray2D in_ray, Arg_Aabb2D in_box, RayHit2D* out_hits) {
 
 	if (tEnter > tExit || tExit <= 0.0f) return 0;
 
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType2D::e_startsOutside) {
 		if (tEnter < 0.0f) return 0;
 	}
 
@@ -195,7 +195,7 @@ int32 RaycastAll(Arg_Ray2D in_ray, Arg_Aabb2D in_box, RayHit2D* out_hits) {
 
 	return hitCount;
 }
-template int32 RaycastAll<RaycastType::e_startsInside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
-template int32 RaycastAll<RaycastType::e_startsOutside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
+template int32 RaycastAll<RaycastType2D::e_startsInside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
+template int32 RaycastAll<RaycastType2D::e_startsOutside>(Arg_Ray2D, Arg_Aabb2D, RayHit2D*);
 
 DEEP_NAMESPACE_END

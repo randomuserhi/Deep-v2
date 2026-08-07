@@ -98,7 +98,8 @@ int32 Int32x4::ToBooleanBitMask() const {
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_bitmask(m_internal);
 #else
-	return (x >> 31) | ((y >> 31) << 1) | ((z >> 31) << 2) | ((w >> 31) << 3);
+	return static_cast<int32>((static_cast<uint32>(x) >> 31u) | ((static_cast<uint32>(y) >> 31u) << 1u)
+	                          | ((static_cast<uint32>(z) >> 31u) << 2u) | ((static_cast<uint32>(w) >> 31u) << 3u));
 #endif
 }
 

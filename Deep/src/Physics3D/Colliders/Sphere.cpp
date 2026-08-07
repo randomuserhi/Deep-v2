@@ -6,7 +6,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out_contactInfo) {
+int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo3D* out_contactInfo) {
 	Deep_Assert(in_sphereA.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_sphereB.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(out_contactInfo != nullptr, "Out param must not be nullptr.");
@@ -21,7 +21,7 @@ int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out
 		return 0;
 	}
 
-	ContactInfo contactInfo;
+	ContactInfo3D contactInfo;
 
 	float32 distance = Sqrt(distanceSqrd);
 
@@ -38,7 +38,7 @@ int IsOverlapping(Arg_Sphere in_sphereA, Arg_Sphere in_sphereB, ContactInfo* out
 	return 1;
 }
 
-template<RaycastType in_queryType>
+template<RaycastType3D in_queryType>
 bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 	Deep_Assert(in_sphere.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -48,7 +48,7 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 	float32 dot = Vec3::s_Dot(delta, in_ray.m_direction);
 	float32 distance = delta.m_SqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
 
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
 		if (distance < 0.0f) return false;
 	}
 
@@ -60,10 +60,10 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 
 	return discriminant >= 0.0f;
 }
-template bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Sphere);
-template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Sphere);
+template bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere);
+template bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere);
 
-template<RaycastType in_queryType>
+template<RaycastType3D in_queryType>
 bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 	Deep_Assert(in_sphere.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -75,10 +75,10 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 
 	return false;
 }
-template bool Raycast<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
-template bool Raycast<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
+template bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
+template bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
 
-template<RaycastType in_queryType>
+template<RaycastType3D in_queryType>
 int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 	Deep_Assert(in_sphere.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
@@ -100,7 +100,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 	int32 hitCount = 0;
 	float32 invRadius;
 
-	if constexpr (in_queryType == RaycastType::e_startsOutside) {
+	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
 		if (distance < 0.0f) return 0;
 		discriminant = Sqrt(discriminant);
 		invRadius = 1.0f / in_sphere.m_radius;
@@ -133,7 +133,7 @@ int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 
 	return hitCount;
 }
-template int32 RaycastAll<RaycastType::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
-template int32 RaycastAll<RaycastType::e_startsOutside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
+template int32 RaycastAll<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
+template int32 RaycastAll<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
 
 DEEP_NAMESPACE_END
