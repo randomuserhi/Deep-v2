@@ -4,7 +4,6 @@
 
 #include "Deep/Math/Vec4.h"
 #include "Deep/Simd/Int32x4.h"
-#include <tmmintrin.h>
 
 DEEP_NAMESPACE_BEGIN
 
