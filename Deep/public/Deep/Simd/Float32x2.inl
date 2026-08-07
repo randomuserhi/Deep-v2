@@ -181,7 +181,7 @@ Int32x2 Float32x2::s_IsNegative(Arg_Float32x2 in_value) {
 }
 
 Float32x2 Float32x2::s_Select(Arg_Float32x2 in_a, Arg_Float32x2 in_b, Arg_Int32x2 in_control) {
-	return Float32x2{ in_control.x ? in_b.x : in_a.x, in_control.y ? in_b.y : in_a.y };
+	return Float32x2{ in_control.x < 0 ? in_b.x : in_a.x, in_control.y < 0 ? in_b.y : in_a.y };
 }
 
 void Float32x2::SinCos(Float32x2& out_sin, Float32x2& out_cos) {

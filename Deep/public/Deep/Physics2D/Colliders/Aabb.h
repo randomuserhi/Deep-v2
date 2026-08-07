@@ -14,7 +14,7 @@ struct DEEP_EXPORT Aabb2D {
 
 using Arg_Aabb2D = const Aabb2D&;
 
-inline bool IsOverlapping(Arg_Vec3 in_point, Arg_Aabb2D in_box);
+inline bool IsOverlapping(Arg_Vec2 in_point, Arg_Aabb2D in_box);
 inline bool IsOverlapping(Arg_Aabb2D in_boxA, Arg_Aabb2D in_boxB);
 DEEP_EXPORT int IsOverlapping(Arg_Aabb2D in_boxA, Arg_Aabb2D in_boxB, ContactInfo2D* out_contactInfo);
 

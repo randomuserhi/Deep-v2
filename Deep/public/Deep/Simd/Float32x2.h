@@ -4,7 +4,7 @@
 #include "Deep/Asm/Intrinsics.h"
 #include "Deep/Simd/SimdArgs.h"
 
-#if defined(DEEP_USE_SSE)
+#if defined(DEEP_USE_SSE2)
 	#define DEEP_VEC_ALIGNMENT alignof(float32)
 #elif defined(DEEP_USE_NEON)
 	#define DEEP_VEC_ALIGNMENT alignof(float32x2_t)

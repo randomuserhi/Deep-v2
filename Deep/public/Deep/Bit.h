@@ -25,7 +25,7 @@ constexpr inline To BitCast(const From& in_value);
 //
 // A obj = {};
 // int* objA = &obj.m_b;
-// A* objFromMember = ContainerOf(objA, &A::m_a);
+// A* objFromMember = ContainerOf(objA, &A::m_b);
 //
 // Deep_Assert(&obj == objFromMember);
 //

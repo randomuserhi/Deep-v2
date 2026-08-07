@@ -69,11 +69,7 @@ Vec4::operator Float32x4() const {
 }
 
 Vec4::operator Vec4i() const {
-#ifdef DEEP_USE_SSE
-	return Vec4i{ _mm_cvtps_epi32(m_float32x4) };
-#else
-	return Vec4i{ static_cast<int32>(x), static_cast<int32>(y), static_cast<int32>(z), static_cast<int32>(w) };
-#endif
+	return Vec4i{ m_float32x4.ToInt() };
 }
 
 constexpr float32& Vec4::operator[](size_t in_index) {

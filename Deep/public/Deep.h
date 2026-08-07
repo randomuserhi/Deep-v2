@@ -269,26 +269,46 @@ DEEP_NAMESPACE_END
 #endif
 
 /*
+ * Architecture
+ */
+#if defined(__wasm32__)
+	#ifndef DEEP_ARCH_WASM32
+		#define DEEP_ARCH_WASM32
+	#endif
+#elif defined(__wasm64__)
+	#ifndef DEEP_ARCH_WASM64
+		#define DEEP_ARCH_WASM64
+	#endif
+#elif defined(__x86_64__) || defined(_M_X64)
+	#ifndef DEEP_ARCH_X86_64
+		#define DEEP_ARCH_X86_64
+	#endif
+#elif defined(__i386__) || defined(_M_IX86)
+	#ifndef DEEP_ARCH_X86
+		#define DEEP_ARCH_X86
+	#endif
+#elif defined(__aarch64__) || defined(_M_ARM64)
+	#ifndef DEEP_ARCH_ARM64
+		#define DEEP_ARCH_ARM64
+	#endif
+#elif defined(__arm__) || defined(_M_ARM)
+	#ifndef DEEP_ARCH_ARM
+		#define DEEP_ARCH_ARM
+	#endif
+#else
+	#error "Unknown architecture"
+#endif
+
+/*
  * Vectorised Instructions
  */
 
 #if defined(DEEP_NO_SIMD_INTRINSICS)
 #elif defined(DEEP_PLATFORM_WASM)
-	#define DEEP_CPU_WASM
-	#if defined(__wasm32__)
-		#define DEEP_CPU_WASM32
-	#elif defined(__wasm64__)
-		#define DEEP_CPU_WASM64
-	#else
-		#error "Unknown WebAssembly address size"
-	#endif
-
 	#if defined(__wasm_simd128__) && !defined(DEEP_USE_WASM_SIMD128)
 		#define DEEP_USE_WASM_SIMD128
 	#endif
 #elif defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-	#define DEEP_CPU_X86
-	#define DEEP_USE_SSE
 	#if defined(__AVX512F__) && defined(__AVX512VL__) && defined(__AVX512DQ__) && !defined(DEEP_USE_AVX512)
 		#define DEEP_USE_AVX512
 	#endif
@@ -304,18 +324,23 @@ DEEP_NAMESPACE_END
 	#if (defined(__SSE4_1__) || defined(DEEP_USE_SSE4_2)) && !defined(DEEP_USE_SSE4_1)
 		#define DEEP_USE_SSE4_1
 	#endif
-	#if (defined(__F16C__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_F16C)
+	#if (defined(__SSE2__) || defined(DEEP_USE_SSE4_1)) && !defined(DEEP_USE_SSE2)
+		#define DEEP_USE_SSE2
+	#endif
+
+	#if defined(__F16C__) && !defined(DEEP_USE_F16C)
 		#define DEEP_USE_F16C
 	#endif
-	#if (defined(__LZCNT__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_LZCNT)
+	#if defined(__LZCNT__) && !defined(DEEP_USE_LZCNT)
 		#define DEEP_USE_LZCNT
 	#endif
-	#if (defined(__BMI__) || defined(DEEP_USE_AVX2)) && !defined(DEEP_USE_TZCNT)
+	#if defined(__BMI__) && !defined(DEEP_USE_TZCNT)
 		#define DEEP_USE_TZCNT
 	#endif
+	#if defined(__FMA__) && !defined(DEEP_USE_FMA)
+		#define DEEP_USE_FMA
+	#endif
 #elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
-	// ARM CPU architecture
-	#define DEEP_CPU_ARM
 	#if defined(__aarch64__) || defined(_M_ARM64)
 		#define DEEP_USE_NEON
 	#endif

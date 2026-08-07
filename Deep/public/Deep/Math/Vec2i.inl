@@ -28,7 +28,7 @@ float32 Vec2i::m_Magnitude() const {
 }
 
 int32 Vec2i::m_ManhattanDistance() const {
-	return x + y;
+	return Abs(x) + Abs(y);
 }
 
 int32 Vec2i::s_Dot(Arg_Vec2i in_a, Arg_Vec2i in_b) {

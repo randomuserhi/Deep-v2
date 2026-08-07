@@ -28,7 +28,7 @@ Mat4x4& Mat4x4::Transpose() {
 	return *this;
 }
 Mat4x4 Mat4x4::transposed() const {
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE2
 	__m128 tmp1 = _mm_shuffle_ps(m_cols[0], m_cols[1], _MM_SHUFFLE(1, 0, 1, 0));
 	__m128 tmp3 = _mm_shuffle_ps(m_cols[0], m_cols[1], _MM_SHUFFLE(3, 2, 3, 2));
 	__m128 tmp2 = _mm_shuffle_ps(m_cols[2], m_cols[3], _MM_SHUFFLE(1, 0, 1, 0));
@@ -112,7 +112,7 @@ Mat4x4 Mat4x4::s_FromQuaternion(const Quat& in_quat) {
 }
 
 float32 Mat4x4::determinant() const {
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE2
 	// TODO(randomuserhi): Optimize, there may be a lot of unnecessary calculations here
 	//                     as its stripped straight from Mat4::Inverse()
 
@@ -188,7 +188,7 @@ Mat4x4& Mat4x4::Inverse() {
 }
 
 Mat4x4 Mat4x4::inversed() const {
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE2
 	// Algorithm from: http://download.intel.com/design/PentiumIII/sml/24504301.pdf
 	// Mirror: https://peertje.daanberg.net/drivers/intel/download.intel.com/design/PentiumIII/sml/24504301.pdf
 	// Streaming SIMD Extensions - Inverse of 4x4 Matrix
@@ -340,7 +340,7 @@ bool operator==(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
 Mat4x4 operator*(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
 	Mat4x4 c;
 
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE2
 	c.m_cols[0] = _mm_mul_ps(in_a.m_cols[0], _mm_shuffle_ps(in_b.m_cols[0], in_b.m_cols[0], _MM_SHUFFLE(0, 0, 0, 0)));
 	c.m_cols[0] = _mm_add_ps(
 		c.m_cols[0], _mm_mul_ps(in_a.m_cols[1], _mm_shuffle_ps(in_b.m_cols[0], in_b.m_cols[0], _MM_SHUFFLE(1, 1, 1, 1))));
@@ -399,7 +399,7 @@ Mat4x4 operator*(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
 
 Vec3 operator*(Arg_Mat4x4 in_mat, Arg_Vec3 in_vec) {
 	Vec3 _v;
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE2
 	_v.m_float32x4 =
 		_mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(0, 0, 0, 0)));
 	_v.m_float32x4 = _mm_add_ps(
@@ -422,7 +422,7 @@ Vec3 operator*(Arg_Mat4x4 in_mat, Arg_Vec3 in_vec) {
 
 Vec4 operator*(Arg_Mat4x4 in_mat, Arg_Vec4 in_vec) {
 	Vec4 _v;
-#ifdef DEEP_USE_SSE
+#ifdef DEEP_USE_SSE2
 	_v.m_float32x4 =
 		_mm_mul_ps(in_mat.m_cols[0], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(0, 0, 0, 0)));
 	_v.m_float32x4 = _mm_add_ps(

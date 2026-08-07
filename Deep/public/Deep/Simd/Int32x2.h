@@ -4,7 +4,7 @@
 #include "Deep/Asm/Intrinsics.h"
 #include "Deep/Simd/SimdArgs.h"
 
-#if defined(DEEP_USE_SSE)
+#if defined(DEEP_USE_SSE2)
 	#define DEEP_VEC_ALIGNMENT alignof(int64)
 #elif defined(DEEP_USE_NEON)
 	#define DEEP_VEC_ALIGNMENT alignof(int32x2_t)
@@ -51,11 +51,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 
 	// Convert into float32x2_t, converting each component to a float
 	inline Float32x2 ToFloat() const;
-	constexpr inline Float32x2 Constexpr_ToFloat() const;
 
 	// Reinterpret bytes as a float32x2_t
 	inline Float32x2 ReinterpretAsFloat() const;
-	constexpr inline Float32x2 Constexpr_ReinterpretAsFloat() const;
 
 	// Treats the 4 components as booleans where true is when the most significant bit is set
 	// and returns it as a bit mask.
@@ -75,7 +73,6 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 	//
 	// True is represented by the most significant bit being set.
 	static inline Int32x2 s_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
-	constexpr static inline Int32x2 Constexpr_s_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b);
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
 	static inline Int32x2 s_Select(Arg_Int32x2 in_a, Arg_Int32x2 in_b, Arg_Int32x2 in_control);

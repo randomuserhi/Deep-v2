@@ -3,6 +3,8 @@
 #include "./Vec4i.h"
 
 #include "Deep/Math/Vec4.h"
+#include "Deep/Simd/Int32x4.h"
+#include <tmmintrin.h>
 
 DEEP_NAMESPACE_BEGIN
 
@@ -30,13 +32,12 @@ float32 Vec4i::m_Magnitude() const {
 
 int32 Vec4i::m_ManhattanDistance() const {
 #ifdef DEEP_USE_SSE4_1
-	// NOTE(randomuserhi): Not even sure if SIMD horizontal sum here is worth. Might be better off without
-	//                     Profiling required.
-	Int32x4 sum = _mm_add_epi32(m_int32x4, _mm_shuffle_epi32(m_int32x4, _MM_SHUFFLE(2, 3, 0, 1)));
+	Int32x4 sum = _mm_abs_epi32(m_int32x4);
+	sum = _mm_add_epi32(sum, _mm_shuffle_epi32(sum, _MM_SHUFFLE(2, 3, 0, 1)));
 	sum = _mm_add_epi32(sum, _mm_shuffle_epi32(sum, _MM_SHUFFLE(1, 0, 3, 2)));
 	return _mm_cvtsi128_si32(sum);
 #else
-	return x + y + z + w;
+	return Abs(x) + Abs(y) + Abs(z) + Abs(w);
 #endif
 }
 
@@ -59,11 +60,7 @@ Vec4i::operator Int32x4() const {
 }
 
 Vec4i::operator Vec4() const {
-#ifdef DEEP_USE_SSE
-	return Vec4{ _mm_cvtepi32_ps(m_int32x4) };
-#else
-	return Vec4{ static_cast<float32>(x), static_cast<float32>(y), static_cast<float32>(z), static_cast<float32>(w) };
-#endif
+	return Vec4{ m_int32x4.ToFloat() };
 }
 
 constexpr int32& Vec4i::operator[](size_t in_index) {

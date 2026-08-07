@@ -4,7 +4,7 @@
 #include "Deep/Asm/Intrinsics.h"
 #include "Deep/Simd/SimdArgs.h"
 
-#if defined(DEEP_USE_SSE)
+#if defined(DEEP_USE_SSE2)
 	#define DEEP_VEC_ALIGNMENT alignof(__m128i)
 #elif defined(DEEP_USE_NEON)
 	#define DEEP_VEC_ALIGNMENT alignof(int64x2_t)
@@ -21,7 +21,7 @@ DEEP_NAMESPACE_BEGIN
 // Abstraction layer for __m128i SIMD type representing 2 independent values
 
 struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
-#if defined(DEEP_USE_SSE)
+#if defined(DEEP_USE_SSE2)
 	using Type = __m128i;
 #elif defined(DEEP_USE_NEON)
 	using Type = int64x2_t;

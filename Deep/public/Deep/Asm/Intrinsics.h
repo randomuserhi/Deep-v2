@@ -1,6 +1,6 @@
 #include "Deep.h"
 
-#if defined(DEEP_USE_SSE)
+#if defined(DEEP_USE_SSE2)
 DEEP_SUPPRESS_WARNINGS_STD_BEGIN
 	#include <immintrin.h> // IWYU pragma: export
 DEEP_SUPPRESS_WARNINGS_STD_END

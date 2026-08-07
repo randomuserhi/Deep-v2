@@ -32,17 +32,8 @@ Int32x2::operator Type() const {
 Float32x2 Int32x2::ToFloat() const {
 	return Float32x2{ static_cast<float32>(x), static_cast<float32>(y) };
 }
-constexpr Float32x2 Int32x2::Constexpr_ToFloat() const {
-	Float32x2 xmm;
-	xmm.x = static_cast<float32>(x);
-	xmm.y = static_cast<float32>(y);
-	return xmm;
-}
 
 Float32x2 Int32x2::ReinterpretAsFloat() const {
-	return BitCast<Float32x2>(*this);
-}
-constexpr Float32x2 Int32x2::Constexpr_ReinterpretAsFloat() const {
 	return BitCast<Float32x2>(*this);
 }
 
@@ -51,7 +42,7 @@ Int32x2 Int32x2::s_Replicate(int32 in_value) {
 }
 
 int32 Int32x2::ToBooleanBitMask() const {
-	return (x >> 31) | ((y >> 31) << 1);
+	return static_cast<int32>((static_cast<uint32>(x) >> 31) | ((static_cast<uint32>(y) >> 31) << 1));
 }
 
 Int32x2 Int32x2::s_Min(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
@@ -73,7 +64,7 @@ Int32x2 Int32x2::s_Equals(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 }
 
 Int32x2 Int32x2::s_Select(Arg_Int32x2 in_a, Arg_Int32x2 in_b, Arg_Int32x2 in_control) {
-	return Int32x2{ in_control.x ? in_b.x : in_a.x, in_control.y ? in_b.y : in_a.y };
+	return Int32x2{ in_control.x < 0 ? in_b.x : in_a.x, in_control.y < 0 ? in_b.y : in_a.y };
 }
 
 constexpr int32& Int32x2::operator[](size_t in_index) {
@@ -91,7 +82,8 @@ bool operator==(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 }
 
 Int32x2& Int32x2::operator<<=(int32 in_count) {
-	m_internal = Int32x2{ x << in_count, y << in_count };
+	m_internal = Int32x2{ static_cast<int32>(static_cast<uint32>(x) << in_count),
+		                  static_cast<int32>(static_cast<uint32>(y) << in_count) };
 	return *this;
 }
 Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
@@ -99,7 +91,8 @@ Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
 }
 
 Int32x2& Int32x2::operator>>=(int32 in_count) {
-	m_internal = Int32x2{ x >> in_count, y >> in_count };
+	m_internal = Int32x2{ static_cast<int32>(static_cast<uint32>(x) >> in_count),
+		                  static_cast<int32>(static_cast<uint32>(y) >> in_count) };
 	return *this;
 }
 Int32x2 operator>>(Int32x2 in_a, int32 in_count) {
