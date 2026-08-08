@@ -94,10 +94,6 @@
 			#define DEEP_EXPORT __declspec(dllexport)
 		#else
 			#define DEEP_EXPORT __attribute__((visibility("default")))
-			#if defined(DEEP_COMPILER_GCC)
-				// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
-				#define DEEP_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
-			#endif
 		#endif
 	#else
 		// When linking against Deep, we must import these symbols
@@ -105,10 +101,6 @@
 			#define DEEP_EXPORT __declspec(dllimport)
 		#else
 			#define DEEP_EXPORT __attribute__((visibility("default")))
-			#if defined(DEEP_COMPILER_GCC)
-				// Prevents an issue with GCC attribute parsing (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69585)
-				#define DEEP_EXPORT_GCC_BUG_WORKAROUND [[gnu::visibility("default")]]
-			#endif
 		#endif
 	#endif
 #else
