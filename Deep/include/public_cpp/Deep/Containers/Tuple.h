@@ -21,10 +21,10 @@ public:
 
 	template<typename U>
 		requires std::is_constructible_v<Type, U&&>
-	constexpr inline explicit TupleStorage(U&& in_val) noexcept(std::is_nothrow_constructible_v<Type, U&&>);
+	constexpr explicit inline TupleStorage(U&& in_val) noexcept(std::is_nothrow_constructible_v<Type, U&&>);
 
 	template<typename... Args>
-	constexpr inline explicit TupleStorage(ConstructorArgs<Type, Args...>&& in_constructor) noexcept(
+	constexpr explicit inline TupleStorage(ConstructorArgs<Type, Args...>&& in_constructor) noexcept(
 		noexcept(std::move(in_constructor).Construct()));
 
 	//

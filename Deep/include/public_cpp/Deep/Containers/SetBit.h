@@ -36,7 +36,7 @@ private:
 
 	// Helper that returns tuple of items
 	template<std::size_t... Is>
-	reference Deref(std::index_sequence<Is...>) const;
+	inline reference Deref(std::index_sequence<Is...>) const;
 
 	//
 

@@ -79,7 +79,7 @@ public:
 	using Type = T;
 	using ArgumentsTuple = detail::_Tuple::Tuple<Args&&...>;
 
-	constexpr explicit ConstructorArgs(Args&&... in_args) noexcept(
+	constexpr explicit inline ConstructorArgs(Args&&... in_args) noexcept(
 		std::is_nothrow_constructible_v<ArgumentsTuple, Args&&...>) :
 		m_args(std::forward<Args>(in_args)...) {}
 
@@ -93,13 +93,13 @@ public:
 	//
 	// Once called, this template is no longer valid (it has been consumed).
 	// Calling it again is undefined behaviour.
-	[[nodiscard]] constexpr T Construct() && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
+	[[nodiscard]] constexpr inline T Construct() && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
 
 	// Constructs the object at a given pointer location.
 	//
 	// Once called, this template is no longer valid (it has been consumed).
 	// Calling it again is undefined behaviour.
-	void Construct(T* in_destination) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
+	inline void Construct(T* in_destination) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
 
 	T Construct() & = delete;
 	T Construct() const& = delete;
@@ -107,10 +107,10 @@ public:
 
 private:
 	template<std::size_t... Is>
-	constexpr T ConstructImpl(std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
+	constexpr inline T ConstructImpl(std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
 
 	template<std::size_t... Is>
-	void ConstructImpl(T*, std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
+	inline void ConstructImpl(T*, std::index_sequence<Is...>) && noexcept(std::is_nothrow_constructible_v<T, Args&&...>);
 
 	ArgumentsTuple m_args;
 };

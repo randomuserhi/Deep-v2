@@ -20,7 +20,7 @@ struct PacketWriter {
 
 public:
 	inline PacketWriter();
-	inline explicit PacketWriter(size_t in_size);
+	explicit inline PacketWriter(size_t in_size);
 
 	//
 

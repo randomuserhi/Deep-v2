@@ -25,7 +25,7 @@ constexpr size_t AlignUp(size_t in_offset, size_t in_alignment) {
 template<typename... Ts>
 class SoALayout {
 public:
-	explicit constexpr SoALayout(size_t in_itemCount);
+	constexpr explicit inline SoALayout(size_t in_itemCount);
 
 	// Number of items each array contains
 	[[nodiscard]] constexpr Deep_ForceInline const size_t& m_ItemCount() const;
@@ -37,10 +37,10 @@ public:
 	[[nodiscard]] constexpr Deep_ForceInline const size_t& m_Alignment() const;
 
 	template<typename T>
-	[[nodiscard]] constexpr size_t OffsetOf() const;
+	[[nodiscard]] constexpr inline size_t OffsetOf() const;
 
 	template<typename T>
-	[[nodiscard]] constexpr size_t SizeOf() const;
+	[[nodiscard]] constexpr inline size_t SizeOf() const;
 
 private:
 	// Number of items each array contains
