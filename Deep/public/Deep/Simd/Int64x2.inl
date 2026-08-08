@@ -80,7 +80,8 @@ Int64x2& Int64x2::operator<<=(int32 in_count) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_slli_epi64(m_internal, in_count);
 #else
-	m_internal = Int64x2{ x << in_count, y << in_count };
+	m_internal = Int64x2{ static_cast<int64>(static_cast<uint64>(x) << in_count),
+		                  static_cast<int64>(static_cast<uint64>(y) << in_count) };
 #endif
 	return *this;
 }
@@ -92,7 +93,8 @@ Int64x2& Int64x2::operator>>=(int32 in_count) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_srli_epi64(m_internal, in_count);
 #else
-	m_internal = Int64x2{ x >> in_count, y >> in_count };
+	m_internal = Int64x2{ static_cast<int64>(static_cast<uint64>(x) >> in_count),
+		                  static_cast<int64>(static_cast<uint64>(y) >> in_count) };
 #endif
 	return *this;
 }
