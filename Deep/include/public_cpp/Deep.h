@@ -368,21 +368,19 @@ using float16 = std::uint16_t;
 using float32 = float;
 using float64 = double;
 
-// Ensure 8-bit bytes
-static_assert(CHAR_BIT == 8);
+static_assert(CHAR_BIT == 8, "Requires 8-bit bytes");
 
-// Ensure IEEE-754 binary32 and binary64 formats
-static_assert(sizeof(float32) == 4);
-static_assert(std::numeric_limits<float32>::is_iec559);
-static_assert(std::numeric_limits<float32>::radix == 2);
-static_assert(std::numeric_limits<float32>::digits == 24);
-static_assert(std::numeric_limits<float32>::max_exponent == 128);
+static_assert(sizeof(float32) == 4, "float must be 32-bit");
+static_assert(std::numeric_limits<float32>::is_iec559, "float must be IEEE-754 binary32 format");
+static_assert(std::numeric_limits<float32>::radix == 2, "float must be IEEE-754 binary32 format");
+static_assert(std::numeric_limits<float32>::digits == 24, "float must be IEEE-754 binary32 format");
+static_assert(std::numeric_limits<float32>::max_exponent == 128, "float must be IEEE-754 binary32 format");
 
-static_assert(sizeof(float64) == 8);
-static_assert(std::numeric_limits<float64>::is_iec559);
-static_assert(std::numeric_limits<float64>::radix == 2);
-static_assert(std::numeric_limits<float64>::digits == 53);
-static_assert(std::numeric_limits<float64>::max_exponent == 1024);
+static_assert(sizeof(float64) == 8, "double must be 64-bit");
+static_assert(std::numeric_limits<float64>::is_iec559, "double must be IEEE-754 binary64 format");
+static_assert(std::numeric_limits<float64>::radix == 2, "double must be IEEE-754 binary64 format");
+static_assert(std::numeric_limits<float64>::digits == 53, "double must be IEEE-754 binary64 format");
+static_assert(std::numeric_limits<float64>::max_exponent == 1024, "double must be IEEE-754 binary64 format");
 
 DEEP_NAMESPACE_END
 
