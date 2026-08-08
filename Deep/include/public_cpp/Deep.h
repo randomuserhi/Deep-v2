@@ -346,7 +346,6 @@
  */
 
 #include <cstdint>
-#include <climits>
 #include <limits>
 
 DEEP_NAMESPACE_BEGIN
