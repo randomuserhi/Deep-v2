@@ -167,6 +167,7 @@ target_compile_features(Deep PUBLIC cxx_std_20)
 
 # Add include directory
 target_include_directories(Deep PRIVATE "${DEEP_ROOT}/public")
+target_include_directories(Deep PRIVATE "${DEEP_ROOT}/public_c")
 
 if (DEEP_TARGET_WASM)
 	# Add WASM intrinsics
@@ -451,9 +452,7 @@ add_library(Deep::Cpp ALIAS DeepCpp)
 
 target_link_libraries(DeepCpp INTERFACE Deep)
 
-target_include_directories(DeepCpp INTERFACE
-    "${DEEP_ROOT}/public"
-)
+target_include_directories(DeepCpp INTERFACE "${DEEP_ROOT}/public")
 
 if (DEEP_TARGET_WASM)
     target_include_directories(DeepCpp INTERFACE
@@ -468,6 +467,4 @@ add_library(Deep::C ALIAS DeepC)
 
 target_link_libraries(DeepC INTERFACE Deep)
 
-target_include_directories(DeepC INTERFACE
-    "${DEEP_ROOT}/public_c"
-)
+target_include_directories(DeepC INTERFACE "${DEEP_ROOT}/public_c")

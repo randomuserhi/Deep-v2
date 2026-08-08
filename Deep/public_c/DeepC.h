@@ -1,4 +1,3 @@
-/* deep_c.h */
 #ifndef DEEP_H
 #define DEEP_H
 
