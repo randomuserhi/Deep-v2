@@ -4,6 +4,7 @@
  * Compiler Macros
  */
 
+#include <cstddef>
 #if defined(__clang__)
 	#define DEEP_COMPILER_CLANG
 #elif defined(__GNUC__) || defined(__GNUG__)
@@ -351,7 +352,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-enum class byte : unsigned char {};
+using byte = std::byte;
 
 using int8 = std::int8_t;
 using int16 = std::int16_t;
