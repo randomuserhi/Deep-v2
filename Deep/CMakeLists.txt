@@ -166,12 +166,12 @@ endif()
 target_compile_features(Deep PUBLIC cxx_std_20)
 
 # Add include directory
-target_include_directories(Deep PUBLIC "${DEEP_ROOT}/public")
+target_include_directories(Deep PRIVATE "${DEEP_ROOT}/public")
 
 if (DEEP_TARGET_WASM)
 	# Add WASM intrinsics
 	set(LLVM_WASM_ROOT "${THIRD_PARTY_ROOT}/llvm_wasm")
-	target_include_directories(Deep PUBLIC "${LLVM_WASM_ROOT}/public")
+	target_include_directories(Deep PRIVATE "${LLVM_WASM_ROOT}/public")
 endif()
 
 # Handle shared library compilation
@@ -443,3 +443,31 @@ if (NOT DEEP_NO_SIMD_INTRINSICS)
 else()
 	target_compile_definitions(Deep PUBLIC DEEP_NO_SIMD_INTRINSICS)
 endif()
+
+# C++ public interface
+
+add_library(DeepCpp INTERFACE)
+add_library(Deep::Cpp ALIAS DeepCpp)
+
+target_link_libraries(DeepCpp INTERFACE Deep)
+
+target_include_directories(DeepCpp INTERFACE
+    "${DEEP_ROOT}/public"
+)
+
+if (DEEP_TARGET_WASM)
+    target_include_directories(DeepCpp INTERFACE
+        "${LLVM_WASM_ROOT}/public"
+    )
+endif()
+
+# C public interface
+
+add_library(DeepC INTERFACE)
+add_library(Deep::C ALIAS DeepC)
+
+target_link_libraries(DeepC INTERFACE Deep)
+
+target_include_directories(DeepC INTERFACE
+    "${DEEP_ROOT}/public_c"
+)
