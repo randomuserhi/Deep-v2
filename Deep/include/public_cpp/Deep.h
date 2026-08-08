@@ -30,6 +30,20 @@
 #endif
 
 /*
+ * Mingw
+ */
+
+#if defined(__MINGW32__)
+	#define DEEP_MINGW32
+#endif
+#if defined(__MINGW64__)
+	#define DEEP_MINGW64
+#endif
+#if defined(DEEP_MINGW32) || defined(DEEP_MINGW64)
+	#define DEEP_MINGW
+#endif
+
+/*
  * Warning pragmas
  */
 #ifdef DEEP_COMPILER_CLANG
@@ -86,14 +100,14 @@
 	// If this define is set, Deep is compiled as a shared library
 	#ifdef DEEP_BUILD_SHARED_LIBRARY
 		// While building the shared library, we must export these symbols
-		#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_COMPILER_MINGW)
+		#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_MINGW)
 			#define DEEP_EXPORT __declspec(dllexport)
 		#else
 			#define DEEP_EXPORT __attribute__((visibility("default")))
 		#endif
 	#else
 		// When linking against Deep, we must import these symbols
-		#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_COMPILER_MINGW)
+		#if defined(DEEP_PLATFORM_WINDOWS) && !defined(DEEP_MINGW)
 			#define DEEP_EXPORT __declspec(dllimport)
 		#else
 			#define DEEP_EXPORT __attribute__((visibility("default")))
