@@ -346,25 +346,43 @@
  */
 
 #include <cstdint>
+#include <climits>
+#include <limits>
 
 DEEP_NAMESPACE_BEGIN
 
 enum class byte : unsigned char {};
 
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
+using int8 = std::int8_t;
+using int16 = std::int16_t;
+using int32 = std::int32_t;
+using int64 = std::int64_t;
 
-using uint8 = uint8_t;
-using uint16 = uint16_t;
-using uint32 = uint32_t;
-using uint64 = uint64_t;
+using uint8 = std::uint8_t;
+using uint16 = std::uint16_t;
+using uint32 = std::uint32_t;
+using uint64 = std::uint64_t;
 
-using float16 = uint16_t;
+using float16 = std::uint16_t;
 
 using float32 = float;
 using float64 = double;
+
+// Ensure 8-bit bytes
+static_assert(CHAR_BIT == 8);
+
+// Ensure IEEE-754 binary32 and binary64 formats
+static_assert(sizeof(float32) == 4);
+static_assert(std::numeric_limits<float32>::is_iec559);
+static_assert(std::numeric_limits<float32>::radix == 2);
+static_assert(std::numeric_limits<float32>::digits == 24);
+static_assert(std::numeric_limits<float32>::max_exponent == 128);
+
+static_assert(sizeof(float64) == 8);
+static_assert(std::numeric_limits<float64>::is_iec559);
+static_assert(std::numeric_limits<float64>::radix == 2);
+static_assert(std::numeric_limits<float64>::digits == 53);
+static_assert(std::numeric_limits<float64>::max_exponent == 1024);
 
 DEEP_NAMESPACE_END
 
