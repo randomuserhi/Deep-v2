@@ -124,7 +124,6 @@ endif()
 target_include_directories(Tests PUBLIC "${TEST_ROOT}/src")
 
 # Add includes and link Deep
-target_include_directories(Tests PRIVATE "${DEEP_ROOT}/public")
 target_link_libraries(Tests PRIVATE Deep)
 
 # Applies to clang-cl and MSVC
