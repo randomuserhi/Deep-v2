@@ -22,6 +22,8 @@ UInt32x4::UInt32x4(UInt32x2 in_low) :
 UInt32x4::UInt32x4(UInt32x2 in_low, UInt32x2 in_high) :
 	m_internal{ _mm_set_epi32(static_cast<int32>(in_high.y), static_cast<int32>(in_high.x), static_cast<int32>(in_low.y),
 	                          static_cast<int32>(in_low.x)) } {}
+UInt32x4::UInt32x4(Int32x4 in_signed) :
+	m_internal(in_signed.m_internal) {}
 #elif defined(DEEP_USE_WASM_SIMD128)
 UInt32x4::UInt32x4(uint32 in_x, uint32 in_y, uint32 in_z, uint32 in_w) :
 	m_internal{ wasm_u32x4_make(in_x, in_y, in_z, in_w) } {}
@@ -29,6 +31,8 @@ UInt32x4::UInt32x4(UInt32x2 in_low) :
 	m_internal{ wasm_u32x4_make(in_low.x, in_low.y, 0, 0) } {}
 UInt32x4::UInt32x4(UInt32x2 in_low, UInt32x2 in_high) :
 	m_internal{ wasm_u32x4_make(in_low.x, in_low.y, in_high.x, in_high.y) } {}
+UInt32x4::UInt32x4(Int32x4 in_signed) :
+	m_internal(in_signed.m_internal) {}
 #else
 UInt32x4::UInt32x4(uint32 in_x, uint32 in_y, uint32 in_z, uint32 in_w) :
 	x{ in_x }, y{ in_y }, z{ in_z }, w{ in_w } {}
@@ -36,13 +40,15 @@ UInt32x4::UInt32x4(UInt32x2 in_low) :
 	x{ in_low.x }, y{ in_low.y }, z{ 0 }, w{ 0 } {}
 UInt32x4::UInt32x4(UInt32x2 in_low, UInt32x2 in_high) :
 	x{ in_low.x }, y{ in_low.y }, z{ in_high.x }, w{ in_high.y } {}
+UInt32x4::UInt32x4(Int32x4 in_signed) :
+	x{ static_cast<uint32>(in_signed.x) },
+	y{ static_cast<uint32>(in_signed.y) },
+	z{ static_cast<uint32>(in_signed.z) },
+	w{ static_cast<uint32>(in_signed.w) } {}
 #endif
 
 UInt32x4::UInt32x4(Type in_internal) :
 	m_internal(in_internal) {}
-
-UInt32x4::UInt32x4(Int32x4 in_signed) :
-	m_internal(in_signed.m_internal) {}
 
 constexpr UInt32x4 UInt32x4::Constexpr(uint32 in_x, uint32 in_y, uint32 in_z, uint32 in_w) {
 	UInt32x4 xmmi;

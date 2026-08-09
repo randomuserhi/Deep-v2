@@ -14,19 +14,22 @@ DEEP_NAMESPACE_BEGIN
 #ifdef DEEP_USE_SSE2
 UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	m_internal{ _mm_set_epi64x(static_cast<int64>(in_y), static_cast<int64>(in_x)) } {}
+UInt64x2::UInt64x2(Int64x2 in_signed) :
+	m_internal(in_signed.m_internal) {}
 #elif defined(DEEP_USE_WASM_SIMD128)
 UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	m_internal{ wasm_u64x2_make(in_x, in_y) } {}
+UInt64x2::UInt64x2(Int64x2 in_signed) :
+	m_internal(in_signed.m_internal) {}
 #else
 UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	x{ in_x }, y{ in_y } {}
+UInt64x2::UInt64x2(Int64x2 in_signed) :
+	x{ static_cast<uint32>(in_signed.x) }, y{ static_cast<uint32>(in_signed.y) } {}
 #endif
 
 UInt64x2::UInt64x2(Type in_internal) :
 	m_internal(in_internal) {}
-
-UInt64x2::UInt64x2(Int64x2 in_signed) :
-	m_internal(in_signed.m_internal) {}
 
 constexpr UInt64x2 UInt64x2::Constexpr(uint64 in_x, uint64 in_y) {
 	UInt64x2 xmmi;
