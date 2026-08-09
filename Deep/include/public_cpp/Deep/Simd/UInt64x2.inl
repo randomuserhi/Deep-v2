@@ -68,8 +68,8 @@ Int64x2 UInt64x2::s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b) {
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_eq(in_a, in_b);
 #else
-	return UInt64x2{ in_a.x == in_b.x ? int64(0xffffffffffffffffull) : 0,
-		             in_a.y == in_b.y ? int64(0xffffffffffffffffull) : 0 };
+	return Int64x2{ in_a.x == in_b.x ? int64(0xffffffffffffffffull) : 0,
+		            in_a.y == in_b.y ? int64(0xffffffffffffffffull) : 0 };
 #endif
 }
 
