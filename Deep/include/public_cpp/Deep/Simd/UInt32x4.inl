@@ -180,6 +180,7 @@ bool operator==(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b) {
 }
 
 UInt32x4& UInt32x4::operator<<=(int32 in_count) {
+	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_slli_epi32(m_internal, in_count);
 #elif defined(DEEP_USE_WASM_SIMD128)
@@ -194,6 +195,7 @@ UInt32x4 operator<<(UInt32x4 in_a, int32 in_count) {
 }
 
 UInt32x4& UInt32x4::operator>>=(int32 in_count) {
+	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_srli_epi32(m_internal, in_count);
 #elif defined(DEEP_USE_WASM_SIMD128)

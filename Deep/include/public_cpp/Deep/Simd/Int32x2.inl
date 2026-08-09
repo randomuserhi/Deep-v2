@@ -90,10 +90,12 @@ Int32x2& Int32x2::operator<<=(int32 in_count) {
 	return *this;
 }
 Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
+	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 	return in_a <<= in_count;
 }
 
 Int32x2& Int32x2::operator>>=(int32 in_count) {
+	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 	m_internal = Int32x2{ x >> in_count, y >> in_count };
 	return *this;
 }

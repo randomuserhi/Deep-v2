@@ -87,6 +87,7 @@ bool operator==(Arg_UInt32x2 in_a, Arg_UInt32x2 in_b) {
 }
 
 UInt32x2& UInt32x2::operator<<=(int32 in_count) {
+	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 	m_internal = UInt32x2{ x << in_count, y << in_count };
 	return *this;
 }
@@ -95,6 +96,7 @@ UInt32x2 operator<<(UInt32x2 in_a, int32 in_count) {
 }
 
 UInt32x2& UInt32x2::operator>>=(int32 in_count) {
+	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 	m_internal = UInt32x2{ x >> in_count, y >> in_count };
 	return *this;
 }
