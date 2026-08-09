@@ -12,7 +12,7 @@ DEEP_NAMESPACE_BEGIN
 #ifdef DEEP_USE_SSE4_1
 Int64x2::Int64x2(int64 in_x, int64 in_y) :
 	m_internal{ _mm_set_epi64x(in_y, in_x) } {}
-#elif defined(DEEP_USE_WASM_SIMD_128)
+#elif defined(DEEP_USE_WASM_SIMD128)
 Int64x2::Int64x2(int64 in_x, int64 in_y) :
 	m_internal{ wasm_i64x2_make(in_x, in_y) } {}
 #else
@@ -37,7 +37,7 @@ Int64x2::operator Type() const {
 Int64x2 Int64x2::s_Replicate(int64 in_value) {
 #ifdef DEEP_USE_SSE2
 	return _mm_set1_epi64x(in_value);
-#elif defined(DEEP_USE_WASM_SIMD_128)
+#elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_splat(in_value);
 #else
 	return Int64x2{ in_value, in_value };
