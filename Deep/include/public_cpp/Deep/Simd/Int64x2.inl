@@ -36,6 +36,8 @@ Int64x2::operator Type() const {
 Int64x2 Int64x2::s_Replicate(int64 in_value) {
 #ifdef DEEP_USE_SSE2
 	return _mm_set1_epi64x(in_value);
+#elif defined(DEEP_USE_WASM_SIMD_128)
+	return wasm_i64x2_splat(in_value);
 #else
 	return Int64x2{ in_value, in_value };
 #endif
@@ -44,6 +46,8 @@ Int64x2 Int64x2::s_Replicate(int64 in_value) {
 int32 Int64x2::ToBooleanBitMask() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_movemask_pd(_mm_castsi128_pd(m_internal));
+#elif defined(DEEP_USE_WASM_SIMD128)
+	return wasm_i64x2_bitmask(m_internal);
 #else
 	return (x >> 63) | ((y >> 63) << 1);
 #endif
@@ -52,6 +56,8 @@ int32 Int64x2::ToBooleanBitMask() const {
 Int64x2 Int64x2::s_Equals(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cmpeq_epi64(in_a, in_b);
+#elif defined(DEEP_USE_WASM_SIMD128)
+	return wasm_i64x2_eq(in_a, in_b);
 #else
 	return Int64x2{ in_a.x == in_b.x ? int64(0xffffffffffffffffull) : 0,
 		            in_a.y == in_b.y ? int64(0xffffffffffffffffull) : 0 };
@@ -79,6 +85,8 @@ bool operator==(Arg_Int64x2 in_a, Arg_Int64x2 in_b) {
 Int64x2& Int64x2::operator<<=(int32 in_count) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_slli_epi64(m_internal, in_count);
+#elif defined(DEEP_USE_WASM_SIMD128)
+	m_internal = wasm_i64x2_shl(m_internal, in_count);
 #else
 	m_internal = Int64x2{ static_cast<int64>(static_cast<uint64>(x) << in_count),
 		                  static_cast<int64>(static_cast<uint64>(y) << in_count) };
@@ -92,6 +100,8 @@ Int64x2 operator<<(Int64x2 in_a, int32 in_count) {
 Int64x2& Int64x2::operator>>=(int32 in_count) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_srli_epi64(m_internal, in_count);
+#elif defined(DEEP_USE_WASM_SIMD128)
+	m_internal = wasm_i64x2_shr(m_internal, in_count);
 #else
 	m_internal = Int64x2{ static_cast<int64>(static_cast<uint64>(x) >> in_count),
 		                  static_cast<int64>(static_cast<uint64>(y) >> in_count) };
@@ -105,6 +115,8 @@ Int64x2 operator>>(Int64x2 in_a, int32 in_count) {
 Int64x2& Int64x2::operator|=(Arg_Int64x2 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_or_si128(m_internal, in_other);
+#elif defined(DEEP_USE_WASM_SIMD128)
+	m_internal = wasm_v128_or(m_internal, in_other);
 #else
 	m_internal = Int64x2{ x | in_other.x, y | in_other.y };
 #endif
@@ -117,6 +129,8 @@ Int64x2 operator|(Int64x2 in_a, Arg_Int64x2 in_b) {
 Int64x2& Int64x2::operator&=(Arg_Int64x2 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_and_si128(m_internal, in_other);
+#elif defined(DEEP_USE_WASM_SIMD128)
+	m_internal = wasm_v128_and(m_internal, in_other);
 #else
 	m_internal = Int64x2{ x & in_other.x, y & in_other.y };
 #endif
@@ -129,6 +143,8 @@ Int64x2 operator&(Int64x2 in_a, Arg_Int64x2 in_b) {
 Int64x2& Int64x2::operator^=(Arg_Int64x2 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_xor_si128(m_internal, in_other);
+#elif defined(DEEP_USE_WASM_SIMD128)
+	m_internal = wasm_v128_xor(m_internal, in_other);
 #else
 	m_internal = Int64x2{ x ^ in_other.x, y ^ in_other.y };
 #endif
