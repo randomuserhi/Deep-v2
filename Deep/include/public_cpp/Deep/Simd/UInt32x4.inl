@@ -58,7 +58,7 @@ UInt32x4::operator Type() const {
 }
 
 Float32x4 UInt32x4::ToFloat() const {
-#ifdef DEEP_USE_SSE2
+#ifdef DEEP_USE_AVX512
 	return _mm_cvtepu32_ps(m_internal);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_convert_u32x4(m_internal);
@@ -139,14 +139,14 @@ UInt32x4 UInt32x4::s_Max(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b) {
 #endif
 }
 
-UInt32x4 UInt32x4::s_Equals(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b) {
+Int32x4 UInt32x4::s_Equals(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b) {
 #ifdef DEEP_USE_SSE2
 	return _mm_cmpeq_epi32(in_a, in_b);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_eq(in_a, in_b);
 #else
-	return UInt32x4{ in_a.x == in_b.x ? 0xffffffffu : 0u, in_a.y == in_b.y ? 0xffffffffu : 0u,
-		             in_a.z == in_b.z ? 0xffffffffu : 0u, in_a.w == in_b.w ? 0xffffffffu : 0u };
+	return Int32x4{ in_a.x == in_b.x ? int32(0xffffffff) : 0, in_a.y == in_b.y ? int32(0xffffffff) : 0,
+		            in_a.z == in_b.z ? int32(0xffffffff) : 0, in_a.w == in_b.w ? int32(0xffffffff) : 0 };
 #endif
 }
 

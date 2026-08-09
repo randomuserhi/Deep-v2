@@ -7,7 +7,7 @@
 #if defined(DEEP_USE_SSE2)
 	#define DEEP_VEC_ALIGNMENT alignof(__m128i)
 #elif defined(DEEP_USE_NEON)
-	#define DEEP_VEC_ALIGNMENT alignof(UInt32x4_t)
+	#define DEEP_VEC_ALIGNMENT alignof(uint32x4_t)
 #elif defined(DEEP_USE_WASM_SIMD128)
 	#define DEEP_VEC_ALIGNMENT alignof(v128_t)
 #else
@@ -25,12 +25,12 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) UInt32x4 {
 #if defined(DEEP_USE_SSE2)
 	using Type = __m128i;
 #elif defined(DEEP_USE_NEON)
-	using Type = UInt32x4_t;
+	using Type = uint32x4_t;
 #elif defined(DEEP_USE_WASM_SIMD128)
 	using Type = v128_t;
 #else
 	using Type = struct {
-		int32 m_values[4];
+		uint32 m_values[4];
 	};
 #endif
 
@@ -79,7 +79,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) UInt32x4 {
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static inline UInt32x4 s_Equals(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b);
+	static inline Int32x4 s_Equals(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b);
 
 	// Component wise select, returns `a` when highest bit of `control` = 0 and `b` when highest bit of `control` = 1
 	static inline UInt32x4 s_Select(Arg_UInt32x4 in_a, Arg_UInt32x4 in_b, Arg_Int32x4 in_control);

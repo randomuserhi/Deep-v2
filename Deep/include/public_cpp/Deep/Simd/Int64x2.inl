@@ -10,7 +10,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE2
 Int64x2::Int64x2(int64 in_x, int64 in_y) :
 	m_internal{ _mm_set_epi64x(in_y, in_x) } {}
 #elif defined(DEEP_USE_WASM_SIMD128)
@@ -54,7 +54,7 @@ uint32 Int64x2::ToBooleanBitMask() const {
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_bitmask(m_internal);
 #else
-	return (static_cast<uint32>(x) >> 63) | ((static_cast<uint32>(y) >> 63) << 1);
+	return (static_cast<uint64>(x) >> 63) | ((static_cast<uint64>(y) >> 63) << 1);
 #endif
 }
 

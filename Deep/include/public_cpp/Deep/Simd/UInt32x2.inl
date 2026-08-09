@@ -64,8 +64,8 @@ UInt32x2 UInt32x2::s_Max(Arg_UInt32x2 in_a, Arg_UInt32x2 in_b) {
 	};
 }
 
-UInt32x2 UInt32x2::s_Equals(Arg_UInt32x2 in_a, Arg_UInt32x2 in_b) {
-	return UInt32x2{ in_a.x == in_b.x ? 0xffffffffu : 0u, in_a.y == in_b.y ? 0xffffffffu : 0u };
+Int32x2 UInt32x2::s_Equals(Arg_UInt32x2 in_a, Arg_UInt32x2 in_b) {
+	return Int32x2{ in_a.x == in_b.x ? int32(0xffffffff) : 0, in_a.y == in_b.y ? int32(0xffffffff) : 0 };
 }
 
 UInt32x2 UInt32x2::s_Select(Arg_UInt32x2 in_a, Arg_UInt32x2 in_b, Arg_Int32x2 in_control) {

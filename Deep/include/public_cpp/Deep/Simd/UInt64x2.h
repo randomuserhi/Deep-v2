@@ -7,7 +7,7 @@
 #if defined(DEEP_USE_SSE2)
 	#define DEEP_VEC_ALIGNMENT alignof(__m128i)
 #elif defined(DEEP_USE_NEON)
-	#define DEEP_VEC_ALIGNMENT alignof(UInt64x2_t)
+	#define DEEP_VEC_ALIGNMENT alignof(uint64x2_t)
 #elif defined(DEEP_USE_WASM_SIMD128)
 	#define DEEP_VEC_ALIGNMENT alignof(v128_t)
 #else
@@ -24,7 +24,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) UInt64x2 {
 #if defined(DEEP_USE_SSE2)
 	using Type = __m128i;
 #elif defined(DEEP_USE_NEON)
-	using Type = UInt64x2_t;
+	using Type = uint64x2_t;
 #elif defined(DEEP_USE_WASM_SIMD128)
 	using Type = v128_t;
 #else
@@ -64,7 +64,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) UInt64x2 {
 	// in `a` or `b`.
 	//
 	// True is represented by the most significant bit being set.
-	static inline UInt64x2 s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b);
+	static inline Int64x2 s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b);
 
 	//
 

@@ -11,7 +11,7 @@
 
 DEEP_NAMESPACE_BEGIN
 
-#ifdef DEEP_USE_SSE4_1
+#ifdef DEEP_USE_SSE2
 UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	m_internal{ _mm_set_epi64x(static_cast<int64>(in_y), static_cast<int64>(in_x)) } {}
 #elif defined(DEEP_USE_WASM_SIMD128)
@@ -55,17 +55,18 @@ uint32 UInt64x2::ToBooleanBitMask() const {
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_bitmask(m_internal);
 #else
-	return (static_cast<uint32>(x) >> 63) | ((static_cast<uint32>(y) >> 63) << 1);
+	return (x >> 63) | ((y >> 63) << 1);
 #endif
 }
 
-UInt64x2 UInt64x2::s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b) {
+Int64x2 UInt64x2::s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cmpeq_epi64(in_a, in_b);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_eq(in_a, in_b);
 #else
-	return UInt64x2{ in_a.x == in_b.x ? 0xffffffffffffffffull : 0ull, in_a.y == in_b.y ? 0xffffffffffffffffull : 0ull };
+	return UInt64x2{ in_a.x == in_b.x ? int64(0xffffffffffffffffull) : 0,
+		             in_a.y == in_b.y ? int64(0xffffffffffffffffull) : 0 };
 #endif
 }
 
@@ -102,7 +103,7 @@ UInt64x2 operator<<(UInt64x2 in_a, int32 in_count) {
 }
 
 UInt64x2& UInt64x2::operator>>=(int32 in_count) {
-#ifdef DEEP_USE_AVX512
+#ifdef DEEP_USE_SSE2
 	m_internal = _mm_srli_epi64(m_internal, in_count);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_u64x2_shr(m_internal, in_count);
