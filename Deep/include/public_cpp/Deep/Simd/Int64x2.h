@@ -40,6 +40,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	constexpr Int64x2& operator=(const Int64x2&) = default;
 	inline Int64x2(int64 in_x, int64 in_y);
 	inline Int64x2(Type in_internal);
+	explicit inline Int64x2(UInt64x2);
 
 	constexpr static inline Int64x2 Constexpr(int64 in_x, int64 in_y);
 
@@ -57,7 +58,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	// and returns it as a bit mask.
 	//
 	// Bit 0 is set if X is true, Bit 1 is set if Y is true.
-	inline int32 ToBooleanBitMask() const;
+	inline uint32 ToBooleanBitMask() const;
 
 	// Returns a 2 component integer value representing the equality of each component
 	// in `a` or `b`.

@@ -19,4 +19,13 @@ using Arg_Int32x4 = const Int32x4;
 struct Int64x2;
 using Arg_Int64x2 = const Int64x2;
 
+struct UInt32x2;
+using Arg_UInt32x2 = const UInt32x2;
+
+struct UInt32x4;
+using Arg_UInt32x4 = const UInt32x4;
+
+struct UInt64x2;
+using Arg_UInt64x2 = const UInt64x2;
+
 DEEP_NAMESPACE_END

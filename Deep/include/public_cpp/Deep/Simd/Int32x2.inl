@@ -2,6 +2,7 @@
 
 #include "./Int32x2.h"
 
+#include "Deep/Simd/UInt32x2.h"
 #include "Deep/Simd/Float32x2.h"
 #include "Deep/Bit.h"
 
@@ -14,6 +15,9 @@ Int32x2::Int32x2(int32 in_x, int32 in_y) :
 
 Int32x2::Int32x2(Type in_internal) :
 	m_internal(in_internal) {}
+
+Int32x2::Int32x2(UInt32x2 in_unsigned) :
+	m_swar64(in_unsigned.m_swar64) {}
 
 Int32x2::Int32x2(Int32x4 in_int32x4) :
 	x{ in_int32x4.x }, y{ in_int32x4.y } {}
@@ -41,8 +45,8 @@ Int32x2 Int32x2::s_Replicate(int32 in_value) {
 	return Int32x2{ in_value, in_value };
 }
 
-int32 Int32x2::ToBooleanBitMask() const {
-	return static_cast<int32>((static_cast<uint32>(x) >> 31) | ((static_cast<uint32>(y) >> 31) << 1));
+uint32 Int32x2::ToBooleanBitMask() const {
+	return (static_cast<uint32>(x) >> 31) | ((static_cast<uint32>(y) >> 31) << 1);
 }
 
 Int32x2 Int32x2::s_Min(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
@@ -82,8 +86,7 @@ bool operator==(Arg_Int32x2 in_a, Arg_Int32x2 in_b) {
 }
 
 Int32x2& Int32x2::operator<<=(int32 in_count) {
-	m_internal = Int32x2{ static_cast<int32>(static_cast<uint32>(x) << in_count),
-		                  static_cast<int32>(static_cast<uint32>(y) << in_count) };
+	m_internal = Int32x2{ x << in_count, y << in_count };
 	return *this;
 }
 Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
@@ -91,8 +94,7 @@ Int32x2 operator<<(Int32x2 in_a, int32 in_count) {
 }
 
 Int32x2& Int32x2::operator>>=(int32 in_count) {
-	m_internal = Int32x2{ static_cast<int32>(static_cast<uint32>(x) >> in_count),
-		                  static_cast<int32>(static_cast<uint32>(y) >> in_count) };
+	m_internal = Int32x2{ x >> in_count, y >> in_count };
 	return *this;
 }
 Int32x2 operator>>(Int32x2 in_a, int32 in_count) {

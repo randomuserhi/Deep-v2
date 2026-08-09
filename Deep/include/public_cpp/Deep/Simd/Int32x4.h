@@ -41,6 +41,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	constexpr Int32x4& operator=(const Int32x4&) = default;
 	inline Int32x4(int32 in_x, int32 in_y, int32 in_z, int32 in_w);
 	inline Int32x4(Type in_internal);
+	explicit inline Int32x4(UInt32x4);
 	inline Int32x4(Int32x2 in_low);
 	inline Int32x4(Int32x2 in_low, Int32x2 in_high);
 
@@ -65,7 +66,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	// and returns it as a bit mask.
 	//
 	// Bit 0 is set if X is true, Bit 1 is set if Y is true, Bit 2 is set if Z is true and Bit 3 is set if W is true.
-	inline int32 ToBooleanBitMask() const;
+	inline uint32 ToBooleanBitMask() const;
 
 	// Replicate the given value across all components
 	static inline Int32x4 s_Replicate(int32 in_value);

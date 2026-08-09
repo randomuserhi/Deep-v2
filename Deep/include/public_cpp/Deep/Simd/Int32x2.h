@@ -5,13 +5,13 @@
 #include "Deep/Simd/SimdArgs.h"
 
 #if defined(DEEP_USE_SSE2)
-	#define DEEP_VEC_ALIGNMENT alignof(int64)
+	#define DEEP_VEC_ALIGNMENT alignof(uint64)
 #elif defined(DEEP_USE_NEON)
 	#define DEEP_VEC_ALIGNMENT alignof(int32x2_t)
 #elif defined(DEEP_USE_WASM_SIMD128)
-	#define DEEP_VEC_ALIGNMENT alignof(int64)
+	#define DEEP_VEC_ALIGNMENT alignof(uint64)
 #else
-	#define DEEP_VEC_ALIGNMENT alignof(int64)
+	#define DEEP_VEC_ALIGNMENT alignof(uint64)
 #endif
 
 #include <type_traits>
@@ -27,7 +27,10 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 	using Type = int32x2_t;
 #else
 	using Type = struct {
-		int32 m_values[2];
+		union {
+			uint64 m_swar64;
+			int32 m_values[2];
+		};
 	};
 #endif
 
@@ -38,6 +41,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 	constexpr Int32x2& operator=(const Int32x2&) = default;
 	inline Int32x2(int32 in_x, int32 in_y);
 	inline Int32x2(Type in_internal);
+	explicit inline Int32x2(UInt32x2);
 	inline Int32x2(Int32x4);
 
 	constexpr static inline Int32x2 Constexpr(int32 in_x, int32 in_y);
@@ -59,7 +63,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 	// and returns it as a bit mask.
 	//
 	// Bit 0 is set if X is true, Bit 1 is set if Y is true, Bit 2 is set if Z is true and Bit 3 is set if W is true.
-	inline int32 ToBooleanBitMask() const;
+	inline uint32 ToBooleanBitMask() const;
 
 	// Replicate the given value across all components
 	static inline Int32x2 s_Replicate(int32 in_value);
@@ -140,7 +144,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x2 {
 
 	union {
 		Type m_internal;
-		int64 m_swar64; // 64 bit register representation for SWAR (simd with a register)
+		uint64 m_swar64; // 64 bit register representation for SWAR (simd with a register)
 		int32 m_values[2];
 		struct {
 			int32 x;
