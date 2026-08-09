@@ -249,6 +249,20 @@ Int32x4 operator^(Int32x4 in_a, Arg_Int32x4 in_b) {
 	return in_a ^= in_b;
 }
 
+Int32x4 operator~(Int32x4 in_value) {
+#ifdef DEEP_USE_SSE2
+	in_value.m_internal = _mm_xor_si128(in_value.m_internal, _mm_set1_epi32(int32(0xffffffff)));
+#elif defined(DEEP_USE_WASM_SIMD128)
+	in_value.m_internal = wasm_v128_not(in_value.m_internal);
+#else
+	in_value.x = static_cast<int32>(~static_cast<uint32>(in_value.x));
+	in_value.y = static_cast<int32>(~static_cast<uint32>(in_value.y));
+	in_value.z = static_cast<int32>(~static_cast<uint32>(in_value.z));
+	in_value.w = static_cast<int32>(~static_cast<uint32>(in_value.w));
+#endif
+	return in_value;
+}
+
 Int32x4& Int32x4::operator+=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_add_epi32(m_internal, in_other);

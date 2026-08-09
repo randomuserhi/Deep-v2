@@ -94,6 +94,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int64x2 {
 	inline Int64x2& operator^=(Arg_Int64x2 in_other);
 	friend inline Int64x2 operator^(Arg_Int64x2 in_a, Arg_Int64x2 in_b);
 
+	// Component wise logical NOT
+	friend inline Int64x2 operator~(Int64x2 in_value);
+
 	//
 
 	union {

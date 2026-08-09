@@ -123,6 +123,11 @@ Int32x2 operator^(Int32x2 in_a, Arg_Int32x2 in_b) {
 	return in_a ^= in_b;
 }
 
+Int32x2 operator~(Int32x2 in_value) {
+	in_value.m_swar64 = ~in_value.m_swar64;
+	return in_value;
+}
+
 Int32x2& Int32x2::operator+=(Arg_Int32x2 in_other) {
 	x += in_other.x;
 	y += in_other.y;

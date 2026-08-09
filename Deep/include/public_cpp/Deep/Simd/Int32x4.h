@@ -112,6 +112,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Int32x4 {
 	inline Int32x4& operator^=(Arg_Int32x4 in_other);
 	friend inline Int32x4 operator^(Int32x4 in_a, Arg_Int32x4 in_b);
 
+	// Component wise logical NOT
+	friend inline Int32x4 operator~(Int32x4 in_value);
+
 	// Component wise Add
 	inline Int32x4& operator+=(Arg_Int32x4 in_other);
 	friend inline Int32x4 operator+(Int32x4 in_a, Arg_Int32x4 in_b);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./Int64x2.h"
+#include "Deep/Simd/SimdArgs.h"
 
 #if !defined(DEEP_USE_SSE2)
 	#include "Deep/Math/Ops.h"
@@ -152,6 +153,18 @@ Int64x2& Int64x2::operator^=(Arg_Int64x2 in_other) {
 }
 Int64x2 operator^(Int64x2 in_a, Arg_Int64x2 in_b) {
 	return in_a ^= in_b;
+}
+
+Int64x2 operator~(Int64x2 in_value) {
+#ifdef DEEP_USE_SSE2
+	in_value.m_internal = _mm_xor_si128(in_value.m_internal, _mm_set1_epi64x(int32(0xffffffff)));
+#elif defined(DEEP_USE_WASM_SIMD128)
+	in_value.m_internal = wasm_v128_not(in_value.m_internal);
+#else
+	in_value.x = static_cast<int64>(~static_cast<uint64>(in_value.x));
+	in_value.y = static_cast<int64>(~static_cast<uint64>(in_value.y));
+#endif
+	return in_value;
 }
 
 DEEP_NAMESPACE_END
