@@ -7,6 +7,7 @@ DEEP_NAMESPACE_BEGIN
 
 #define INTEGER_BITMASK_TEMPLATE template<c_UnsignedInteger T>
 #define INTEGER_BITMASK IntegerBitMask<T>
+#define ARG_INTEGER_BITMASK Arg_IntegerBitMask<T>
 
 INTEGER_BITMASK_TEMPLATE
 INTEGER_BITMASK::IntegerBitMask(T in_value) :
@@ -59,7 +60,6 @@ constexpr void INTEGER_BITMASK::Inverse() {
 INTEGER_BITMASK_TEMPLATE
 constexpr size_t INTEGER_BITMASK::IndexOfLowestSetBit() const {
 	Deep_Assert(Any(), "No bits are set, cannot get lowest set bit.");
-
 	return CountTrailingZeros(m_bits);
 }
 
@@ -77,22 +77,22 @@ constexpr void INTEGER_BITMASK::ClearLowestSetBit() {
 }
 
 INTEGER_BITMASK_TEMPLATE
-constexpr INTEGER_BITMASK& INTEGER_BITMASK::operator|=(Arg_IntegerBitMask<T> in_other) {
+constexpr INTEGER_BITMASK& INTEGER_BITMASK::operator|=(ARG_INTEGER_BITMASK in_other) {
 	m_bits |= in_other.m_bits;
 	return *this;
 }
 INTEGER_BITMASK_TEMPLATE
-constexpr Deep_ForceInline INTEGER_BITMASK operator|(INTEGER_BITMASK in_a, Arg_IntegerBitMask<T> in_b) {
+constexpr Deep_ForceInline INTEGER_BITMASK operator|(INTEGER_BITMASK in_a, ARG_INTEGER_BITMASK in_b) {
 	return in_a |= in_b;
 }
 
 INTEGER_BITMASK_TEMPLATE
-constexpr INTEGER_BITMASK& INTEGER_BITMASK::operator&=(Arg_IntegerBitMask<T> in_other) {
+constexpr INTEGER_BITMASK& INTEGER_BITMASK::operator&=(ARG_INTEGER_BITMASK in_other) {
 	m_bits &= in_other.m_bits;
 	return *this;
 }
 INTEGER_BITMASK_TEMPLATE
-constexpr Deep_ForceInline INTEGER_BITMASK operator&(INTEGER_BITMASK in_a, Arg_IntegerBitMask<T> in_b) {
+constexpr Deep_ForceInline INTEGER_BITMASK operator&(INTEGER_BITMASK in_a, ARG_INTEGER_BITMASK in_b) {
 	return in_a &= in_b;
 }
 
@@ -103,7 +103,7 @@ constexpr Deep_ForceInline INTEGER_BITMASK operator~(INTEGER_BITMASK in_a) {
 }
 
 INTEGER_BITMASK_TEMPLATE
-constexpr Deep_ForceInline bool operator==(Arg_IntegerBitMask<T> in_a, Arg_IntegerBitMask<T> in_b) {
+constexpr Deep_ForceInline bool operator==(ARG_INTEGER_BITMASK in_a, ARG_INTEGER_BITMASK in_b) {
 	return in_a.m_bits == in_b.m_bits;
 }
 
