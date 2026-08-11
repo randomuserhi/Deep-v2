@@ -33,7 +33,7 @@ constexpr inline bool operator==(Arg_BitMask<in_N, in_Policy>, Arg_BitMask<in_N,
 template<size_t in_N, StoragePolicy in_Policy>
 constexpr Deep_ForceInline bool operator!=(Arg_BitMask<in_N, in_Policy>, Arg_BitMask<in_N, in_Policy>);
 
-namespace detail::_Bitmask {
+namespace detail::_BitMask {
 
 template<size_t in_N>
 class StorageInfo {
@@ -47,53 +47,7 @@ public:
 	constexpr static size_t k_pageShift = Deep::CountTrailingZeros(k_bitsPerChunk);
 	constexpr static size_t k_itemMask = k_bitsPerChunk - 1;
 
-	constexpr static size_t k_numLeafChunks = ((in_N - 1) >> k_pageShift) + 1;
-	constexpr static size_t k_numLevels = []() -> size_t {
-		if (in_N == 0) return 0;
-
-		size_t numChunks = k_numLeafChunks;
-		size_t numLevels = 1;
-		while (numChunks > 1) {
-			numChunks = ((numChunks - 1) >> k_pageShift) + 1;
-			++numLevels;
-		}
-		return numLevels;
-	}();
-	constexpr static size_t k_numChunks = []() -> size_t {
-		if (in_N == 0) return 0;
-
-		size_t numChunks = k_numLeafChunks;
-		size_t total = 0;
-		while (true) {
-			total += numChunks;
-			if (numChunks == 1) return total;
-			numChunks = ((numChunks - 1) >> k_pageShift) + 1;
-		}
-	}();
-
-	constexpr static auto k_levelOffsets = []() {
-		std::array<size_t, k_numLevels> offsets{};
-		size_t offset = 0;
-		size_t numChunks = k_numLeafChunks;
-
-		for (size_t level = 0; level < k_numLevels; ++level) {
-			offsets[level] = offset;
-
-			offset += numChunks;
-			numChunks = ((numChunks - 1) >> k_pageShift) + 1;
-		}
-		return offsets;
-	}();
-	constexpr static auto k_levelSizes = []() {
-		std::array<size_t, k_numLevels> sizes{};
-		size_t numChunks = k_numLeafChunks;
-
-		for (size_t level = 0; level < k_numLevels; ++level) {
-			sizes[level] = numChunks;
-			numChunks = ((numChunks - 1) >> k_pageShift) + 1;
-		}
-		return sizes;
-	}();
+	constexpr static size_t k_numChunks = ((in_N - 1) >> k_pageShift) + 1;
 };
 
 template<size_t in_N, StoragePolicy in_policy>
@@ -109,12 +63,7 @@ public:
 	using StorageInfo<in_N>::k_pageShift;
 	using StorageInfo<in_N>::k_itemMask;
 
-	using StorageInfo<in_N>::k_numLeafChunks;
-	using StorageInfo<in_N>::k_numLevels;
 	using StorageInfo<in_N>::k_numChunks;
-
-	using StorageInfo<in_N>::k_levelOffsets;
-	using StorageInfo<in_N>::k_levelSizes;
 
 	constexpr Deep_ForceInline ChunkType& operator[](size_t in_index);
 	constexpr Deep_ForceInline const ChunkType& operator[](size_t in_index) const;
@@ -138,12 +87,7 @@ public:
 	using StorageInfo<in_N>::k_pageShift;
 	using StorageInfo<in_N>::k_itemMask;
 
-	using StorageInfo<in_N>::k_numLeafChunks;
-	using StorageInfo<in_N>::k_numLevels;
 	using StorageInfo<in_N>::k_numChunks;
-
-	using StorageInfo<in_N>::k_levelOffsets;
-	using StorageInfo<in_N>::k_levelSizes;
 
 	inline Storage(const Storage& in_other) noexcept;
 	inline Storage(Storage&& in_other) noexcept;
@@ -169,16 +113,14 @@ private:
 	ChunkType* m_chunks;
 };
 
-} // namespace detail::_Bitmask
+} // namespace detail::_BitMask
 
-// Bitmask for arbitrary number of bits.
-// Uses a hierarchy of flags for fast operations.
-//
-// TODO(randomuserhi): Documentation
+// BitMask for arbitrary number of bits.
+// Underlying representation is a flat buffer of integers.
 template<size_t in_N, StoragePolicy in_Policy>
 class BitMask {
 	static_assert(in_N > 0, "Bit mask must contain atleast 1 bit.");
-	using Storage = detail::_Bitmask::Storage<in_N, in_Policy>;
+	using Storage = detail::_BitMask::Storage<in_N, in_Policy>;
 
 public:
 	using ChunkType = typename Storage::ChunkType;
@@ -225,27 +167,17 @@ public:
 	constexpr static size_t k_maxNumBits = in_N;
 
 	constexpr static size_t k_bitsPerChunk = Storage::k_bitsPerChunk;
-	constexpr static size_t k_numLeafChunks = Storage::k_numLeafChunks;
+	constexpr static size_t k_numChunks = Storage::k_numChunks;
 
 private:
 	DEEP_PRIVATE_TESTABLE
 
-	constexpr void RebuildHierarchy();
-	constexpr void MaskUnusedBits();
-	constexpr void PropagateOccupancy(size_t in_childLevel, size_t in_childIndex, bool in_occupied);
+	Storage m_chunks;
 
 	//
 
-	constexpr static size_t k_numChunks = Storage::k_numChunks;
-	constexpr static size_t k_numLevels = Storage::k_numLevels;
-
-	constexpr static auto k_levelOffsets = Storage::k_levelOffsets;
-	constexpr static auto k_levelSizes = Storage::k_levelSizes;
-
 	constexpr static size_t k_pageShift = Storage::k_pageShift;
 	constexpr static size_t k_itemMask = Storage::k_itemMask;
-
-	Storage m_chunks;
 };
 
 static_assert(c_BitMask<BitMask<32, StoragePolicy::e_stack>>);

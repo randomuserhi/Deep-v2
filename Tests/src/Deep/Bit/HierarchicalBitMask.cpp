@@ -3,12 +3,10 @@
 #define DEEP_TESTABLE
 
 #include "Deep/Types.h"
-#include "Deep/Bit/BitMask.h"
+#include "Deep/Bit/HierarchicalBitMask.h"
 
-// TODO(randomuserhi): This is copied from HierarchicalBitmask -> need to actually write tests for this bitmask
-
-TEST(BitMask, DefaultConstructionAndClear) {
-	Deep::BitMask<32> mask{};
+TEST(HierarchicalBitMask, DefaultConstructionAndClear) {
+	Deep::HierarchicalBitMask<32> mask{};
 
 	EXPECT_FALSE(mask.Any());
 	EXPECT_EQ(mask.NumSetBits(), 0);
@@ -18,8 +16,8 @@ TEST(BitMask, DefaultConstructionAndClear) {
 	}
 }
 
-TEST(BitMask, SetAndTest) {
-	Deep::BitMask<32> mask{};
+TEST(HierarchicalBitMask, SetAndTest) {
+	Deep::HierarchicalBitMask<32> mask{};
 
 	mask.Set<true>(0);
 	EXPECT_TRUE(mask.Test(0));
@@ -45,8 +43,8 @@ TEST(BitMask, SetAndTest) {
 	EXPECT_EQ(mask.NumSetBits(), 2);
 }
 
-TEST(BitMask, RuntimeSet) {
-	Deep::BitMask<32> mask{};
+TEST(HierarchicalBitMask, RuntimeSet) {
+	Deep::HierarchicalBitMask<32> mask{};
 
 	mask.Set(7, true);
 
@@ -59,8 +57,8 @@ TEST(BitMask, RuntimeSet) {
 	EXPECT_FALSE(mask.Any());
 }
 
-TEST(BitMask, InverseSingleChunk) {
-	using Mask = Deep::BitMask<32>;
+TEST(HierarchicalBitMask, InverseSingleChunk) {
+	using Mask = Deep::HierarchicalBitMask<32>;
 
 	Mask mask{};
 
@@ -79,8 +77,8 @@ TEST(BitMask, InverseSingleChunk) {
 	EXPECT_EQ(mask.NumSetBits(), 0);
 }
 
-TEST(BitMask, InverseMasksUnusedBits) {
-	Deep::BitMask<35> mask{};
+TEST(HierarchicalBitMask, InverseMasksUnusedBits) {
+	Deep::HierarchicalBitMask<35> mask{};
 
 	mask.Inverse();
 
@@ -97,9 +95,9 @@ TEST(BitMask, InverseMasksUnusedBits) {
 	EXPECT_EQ(mask.NumSetBits(), 0);
 }
 
-TEST(BitMask, BitwiseOr) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, BitwiseOr) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	a.Set<true>(1);
 	a.Set<true>(10);
@@ -125,9 +123,9 @@ TEST(BitMask, BitwiseOr) {
 	EXPECT_TRUE(b.Test(20));
 }
 
-TEST(BitMask, BitwiseOrAssign) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, BitwiseOrAssign) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	a.Set<true>(3);
 	b.Set<true>(17);
@@ -139,9 +137,9 @@ TEST(BitMask, BitwiseOrAssign) {
 	EXPECT_EQ(a.NumSetBits(), 2);
 }
 
-TEST(BitMask, BitwiseAnd) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, BitwiseAnd) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	a.Set<true>(1);
 	a.Set<true>(10);
@@ -161,9 +159,9 @@ TEST(BitMask, BitwiseAnd) {
 	EXPECT_EQ(result.NumSetBits(), 2);
 }
 
-TEST(BitMask, BitwiseAndAssign) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, BitwiseAndAssign) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	a.Set<true>(4);
 	a.Set<true>(12);
@@ -180,9 +178,9 @@ TEST(BitMask, BitwiseAndAssign) {
 	EXPECT_EQ(a.NumSetBits(), 1);
 }
 
-TEST(BitMask, BitwiseXor) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, BitwiseXor) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	a.Set<true>(1);
 	a.Set<true>(10);
@@ -201,9 +199,9 @@ TEST(BitMask, BitwiseXor) {
 	EXPECT_EQ(result.NumSetBits(), 3);
 }
 
-TEST(BitMask, BitwiseXorAssign) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, BitwiseXorAssign) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	a.Set<true>(5);
 	a.Set<true>(6);
@@ -220,8 +218,8 @@ TEST(BitMask, BitwiseXorAssign) {
 	EXPECT_EQ(a.NumSetBits(), 2);
 }
 
-TEST(BitMask, BitwiseNot) {
-	Deep::BitMask<32> a{};
+TEST(HierarchicalBitMask, BitwiseNot) {
+	Deep::HierarchicalBitMask<32> a{};
 
 	a.Set<true>(3);
 	a.Set<true>(9);
@@ -240,9 +238,9 @@ TEST(BitMask, BitwiseNot) {
 	EXPECT_EQ(result.NumSetBits(), 30);
 }
 
-TEST(BitMask, Equality) {
-	Deep::BitMask<32> a{};
-	Deep::BitMask<32> b{};
+TEST(HierarchicalBitMask, Equality) {
+	Deep::HierarchicalBitMask<32> a{};
+	Deep::HierarchicalBitMask<32> b{};
 
 	EXPECT_TRUE(a == b);
 
@@ -263,8 +261,8 @@ TEST(BitMask, Equality) {
 	EXPECT_TRUE(a == b);
 }
 
-TEST(BitMask, NumSetBits) {
-	Deep::BitMask<128> mask{};
+TEST(HierarchicalBitMask, NumSetBits) {
+	Deep::HierarchicalBitMask<128> mask{};
 
 	EXPECT_EQ(mask.NumSetBits(), 0);
 
@@ -284,8 +282,8 @@ TEST(BitMask, NumSetBits) {
 	EXPECT_EQ(mask.NumSetBits(), std::size(indices) - 2);
 }
 
-TEST(BitMask, IndexOfLowestSetBit) {
-	Deep::BitMask<128> mask{};
+TEST(HierarchicalBitMask, IndexOfLowestSetBit) {
+	Deep::HierarchicalBitMask<128> mask{};
 
 	mask.Set<true>(93);
 	EXPECT_EQ(mask.IndexOfLowestSetBit(), 93);
@@ -300,8 +298,8 @@ TEST(BitMask, IndexOfLowestSetBit) {
 	EXPECT_EQ(mask.IndexOfLowestSetBit(), 0);
 }
 
-TEST(BitMask, ClearLowestSetBit) {
-	Deep::BitMask<128> mask{};
+TEST(HierarchicalBitMask, ClearLowestSetBit) {
+	Deep::HierarchicalBitMask<128> mask{};
 
 	mask.Set<true>(5);
 	mask.Set<true>(37);
@@ -331,8 +329,8 @@ TEST(BitMask, ClearLowestSetBit) {
 	EXPECT_EQ(mask.NumSetBits(), 0);
 }
 
-TEST(BitMask, PopLowestSetBit) {
-	Deep::BitMask<128> mask{};
+TEST(HierarchicalBitMask, PopLowestSetBit) {
+	Deep::HierarchicalBitMask<128> mask{};
 
 	mask.Set<true>(100);
 	mask.Set<true>(2);
@@ -354,8 +352,8 @@ TEST(BitMask, PopLowestSetBit) {
 	EXPECT_FALSE(mask.Any());
 }
 
-TEST(BitMask, ChunkBoundaryOperations) {
-	using Mask = Deep::BitMask<128>;
+TEST(HierarchicalBitMask, ChunkBoundaryOperations) {
+	using Mask = Deep::HierarchicalBitMask<128>;
 
 	constexpr size_t bitsPerChunk = Mask::k_bitsPerChunk;
 
@@ -373,8 +371,77 @@ TEST(BitMask, ChunkBoundaryOperations) {
 	EXPECT_EQ(mask.IndexOfLowestSetBit(), bitsPerChunk - 1);
 }
 
-TEST(BitMask, MultipleHierarchyBranches) {
-	using Mask = Deep::BitMask<512>;
+TEST(HierarchicalBitMask, SummaryUpdatedWhenLeafBecomesOccupied) {
+	using Mask = Deep::HierarchicalBitMask<512>;
+
+	Mask mask{};
+
+	EXPECT_FALSE(mask.Any());
+
+	mask.Set<true>(400);
+
+	EXPECT_TRUE(mask.Any());
+	EXPECT_TRUE(mask.Test(400));
+
+	// Every level above the leaf should now contain occupancy
+	// information for the path to bit 400.
+	for (size_t level = 1; level < Mask::k_numLevels; ++level) {
+		bool levelHasBits = false;
+
+		for (size_t i = 0; i < Mask::k_levelSizes[level]; ++i) {
+			if (mask.m_chunks[Mask::k_levelOffsets[level] + i] != 0) {
+				levelHasBits = true;
+				break;
+			}
+		}
+
+		EXPECT_TRUE(levelHasBits);
+	}
+}
+
+TEST(HierarchicalBitMask, SummaryRemainsSetWhenLeafStillOccupied) {
+	using Mask = Deep::HierarchicalBitMask<512>;
+
+	Mask mask{};
+
+	mask.Set<true>(100);
+	mask.Set<true>(101);
+
+	EXPECT_TRUE(mask.Any());
+
+	mask.Set<false>(100);
+
+	EXPECT_FALSE(mask.Test(100));
+	EXPECT_TRUE(mask.Test(101));
+
+	// The hierarchy must still report occupancy.
+	EXPECT_TRUE(mask.Any());
+
+	mask.Set<false>(101);
+
+	EXPECT_FALSE(mask.Any());
+}
+
+TEST(HierarchicalBitMask, SummaryPropagatesToRootWhenCleared) {
+	using Mask = Deep::HierarchicalBitMask<512>;
+
+	Mask mask{};
+
+	mask.Set<true>(511);
+
+	EXPECT_TRUE(mask.Any());
+
+	mask.ClearLowestSetBit();
+
+	EXPECT_FALSE(mask.Any());
+
+	const size_t rootOffset = Mask::k_levelOffsets[Mask::k_numLevels - 1];
+
+	EXPECT_EQ(mask.m_chunks[rootOffset], 0);
+}
+
+TEST(HierarchicalBitMask, MultipleHierarchyBranches) {
+	using Mask = Deep::HierarchicalBitMask<512>;
 
 	Mask mask{};
 
@@ -396,8 +463,8 @@ TEST(BitMask, MultipleHierarchyBranches) {
 	EXPECT_FALSE(mask.Any());
 }
 
-TEST(BitMask, OrMaintainsHierarchy) {
-	using Mask = Deep::BitMask<512>;
+TEST(HierarchicalBitMask, OrMaintainsHierarchy) {
+	using Mask = Deep::HierarchicalBitMask<512>;
 
 	Mask a{};
 	Mask b{};
@@ -427,8 +494,8 @@ TEST(BitMask, OrMaintainsHierarchy) {
 	EXPECT_FALSE(a.Any());
 }
 
-TEST(BitMask, AndRebuildsHierarchyCorrectly) {
-	using Mask = Deep::BitMask<512>;
+TEST(HierarchicalBitMask, AndRebuildsHierarchyCorrectly) {
+	using Mask = Deep::HierarchicalBitMask<512>;
 
 	Mask a{};
 	Mask b{};
@@ -455,8 +522,8 @@ TEST(BitMask, AndRebuildsHierarchyCorrectly) {
 	EXPECT_FALSE(a.Any());
 }
 
-TEST(BitMask, XorRebuildsHierarchyCorrectly) {
-	using Mask = Deep::BitMask<512>;
+TEST(HierarchicalBitMask, XorRebuildsHierarchyCorrectly) {
+	using Mask = Deep::HierarchicalBitMask<512>;
 
 	Mask a{};
 	Mask b{};
@@ -485,8 +552,8 @@ TEST(BitMask, XorRebuildsHierarchyCorrectly) {
 	EXPECT_FALSE(a.Any());
 }
 
-TEST(BitMask, InverseRebuildsHierarchyCorrectly) {
-	using Mask = Deep::BitMask<512>;
+TEST(HierarchicalBitMask, InverseRebuildsHierarchyCorrectly) {
+	using Mask = Deep::HierarchicalBitMask<512>;
 
 	Mask mask{};
 
@@ -507,8 +574,8 @@ TEST(BitMask, InverseRebuildsHierarchyCorrectly) {
 	EXPECT_EQ(mask.IndexOfLowestSetBit(), 1);
 }
 
-TEST(BitMask, RepeatedPopProducesSortedIndices) {
-	using Mask = Deep::BitMask<512>;
+TEST(HierarchicalBitMask, RepeatedPopProducesSortedIndices) {
+	using Mask = Deep::HierarchicalBitMask<512>;
 
 	Mask mask{};
 
