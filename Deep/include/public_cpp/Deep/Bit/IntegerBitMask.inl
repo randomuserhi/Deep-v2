@@ -35,8 +35,8 @@ INTEGER_BITMASK_TEMPLATE
 constexpr void INTEGER_BITMASK::Set(size_t in_index, bool in_value) {
 	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
 
-	const T clear_mask = ~(T{ 1 } << in_index);
-	const T new_bit = T{ in_value } << in_index;
+	const T clear_mask = ~static_cast<T>(T{ 1 } << in_index);
+	const T new_bit = static_cast<T>(T{ in_value } << in_index);
 	m_bits = (m_bits & clear_mask) | new_bit;
 }
 
@@ -46,9 +46,9 @@ constexpr void INTEGER_BITMASK::Set(size_t in_index) {
 	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
 
 	if constexpr (in_value) {
-		m_bits |= (T{ 1 } << in_index);
+		m_bits |= static_cast<T>(T{ 1 } << in_index);
 	} else {
-		m_bits &= ~(T{ 1 } << in_index);
+		m_bits &= ~static_cast<T>(T{ 1 } << in_index);
 	}
 }
 
@@ -97,6 +97,16 @@ constexpr Deep_ForceInline INTEGER_BITMASK operator&(INTEGER_BITMASK in_a, ARG_I
 }
 
 INTEGER_BITMASK_TEMPLATE
+constexpr INTEGER_BITMASK& INTEGER_BITMASK::operator^=(ARG_INTEGER_BITMASK in_other) {
+	m_bits ^= in_other.m_bits;
+	return *this;
+}
+INTEGER_BITMASK_TEMPLATE
+constexpr Deep_ForceInline INTEGER_BITMASK operator^(INTEGER_BITMASK in_a, ARG_INTEGER_BITMASK in_b) {
+	return in_a ^= in_b;
+}
+
+INTEGER_BITMASK_TEMPLATE
 constexpr Deep_ForceInline INTEGER_BITMASK operator~(INTEGER_BITMASK in_a) {
 	in_a.Inverse();
 	return in_a;
@@ -105,6 +115,11 @@ constexpr Deep_ForceInline INTEGER_BITMASK operator~(INTEGER_BITMASK in_a) {
 INTEGER_BITMASK_TEMPLATE
 constexpr Deep_ForceInline bool operator==(ARG_INTEGER_BITMASK in_a, ARG_INTEGER_BITMASK in_b) {
 	return in_a.m_bits == in_b.m_bits;
+}
+
+INTEGER_BITMASK_TEMPLATE
+constexpr Deep_ForceInline bool operator!=(ARG_INTEGER_BITMASK in_a, ARG_INTEGER_BITMASK in_b) {
+	return in_a.m_bits != in_b.m_bits;
 }
 
 #undef INTEGER_BITMASK_TEMPLATE

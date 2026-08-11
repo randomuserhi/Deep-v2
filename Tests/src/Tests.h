@@ -199,6 +199,19 @@ TEST_SUPPRESS_WARNINGS
 		}                                                                                                                   \
 	} while (0)
 
+#define ASSERT_TRUE(condition)                                                                                              \
+	do {                                                                                                                    \
+		if (!(condition)) {                                                                                                 \
+			this->m_failed = true;                                                                                          \
+			std::cout << "Condition '" #condition "' was false, but expected true\n";                                       \
+			std::cout << "- " TEST_STRINGIFY_(Test_FILE_) " (ln: " TEST_STRINGIFY_(Test_LINE_) ")\n\n";                     \
+			TEST_EXIT();                                                                                                    \
+		}                                                                                                                   \
+	} while (0)
+
+#define TEST_EXIT() return
+#define TEST_CASE_EXIT() break
+
 namespace Test {
 
 class IndentBuf : public std::streambuf {

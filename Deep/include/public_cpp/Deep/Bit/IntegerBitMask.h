@@ -20,6 +20,9 @@ template<c_UnsignedInteger T>
 constexpr Deep_ForceInline IntegerBitMask<T> operator&(IntegerBitMask<T>, Arg_IntegerBitMask<T>);
 
 template<c_UnsignedInteger T>
+constexpr Deep_ForceInline IntegerBitMask<T> operator^(IntegerBitMask<T>, IntegerBitMask<T>);
+
+template<c_UnsignedInteger T>
 constexpr Deep_ForceInline IntegerBitMask<T> operator~(IntegerBitMask<T>);
 
 template<c_UnsignedInteger T>
@@ -27,6 +30,9 @@ constexpr Deep_ForceInline bool operator==(Arg_IntegerBitMask<T>, Arg_IntegerBit
 
 // Bitmask implementation for common integer types that allows them to be used with
 // `_BitMask` concept.
+//
+// Acts as a zero cost abstraction around the underlying integer type, and thus unlike BitMask,
+// has a undefined default value.
 template<c_UnsignedInteger T>
 class IntegerBitMask {
 public:
@@ -62,6 +68,9 @@ public:
 
 	constexpr Deep_ForceInline IntegerBitMask& operator&=(Arg_IntegerBitMask<T> in_other);
 	friend constexpr IntegerBitMask operator& <T>(IntegerBitMask, Arg_IntegerBitMask<T>);
+
+	constexpr Deep_ForceInline IntegerBitMask& operator^=(Arg_IntegerBitMask<T> in_other);
+	friend constexpr IntegerBitMask operator^ <T>(IntegerBitMask, Arg_IntegerBitMask<T>);
 
 	friend constexpr IntegerBitMask operator~ <T>(IntegerBitMask);
 
