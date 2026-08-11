@@ -59,6 +59,9 @@ STORAGE& STORAGE::operator=(const Storage& in_other) noexcept {
 	if (this == &in_other) return *this;
 	Deep_Assert(in_other.m_chunks != nullptr, "Cannot copy from a nullptr storage.");
 
+	if (m_chunks == nullptr) {
+		m_chunks = new ChunkType[k_numChunks];
+	}
 	Deep::TMemcpy<ChunkType>(m_chunks, in_other.m_chunks, k_numChunks);
 
 	return *this;

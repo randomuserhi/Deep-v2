@@ -10,12 +10,6 @@
 
 DEEP_NAMESPACE_BEGIN
 
-// TODO(randomuserhi): Move away from std::bitset for performance of IndexOfLowestSetBit.
-//                     Also allows implementation of a storage policy if bitset is too large for the stack.
-//                     (Uses a std::array<Chunk, in_N> instead of a Chunk*):
-//                     template<size_t in_N, StoragePolicy in_StoragePolicy>
-//                     - StoragePolicy::e_stack, StoragePolicy::e_heap
-
 template<size_t in_N, StoragePolicy in_Policy = StoragePolicy::e_stack>
 class BitMask;
 
@@ -177,10 +171,13 @@ private:
 
 } // namespace detail::_Bitmask
 
-// Bitmask wrapper for std::bitset
+// Bitmask for arbitrary number of bits.
+// Uses a hierarchy of flags for fast operations.
+//
+// TODO(randomuserhi): Documentation
 template<size_t in_N, StoragePolicy in_Policy>
 class BitMask {
-	static_assert(in_N > 0, "Bit mask must contain more than 1 bit.");
+	static_assert(in_N > 0, "Bit mask must contain atleast 1 bit.");
 	using Storage = detail::_Bitmask::Storage<in_N, in_Policy>;
 
 public:
