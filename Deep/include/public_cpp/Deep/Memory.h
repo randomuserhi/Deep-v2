@@ -47,6 +47,9 @@ Deep_ForceInline T* TMemset(T* in_dest, int32 in_value, size_t in_size) noexcept
 template<typename A, typename B = A>
 inline bool DoBuffersOverlap(const A* in_a, size_t in_sizeA, const B* in_b, size_t in_sizeB) noexcept;
 
+template<typename A, typename B = A>
+inline bool InBounds(const A* in_a, const B* in_b, size_t in_sizeB) noexcept;
+
 DEEP_NAMESPACE_END
 
 #include "./Memory.inl" // IWYU pragma: export

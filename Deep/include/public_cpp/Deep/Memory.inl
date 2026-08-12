@@ -172,4 +172,16 @@ bool DoBuffersOverlap(const A* in_a, size_t in_sizeA, const B* in_b, size_t in_s
 	return addressA - addressB < sizeB;
 }
 
+template<typename A, typename B>
+inline bool IsPtrWithinBuffer(const A* in_a, const B* in_b, size_t in_sizeB) noexcept {
+	const uintptr_t address = reinterpret_cast<uintptr_t>(in_a);
+	const uintptr_t begin = reinterpret_cast<uintptr_t>(in_b);
+
+	if (address < begin) return false;
+
+	const uintptr_t offset = address - begin;
+
+	return offset <= in_sizeB && sizeof(A) <= in_sizeB - offset;
+}
+
 DEEP_NAMESPACE_END
