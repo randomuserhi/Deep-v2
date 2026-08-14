@@ -67,7 +67,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) UInt64x2 {
 	static inline Int64x2 s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b);
 
 	template<uint32 in_x, uint32 in_y>
-	inline UInt64x2 Shuffle();
+	static inline UInt64x2 s_Shuffle(Arg_UInt64x2 in_value);
 
 	//
 

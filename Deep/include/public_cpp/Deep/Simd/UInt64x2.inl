@@ -74,17 +74,17 @@ Int64x2 UInt64x2::s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b) {
 }
 
 template<uint32 in_x, uint32 in_y>
-UInt64x2 UInt64x2::Shuffle() {
+UInt64x2 UInt64x2::s_Shuffle(Arg_UInt64x2 in_value) {
 	static_assert(in_x < 2, "Shuffle component out of range.");
 	static_assert(in_y < 2, "Shuffle component out of range.");
 
 #if defined(DEEP_USE_SSE2)
 	constexpr int32 shuffleMask = _MM_SHUFFLE(in_y * 2 + 1, in_y * 2, in_x * 2 + 1, in_x * 2);
-	return UInt64x2{ _mm_shuffle_epi32(m_internal, shuffleMask) };
+	return UInt64x2{ _mm_shuffle_epi32(in_value.m_internal, shuffleMask) };
 #elif defined(DEEP_USE_WASM_SIMD128)
-	return UInt64x2{ wasm_i64x2_shuffle(m_internal, m_internal, in_x, in_y) };
+	return UInt64x2{ wasm_i64x2_shuffle(in_value.m_internal, in_value.m_internal, in_x, in_y) };
 #else
-	return UInt64x2{ m_values[in_x], m_values[in_y] };
+	return UInt64x2{ in_value[in_x], in_value[in_y] };
 #endif
 }
 
