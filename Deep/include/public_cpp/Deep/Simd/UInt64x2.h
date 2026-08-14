@@ -66,6 +66,9 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) UInt64x2 {
 	// True is represented by the most significant bit being set.
 	static inline Int64x2 s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b);
 
+	template<uint32 in_x, uint32 in_y>
+	inline UInt64x2 Shuffle();
+
 	//
 
 	Deep_ForceInline constexpr uint64& operator[](size_t);
