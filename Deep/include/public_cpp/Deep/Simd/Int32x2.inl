@@ -24,8 +24,8 @@ Int32x2::Int32x2(Int32x4 in_int32x4) :
 
 constexpr Int32x2 Int32x2::Constexpr(int32 in_x, int32 in_y) {
 	Int32x2 xmmi;
-	xmmi.x = in_x;
-	xmmi.y = in_y;
+	xmmi.m_values[0] = in_x;
+	xmmi.m_values[1] = in_y;
 	return xmmi;
 }
 

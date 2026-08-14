@@ -25,8 +25,8 @@ UInt32x2::UInt32x2(UInt32x4 in_uint32x4) :
 
 constexpr UInt32x2 UInt32x2::Constexpr(uint32 in_x, uint32 in_y) {
 	UInt32x2 xmmi;
-	xmmi.x = in_x;
-	xmmi.y = in_y;
+	xmmi.m_values[0] = in_x;
+	xmmi.m_values[1] = in_y;
 	return xmmi;
 }
 

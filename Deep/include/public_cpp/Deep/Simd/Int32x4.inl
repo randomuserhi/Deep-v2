@@ -50,10 +50,10 @@ Int32x4::Int32x4(Type in_internal) :
 
 constexpr Int32x4 Int32x4::Constexpr(int32 in_x, int32 in_y, int32 in_z, int32 in_w) {
 	Int32x4 xmmi;
-	xmmi.x = in_x;
-	xmmi.y = in_y;
-	xmmi.z = in_z;
-	xmmi.w = in_w;
+	xmmi.m_values[0] = in_x;
+	xmmi.m_values[1] = in_y;
+	xmmi.m_values[2] = in_z;
+	xmmi.m_values[3] = in_w;
 	return xmmi;
 }
 

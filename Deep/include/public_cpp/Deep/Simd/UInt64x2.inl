@@ -33,8 +33,8 @@ UInt64x2::UInt64x2(Type in_internal) :
 
 constexpr UInt64x2 UInt64x2::Constexpr(uint64 in_x, uint64 in_y) {
 	UInt64x2 xmmi;
-	xmmi.x = in_x;
-	xmmi.y = in_y;
+	xmmi.m_values[0] = in_x;
+	xmmi.m_values[1] = in_y;
 	return xmmi;
 }
 

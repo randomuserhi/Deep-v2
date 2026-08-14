@@ -32,8 +32,8 @@ Int64x2::Int64x2(Type in_internal) :
 
 constexpr Int64x2 Int64x2::Constexpr(int64 in_x, int64 in_y) {
 	Int64x2 xmmi;
-	xmmi.x = in_x;
-	xmmi.y = in_y;
+	xmmi.m_values[0] = in_x;
+	xmmi.m_values[1] = in_y;
 	return xmmi;
 }
 

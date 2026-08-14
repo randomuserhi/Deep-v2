@@ -21,8 +21,8 @@ Float32x2::Float32x2(Float32x4 in_float32x4) :
 
 constexpr Float32x2 Float32x2::Constexpr(float32 in_x, float32 in_y) {
 	Float32x2 xmm;
-	xmm.x = in_x;
-	xmm.y = in_y;
+	xmm.m_values[0] = in_x;
+	xmm.m_values[1] = in_y;
 	return xmm;
 }
 

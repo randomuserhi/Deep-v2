@@ -40,10 +40,10 @@ Float32x4::Float32x4(Type in_internal) :
 
 constexpr Float32x4 Float32x4::Constexpr(float32 in_x, float32 in_y, float32 in_z, float32 in_w) {
 	Float32x4 xmm;
-	xmm.x = in_x;
-	xmm.y = in_y;
-	xmm.z = in_z;
-	xmm.w = in_w;
+	xmm.m_values[0] = in_x;
+	xmm.m_values[1] = in_y;
+	xmm.m_values[2] = in_z;
+	xmm.m_values[3] = in_w;
 	return xmm;
 }
 
