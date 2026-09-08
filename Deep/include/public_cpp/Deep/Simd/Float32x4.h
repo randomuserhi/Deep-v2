@@ -65,6 +65,7 @@ struct [[nodiscard]] alignas(DEEP_VEC_ALIGNMENT) Float32x4 {
 	static inline Float32x4 s_Replicate(float32 in_value);
 
 	// Component wise min/max
+	// Returns the second operand when lanes compare equal or either operand is NaN.
 	static inline Float32x4 s_Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
 	static inline Float32x4 s_Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b);
 

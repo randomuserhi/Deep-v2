@@ -19,6 +19,13 @@ Float32x4::Float32x4(Float32x2 in_low) :
 	m_internal{ _mm_set_ps(0, 0, in_low.y, in_low.x) } {}
 Float32x4::Float32x4(Float32x2 in_low, Float32x2 in_high) :
 	m_internal{ _mm_set_ps(in_high.y, in_high.x, in_low.y, in_low.x) } {}
+#elif defined(DEEP_USE_NEON)
+Float32x4::Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
+	m_internal{ Type{ in_x, in_y, in_z, in_w } } {}
+Float32x4::Float32x4(Float32x2 in_low) :
+	m_internal{ vcombine_f32(in_low, vdup_n_f32(0)) } {}
+Float32x4::Float32x4(Float32x2 in_low, Float32x2 in_high) :
+	m_internal{ vcombine_f32(in_low, in_high) } {}
 #elif defined(DEEP_USE_WASM_SIMD128)
 Float32x4::Float32x4(float32 in_x, float32 in_y, float32 in_z, float32 in_w) :
 	m_internal{ wasm_f32x4_make(in_x, in_y, in_z, in_w) } {}
@@ -54,6 +61,8 @@ constexpr Float32x4::operator Type() const {
 Int32x4 Float32x4::ToInt() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_cvttps_epi32(m_internal);
+#elif defined(DEEP_USE_NEON)
+	return vcvtq_s32_f32(m_internal);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_trunc_sat_f32x4(m_internal);
 #else
@@ -67,6 +76,8 @@ constexpr Int32x4 Float32x4::Constexpr_ToInt() const {
 Int32x4 Float32x4::ReinterpretAsInt() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_castps_si128(m_internal);
+#elif defined(DEEP_USE_NEON)
+	return vreinterpretq_s32_f32(m_internal);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return m_internal;
 #else
@@ -80,6 +91,8 @@ constexpr Int32x4 Float32x4::Constexpr_ReinterpretAsInt() const {
 Float32x4 Float32x4::s_Replicate(float32 in_value) {
 #ifdef DEEP_USE_SSE2
 	return _mm_set1_ps(in_value);
+#elif defined(DEEP_USE_NEON)
+	return vdupq_n_f32(in_value);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_splat(in_value);
 #else
@@ -90,8 +103,10 @@ Float32x4 Float32x4::s_Replicate(float32 in_value) {
 Float32x4 Float32x4::s_Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE2
 	return _mm_min_ps(in_a, in_b);
+#elif defined(DEEP_USE_NEON)
+	return vbslq_f32(vcltq_f32(in_a, in_b), in_a, in_b);
 #elif defined(DEEP_USE_WASM_SIMD128)
-	return wasm_f32x4_min(in_a, in_b);
+	return wasm_v128_bitselect(in_a, in_b, wasm_f32x4_lt(in_a, in_b));
 #else
 	return Float32x4{
 		Deep::Min(in_a.x, in_b.x), //
@@ -105,8 +120,10 @@ Float32x4 Float32x4::s_Min(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4 Float32x4::s_Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE2
 	return _mm_max_ps(in_a, in_b);
+#elif defined(DEEP_USE_NEON)
+	return vbslq_f32(vcgtq_f32(in_a, in_b), in_a, in_b);
 #elif defined(DEEP_USE_WASM_SIMD128)
-	return wasm_f32x4_max(in_a, in_b);
+	return wasm_v128_bitselect(in_a, in_b, wasm_f32x4_gt(in_a, in_b));
 #else
 	return Float32x4{
 		Deep::Max(in_a.x, in_b.x), //
@@ -120,6 +137,8 @@ Float32x4 Float32x4::s_Max(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 Int32x4 Float32x4::s_Equals(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 #ifdef DEEP_USE_SSE2
 	return _mm_castps_si128(_mm_cmpeq_ps(in_a, in_b));
+#elif defined(DEEP_USE_NEON)
+	return vreinterpretq_s32_u32(vceqq_f32(in_a, in_b));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_eq(in_a, in_b);
 #else
@@ -138,7 +157,7 @@ constexpr const float32& Float32x4::operator[](size_t in_index) const {
 }
 
 bool operator!=(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
-#if defined(DEEP_USE_SSE4_1) || defined(DEEP_USE_WASM_SIMD128)
+#if defined(DEEP_USE_SSE4_1) || defined(DEEP_USE_NEON) || defined(DEEP_USE_WASM_SIMD128)
 	return Float32x4::s_Equals(in_a, in_b).ToBooleanBitMask() != 0b1111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
@@ -151,6 +170,8 @@ bool operator==(Arg_Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator|=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_or_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vreinterpretq_f32_u32(vorrq_u32(vreinterpretq_u32_f32(m_internal), vreinterpretq_u32_f32(in_other)));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_or(m_internal, in_other);
 #else
@@ -165,6 +186,8 @@ Float32x4 operator|(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator&=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_and_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vreinterpretq_f32_u32(vandq_u32(vreinterpretq_u32_f32(m_internal), vreinterpretq_u32_f32(in_other)));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_and(m_internal, in_other);
 #else
@@ -179,6 +202,8 @@ Float32x4 operator&(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator^=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_xor_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vreinterpretq_f32_u32(veorq_u32(vreinterpretq_u32_f32(m_internal), vreinterpretq_u32_f32(in_other)));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_xor(m_internal, in_other);
 #else
@@ -193,6 +218,8 @@ Float32x4 operator^(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator+=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_add_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vaddq_f32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_f32x4_add(m_internal, in_other);
 #else
@@ -211,6 +238,8 @@ Float32x4 operator+(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator-=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_sub_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vsubq_f32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_f32x4_sub(m_internal, in_other);
 #else
@@ -229,6 +258,8 @@ Float32x4 operator-(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4 operator-(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	return _mm_sub_ps(_mm_setzero_ps(), in_other);
+#elif defined(DEEP_USE_NEON)
+	return vsubq_f32(vdupq_n_f32(0.0f), in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_sub(wasm_f32x4_splat(0.0f), in_other);
 #else
@@ -240,6 +271,8 @@ Float32x4 operator-(Arg_Float32x4 in_other) {
 Float32x4& Float32x4::operator*=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_mul_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vmulq_f32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_f32x4_mul(m_internal, in_other);
 #else
@@ -257,6 +290,8 @@ Float32x4 operator*(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator*=(float32 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_mul_ps(m_internal, _mm_set1_ps(in_other));
+#elif defined(DEEP_USE_NEON)
+	m_internal = vmulq_f32(m_internal, vdupq_n_f32(in_other));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_f32x4_mul(m_internal, wasm_f32x4_splat(in_other));
 #else
@@ -275,6 +310,8 @@ Float32x4 operator*(Float32x4 in_vec, float32 in_val) {
 Float32x4 operator*(float32 in_val, Arg_Float32x4 in_vec) {
 #ifdef DEEP_USE_SSE2
 	return _mm_mul_ps(_mm_set1_ps(in_val), in_vec);
+#elif defined(DEEP_USE_NEON)
+	return vmulq_f32(vdupq_n_f32(in_val), in_vec);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_mul(wasm_f32x4_splat(in_val), in_vec);
 #else
@@ -285,6 +322,8 @@ Float32x4 operator*(float32 in_val, Arg_Float32x4 in_vec) {
 Float32x4& Float32x4::operator/=(Arg_Float32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_div_ps(m_internal, in_other);
+#elif defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	m_internal = vdivq_f32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_f32x4_div(m_internal, in_other);
 #else
@@ -302,6 +341,8 @@ Float32x4 operator/(Float32x4 in_a, Arg_Float32x4 in_b) {
 Float32x4& Float32x4::operator/=(float32 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_div_ps(m_internal, _mm_set1_ps(in_other));
+#elif defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	m_internal = vdivq_f32(m_internal, vdupq_n_f32(in_other));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_f32x4_div(m_internal, wasm_f32x4_splat(in_other));
 #else
@@ -320,6 +361,8 @@ Float32x4 operator/(Float32x4 in_vec, float32 in_val) {
 Float32x4 operator/(float32 in_val, Arg_Float32x4 in_vec) {
 #ifdef DEEP_USE_SSE2
 	return _mm_div_ps(_mm_set1_ps(in_val), in_vec);
+#elif defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	return vdivq_f32(vdupq_n_f32(in_val), in_vec);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_div(wasm_f32x4_splat(in_val), in_vec);
 #else
@@ -330,6 +373,8 @@ Float32x4 operator/(float32 in_val, Arg_Float32x4 in_vec) {
 Int32x4 Float32x4::s_IsNegative(Arg_Float32x4 in_value) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_castps_si128(_mm_cmplt_ps(in_value, _mm_setzero_ps()));
+#elif defined(DEEP_USE_NEON)
+	return vreinterpretq_s32_u32(vcltq_f32(in_value, vdupq_n_f32(0.0f)));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_lt(in_value, wasm_f32x4_splat(0.0f));
 #else
@@ -341,6 +386,8 @@ Int32x4 Float32x4::s_IsNegative(Arg_Float32x4 in_value) {
 Float32x4 Float32x4::s_Select(Arg_Float32x4 in_a, Arg_Float32x4 in_b, Arg_Int32x4 in_control) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_blendv_ps(in_a, in_b, _mm_castsi128_ps(in_control));
+#elif defined(DEEP_USE_NEON)
+	return vbslq_f32(vreinterpretq_u32_s32(vshrq_n_s32(in_control, 31)), in_b, in_a);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_v128_bitselect(in_b, in_a, wasm_i32x4_shr(in_control, 31));
 #else

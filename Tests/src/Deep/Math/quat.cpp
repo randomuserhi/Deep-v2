@@ -3,6 +3,29 @@
 #include "Deep/Math/Constants.h"
 #include "Deep/Math/Quat.h"
 
+TEST(Quat, CompositionAndMatrix) {
+	for (int step = -8; step <= 8; ++step) {
+		Deep::Quat a{ Deep::Vec3{ 1, 2, 3 }.m_Normalized(), static_cast<float>(step) * 0.25f };
+		Deep::Quat b{ Deep::Vec3{ -2, 1, 3 }.m_Normalized(), static_cast<float>(step) * -0.125f };
+		Deep::Vec3 vector{ 2, -3, 4 };
+		auto composed = (a * b) * vector;
+		auto sequential = a * (b * vector);
+		auto matrix = a.ToMat4();
+		auto matrixResult = matrix * vector;
+		auto rotated = a * vector;
+		auto restored = a.m_Inversed() * rotated;
+		for (size_t i = 0; i < 3; ++i) {
+			EXPECT_TRUE(Deep::Abs(composed[i] - sequential[i]) < 0.00001f);
+			EXPECT_TRUE(Deep::Abs(matrixResult[i] - rotated[i]) < 0.00001f);
+			EXPECT_TRUE(Deep::Abs(restored[i] - vector[i]) < 0.00001f);
+		}
+		EXPECT_EQ(matrix.m30, 0.0f);
+		EXPECT_EQ(matrix.m31, 0.0f);
+		EXPECT_EQ(matrix.m32, 0.0f);
+		EXPECT_EQ(matrix.m33, 1.0f);
+	}
+}
+
 TEST(Quat, Equality) {
 	const Deep::Quat a{ 0.0f, 0.0f, 0.0f, 1.0f };
 	const Deep::Quat b{ 0.0f, 0.0f, 0.0f, 1.0f };

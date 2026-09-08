@@ -44,7 +44,6 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
 
 	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
-
 	float32 dot = Vec3::s_Dot(delta, in_ray.m_direction);
 	float32 distance = delta.m_SqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
 
@@ -52,28 +51,47 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere) {
 		if (distance < 0.0f) return false;
 	}
 
-	if (dot > 0.0f) {
-		return false;
-	}
-
 	float32 discriminant = dot * dot - distance;
+	if (discriminant < 0.0f) return false;
 
-	return discriminant >= 0.0f;
+	discriminant = Sqrt(discriminant);
+	float32 tExit = -dot + discriminant;
+
+	return tExit > 0.0f;
 }
 template bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere);
 template bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere);
 
 template<RaycastType3D in_queryType>
-bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
+bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hit) {
 	Deep_Assert(in_sphere.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
+	Deep_Assert(out_hit != nullptr, "Out param must not be nullptr.");
 
-	// TODO(randomuserhi)
-	(void)in_ray;
-	(void)in_sphere;
-	(void)out_hits;
+	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
+	float32 dot = Vec3::s_Dot(delta, in_ray.m_direction);
+	float32 distance = delta.m_SqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
 
-	return false;
+	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
+		if (distance < 0.0f) return false;
+	}
+
+	float32 discriminant = dot * dot - distance;
+	if (discriminant < 0.0f) return false;
+
+	discriminant = Sqrt(discriminant);
+	float32 tEnter = -dot - discriminant;
+	float32 tExit = -dot + discriminant;
+
+	if (tExit <= 0.0f) return false;
+
+	float32 invRadius = 1.0f / in_sphere.m_radius;
+	float32 hitDistance = tEnter >= 0.0f ? tEnter : tExit;
+	out_hit->m_point = in_ray.m_origin + in_ray.m_direction * hitDistance;
+	out_hit->m_Normal4() = (out_hit->m_point - in_sphere.m_Center4()) * invRadius;
+	out_hit->m_distance = hitDistance;
+
+	return true;
 }
 template bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
 template bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
@@ -82,52 +100,41 @@ template<RaycastType3D in_queryType>
 int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits) {
 	Deep_Assert(in_sphere.m_radius > 0, "Radius of sphere > 0.");
 	Deep_Assert(in_ray.m_direction.IsNormalized(), "Direction should be normalized.");
-
-	// TODO(randomuserhi): Fairly sure logic here is wrong, needs testing
+	Deep_Assert(out_hits != nullptr, "Out param must not be nullptr.");
 
 	Vec3 delta = in_ray.m_origin - in_sphere.m_Center4();
-
 	float32 dot = Vec3::s_Dot(delta, in_ray.m_direction);
 	float32 distance = delta.m_SqrdMagnitude() - in_sphere.m_radius * in_sphere.m_radius;
 
-	float32 discriminant = dot * dot - distance;
-
-	// No hits
-	if (discriminant < 0) {
-		return 0;
-	}
-
-	int32 hitCount = 0;
-	float32 invRadius;
-
 	if constexpr (in_queryType == RaycastType3D::e_startsOutside) {
 		if (distance < 0.0f) return 0;
-		discriminant = Sqrt(discriminant);
-		invRadius = 1.0f / in_sphere.m_radius;
-	} else {
-		discriminant = Sqrt(discriminant);
-		invRadius = 1.0f / in_sphere.m_radius;
-
-		// Handle entry hit
-		if (distance > 0.0f) {
-			float32 t = -dot - discriminant;
-			out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * t;
-			out_hits[hitCount].m_Normal4() =
-				(out_hits[hitCount].m_point - in_sphere.m_Center4()) * invRadius; // normalize via division
-			++hitCount;
-		}
 	}
 
-	if (dot > 0.0f) {
-		return hitCount;
+	float32 discriminant = dot * dot - distance;
+	if (discriminant < 0.0f) return 0;
+
+	discriminant = Sqrt(discriminant);
+	float32 tEnter = -dot - discriminant;
+	float32 tExit = -dot + discriminant;
+
+	if (tExit <= 0.0f) return 0;
+
+	float32 invRadius = 1.0f / in_sphere.m_radius;
+	int32 hitCount = 0;
+
+	// Handle entry hit
+	if (tEnter >= 0.0f) {
+		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * tEnter;
+		out_hits[hitCount].m_Normal4() = (out_hits[hitCount].m_point - in_sphere.m_Center4()) * invRadius;
+		out_hits[hitCount].m_distance = tEnter;
+		++hitCount;
 	}
 
-	// Exit hit
+	// Handle exit hit
 	{
-		float32 t = -dot + discriminant;
-		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * t;
-		out_hits[hitCount].m_Normal4() =
-			(out_hits[hitCount].m_point - in_sphere.m_Center4()) * invRadius; // normalize via division
+		out_hits[hitCount].m_point = in_ray.m_origin + in_ray.m_direction * tExit;
+		out_hits[hitCount].m_Normal4() = (out_hits[hitCount].m_point - in_sphere.m_Center4()) * invRadius;
+		out_hits[hitCount].m_distance = tExit;
 		++hitCount;
 	}
 

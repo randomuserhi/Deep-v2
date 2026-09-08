@@ -16,6 +16,11 @@ UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	m_internal{ _mm_set_epi64x(static_cast<int64>(in_y), static_cast<int64>(in_x)) } {}
 UInt64x2::UInt64x2(Int64x2 in_signed) :
 	m_internal(in_signed.m_internal) {}
+#elif defined(DEEP_USE_NEON)
+UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
+	m_internal{ Type{ in_x, in_y } } {}
+UInt64x2::UInt64x2(Int64x2 in_signed) :
+	m_internal(vreinterpretq_u64_s64(in_signed.m_internal)) {}
 #elif defined(DEEP_USE_WASM_SIMD128)
 UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	m_internal{ wasm_u64x2_make(in_x, in_y) } {}
@@ -25,7 +30,7 @@ UInt64x2::UInt64x2(Int64x2 in_signed) :
 UInt64x2::UInt64x2(uint64 in_x, uint64 in_y) :
 	x{ in_x }, y{ in_y } {}
 UInt64x2::UInt64x2(Int64x2 in_signed) :
-	x{ static_cast<uint32>(in_signed.x) }, y{ static_cast<uint32>(in_signed.y) } {}
+	x{ static_cast<uint64>(in_signed.x) }, y{ static_cast<uint64>(in_signed.y) } {}
 #endif
 
 UInt64x2::UInt64x2(Type in_internal) :
@@ -45,6 +50,8 @@ UInt64x2::operator Type() const {
 UInt64x2 UInt64x2::s_Replicate(uint64 in_value) {
 #ifdef DEEP_USE_SSE2
 	return _mm_set1_epi64x(static_cast<int64>(in_value));
+#elif defined(DEEP_USE_NEON)
+	return vdupq_n_u64(in_value);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_u64x2_splat(in_value);
 #else
@@ -55,6 +62,9 @@ UInt64x2 UInt64x2::s_Replicate(uint64 in_value) {
 uint32 UInt64x2::ToBooleanBitMask() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_movemask_pd(_mm_castsi128_pd(m_internal));
+#elif defined(DEEP_USE_NEON)
+	uint64x2_t signs = vshrq_n_u64(m_internal, 63);
+	return (static_cast<uint32>(vgetq_lane_u64(signs, 0))) | (static_cast<uint32>(vgetq_lane_u64(signs, 1)) << 1);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_bitmask(m_internal);
 #else
@@ -65,6 +75,8 @@ uint32 UInt64x2::ToBooleanBitMask() const {
 Int64x2 UInt64x2::s_Equals(Arg_UInt64x2 in_a, Arg_UInt64x2 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cmpeq_epi64(in_a, in_b);
+#elif defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	return vreinterpretq_s64_u64(vceqq_u64(in_a, in_b));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i64x2_eq(in_a, in_b);
 #else
@@ -81,6 +93,8 @@ UInt64x2 UInt64x2::s_Shuffle(Arg_UInt64x2 in_value) {
 #if defined(DEEP_USE_SSE2)
 	constexpr int32 shuffleMask = _MM_SHUFFLE(in_y * 2 + 1, in_y * 2, in_x * 2 + 1, in_x * 2);
 	return UInt64x2{ _mm_shuffle_epi32(in_value.m_internal, shuffleMask) };
+#elif defined(DEEP_USE_NEON)
+	return vcombine_u64(vdup_n_u64(vgetq_lane_u64(in_value, in_x)), vdup_n_u64(vgetq_lane_u64(in_value, in_y)));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return UInt64x2{ wasm_i64x2_shuffle(in_value.m_internal, in_value.m_internal, in_x, in_y) };
 #else
@@ -110,6 +124,8 @@ UInt64x2& UInt64x2::operator<<=(int32 in_count) {
 	Deep_Assert(in_count >= 0 && in_count < 64, "Invalid shift amount.");
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_slli_epi64(m_internal, in_count);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vshlq_u64(m_internal, vdupq_n_s64(in_count));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i64x2_shl(m_internal, in_count);
 #else
@@ -125,6 +141,8 @@ UInt64x2& UInt64x2::operator>>=(int32 in_count) {
 	Deep_Assert(in_count >= 0 && in_count < 64, "Invalid shift amount.");
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_srli_epi64(m_internal, in_count);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vshlq_u64(m_internal, vdupq_n_s64(-in_count));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_u64x2_shr(m_internal, in_count);
 #else
@@ -139,6 +157,8 @@ UInt64x2 operator>>(UInt64x2 in_a, int32 in_count) {
 UInt64x2& UInt64x2::operator|=(Arg_UInt64x2 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_or_si128(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vorrq_u64(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_or(m_internal, in_other);
 #else
@@ -153,6 +173,8 @@ UInt64x2 operator|(UInt64x2 in_a, Arg_UInt64x2 in_b) {
 UInt64x2& UInt64x2::operator&=(Arg_UInt64x2 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_and_si128(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vandq_u64(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_and(m_internal, in_other);
 #else
@@ -167,6 +189,8 @@ UInt64x2 operator&(UInt64x2 in_a, Arg_UInt64x2 in_b) {
 UInt64x2& UInt64x2::operator^=(Arg_UInt64x2 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_xor_si128(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = veorq_u64(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_xor(m_internal, in_other);
 #else
@@ -181,6 +205,8 @@ UInt64x2 operator^(UInt64x2 in_a, Arg_UInt64x2 in_b) {
 UInt64x2 operator~(UInt64x2 in_value) {
 #ifdef DEEP_USE_SSE2
 	in_value.m_internal = _mm_xor_si128(in_value.m_internal, _mm_set1_epi64x(int64{ -1 }));
+#elif defined(DEEP_USE_NEON)
+	in_value.m_internal = veorq_u64(in_value.m_internal, vdupq_n_u64(~uint64{ 0 }));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	in_value.m_internal = wasm_v128_not(in_value.m_internal);
 #else

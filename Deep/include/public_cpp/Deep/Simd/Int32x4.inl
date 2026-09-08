@@ -7,7 +7,7 @@
 #include "Deep/Simd/Float32x4.h"
 #include "Deep/Bit.h"
 
-#if !defined(DEEP_USE_SSE2)
+#if !defined(DEEP_USE_SSE4_1)
 	#include "Deep/Math/Ops.h"
 #endif
 
@@ -22,6 +22,15 @@ Int32x4::Int32x4(Int32x2 in_low, Int32x2 in_high) :
 	m_internal{ _mm_set_epi32(in_high.y, in_high.x, in_low.y, in_low.x) } {}
 Int32x4::Int32x4(UInt32x4 in_unsigned) :
 	m_internal(in_unsigned.m_internal) {}
+#elif defined(DEEP_USE_NEON)
+Int32x4::Int32x4(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
+	m_internal{ Type{ in_x, in_y, in_z, in_w } } {}
+Int32x4::Int32x4(Int32x2 in_low) :
+	m_internal{ vcombine_s32(in_low, vdup_n_s32(0)) } {}
+Int32x4::Int32x4(Int32x2 in_low, Int32x2 in_high) :
+	m_internal{ vcombine_s32(in_low, in_high) } {}
+Int32x4::Int32x4(UInt32x4 in_unsigned) :
+	m_internal(vreinterpretq_s32_u32(in_unsigned.m_internal)) {}
 #elif defined(DEEP_USE_WASM_SIMD128)
 Int32x4::Int32x4(int32 in_x, int32 in_y, int32 in_z, int32 in_w) :
 	m_internal{ wasm_i32x4_make(in_x, in_y, in_z, in_w) } {}
@@ -64,6 +73,8 @@ Int32x4::operator Type() const {
 Float32x4 Int32x4::ToFloat() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_cvtepi32_ps(m_internal);
+#elif defined(DEEP_USE_NEON)
+	return vcvtq_f32_s32(m_internal);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_f32x4_convert_i32x4(m_internal);
 #else
@@ -82,6 +93,8 @@ constexpr Float32x4 Int32x4::Constexpr_ToFloat() const {
 Float32x4 Int32x4::ReinterpretAsFloat() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_castsi128_ps(m_internal);
+#elif defined(DEEP_USE_NEON)
+	return vreinterpretq_f32_s32(m_internal);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return m_internal;
 #else
@@ -95,6 +108,8 @@ constexpr Float32x4 Int32x4::Constexpr_ReinterpretAsFloat() const {
 Int32x4 Int32x4::s_Replicate(int32 in_value) {
 #ifdef DEEP_USE_SSE2
 	return _mm_set1_epi32(in_value);
+#elif defined(DEEP_USE_NEON)
+	return vdupq_n_s32(in_value);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_splat(in_value);
 #else
@@ -105,6 +120,10 @@ Int32x4 Int32x4::s_Replicate(int32 in_value) {
 uint32 Int32x4::ToBooleanBitMask() const {
 #ifdef DEEP_USE_SSE2
 	return _mm_movemask_ps(_mm_castsi128_ps(m_internal));
+#elif defined(DEEP_USE_NEON)
+	uint32x4_t signs = vshrq_n_u32(vreinterpretq_u32_s32(m_internal), 31);
+	return (static_cast<uint32>(vgetq_lane_u32(signs, 0))) | (static_cast<uint32>(vgetq_lane_u32(signs, 1)) << 1)
+	       | (static_cast<uint32>(vgetq_lane_u32(signs, 2)) << 2) | (static_cast<uint32>(vgetq_lane_u32(signs, 3)) << 3);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_bitmask(m_internal);
 #else
@@ -116,6 +135,8 @@ uint32 Int32x4::ToBooleanBitMask() const {
 Int32x4 Int32x4::s_Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_min_epi32(in_a, in_b);
+#elif defined(DEEP_USE_NEON)
+	return vminq_s32(in_a, in_b);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_min(in_a, in_b);
 #else
@@ -131,6 +152,8 @@ Int32x4 Int32x4::s_Min(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4 Int32x4::s_Max(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_max_epi32(in_a, in_b);
+#elif defined(DEEP_USE_NEON)
+	return vmaxq_s32(in_a, in_b);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_max(in_a, in_b);
 #else
@@ -146,6 +169,8 @@ Int32x4 Int32x4::s_Max(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4 Int32x4::s_Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 #ifdef DEEP_USE_SSE2
 	return _mm_cmpeq_epi32(in_a, in_b);
+#elif defined(DEEP_USE_NEON)
+	return vreinterpretq_s32_u32(vceqq_s32(in_a, in_b));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_eq(in_a, in_b);
 #else
@@ -157,6 +182,8 @@ Int32x4 Int32x4::s_Equals(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4 Int32x4::s_Select(Arg_Int32x4 in_a, Arg_Int32x4 in_b, Arg_Int32x4 in_control) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_castps_si128(_mm_blendv_ps(_mm_castsi128_ps(in_a), _mm_castsi128_ps(in_b), _mm_castsi128_ps(in_control)));
+#elif defined(DEEP_USE_NEON)
+	return vbslq_s32(vreinterpretq_u32_s32(vshrq_n_s32(in_control, 31)), in_b, in_a);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_v128_bitselect(in_b, in_a, wasm_i32x4_shr(in_control, 31));
 #else
@@ -173,7 +200,7 @@ constexpr const int32& Int32x4::operator[](size_t in_index) const {
 }
 
 bool operator!=(Arg_Int32x4 in_a, Arg_Int32x4 in_b) {
-#if defined(DEEP_USE_SSE4_1) || defined(DEEP_USE_WASM_SIMD128)
+#if defined(DEEP_USE_SSE4_1) || defined(DEEP_USE_NEON) || defined(DEEP_USE_WASM_SIMD128)
 	return Int32x4::s_Equals(in_a, in_b).ToBooleanBitMask() != 0b1111u;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z || in_a.w != in_b.w;
@@ -187,6 +214,8 @@ Int32x4& Int32x4::operator<<=(int32 in_count) {
 	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_slli_epi32(m_internal, in_count);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vshlq_s32(m_internal, vdupq_n_s32(in_count));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i32x4_shl(m_internal, in_count);
 #else
@@ -202,6 +231,8 @@ Int32x4& Int32x4::operator>>=(int32 in_count) {
 	Deep_Assert(in_count >= 0 && in_count < 32, "Invalid shift amount.");
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_srai_epi32(m_internal, in_count);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vshlq_s32(m_internal, vdupq_n_s32(-in_count));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i32x4_shr(m_internal, in_count);
 #else
@@ -216,6 +247,8 @@ Int32x4 operator>>(Int32x4 in_a, int32 in_count) {
 Int32x4& Int32x4::operator|=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_or_si128(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vorrq_s32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_or(m_internal, in_other);
 #else
@@ -230,6 +263,8 @@ Int32x4 operator|(Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4& Int32x4::operator&=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_and_si128(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vandq_s32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_and(m_internal, in_other);
 #else
@@ -244,6 +279,8 @@ Int32x4 operator&(Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4& Int32x4::operator^=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_xor_si128(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = veorq_s32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_v128_xor(m_internal, in_other);
 #else
@@ -258,6 +295,8 @@ Int32x4 operator^(Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4 operator~(Int32x4 in_value) {
 #ifdef DEEP_USE_SSE2
 	in_value.m_internal = _mm_xor_si128(in_value.m_internal, _mm_set1_epi32(int32{ -1 }));
+#elif defined(DEEP_USE_NEON)
+	in_value.m_internal = veorq_s32(in_value.m_internal, vdupq_n_s32(~int32{ 0 }));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	in_value.m_internal = wasm_v128_not(in_value.m_internal);
 #else
@@ -272,6 +311,8 @@ Int32x4 operator~(Int32x4 in_value) {
 Int32x4& Int32x4::operator+=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_add_epi32(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vaddq_s32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i32x4_add(m_internal, in_other);
 #else
@@ -290,6 +331,8 @@ Int32x4 operator+(Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4& Int32x4::operator-=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE2
 	m_internal = _mm_sub_epi32(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vsubq_s32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i32x4_sub(m_internal, in_other);
 #else
@@ -308,6 +351,8 @@ Int32x4 operator-(Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4 operator-(Arg_Int32x4 in_a) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_sub_epi32(_mm_setzero_si128(), in_a);
+#elif defined(DEEP_USE_NEON)
+	return vsubq_s32(vdupq_n_s32(0), in_a);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_sub(wasm_i32x4_splat(0), in_a);
 #else
@@ -319,6 +364,8 @@ Int32x4 operator-(Arg_Int32x4 in_a) {
 Int32x4& Int32x4::operator*=(Arg_Int32x4 in_other) {
 #ifdef DEEP_USE_SSE4_1
 	m_internal = _mm_mullo_epi32(m_internal, in_other);
+#elif defined(DEEP_USE_NEON)
+	m_internal = vmulq_s32(m_internal, in_other);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i32x4_mul(m_internal, in_other);
 #else
@@ -336,6 +383,8 @@ Int32x4 operator*(Int32x4 in_a, Arg_Int32x4 in_b) {
 Int32x4& Int32x4::operator*=(int32 in_other) {
 #ifdef DEEP_USE_SSE4_1
 	m_internal = _mm_mullo_epi32(m_internal, _mm_set1_epi32(in_other));
+#elif defined(DEEP_USE_NEON)
+	m_internal = vmulq_s32(m_internal, vdupq_n_s32(in_other));
 #elif defined(DEEP_USE_WASM_SIMD128)
 	m_internal = wasm_i32x4_mul(m_internal, wasm_i32x4_splat(in_other));
 #else
@@ -354,6 +403,8 @@ Int32x4 operator*(Int32x4 in_vec, int32 in_val) {
 Int32x4 operator*(int32 in_val, Arg_Int32x4 in_vec) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_mullo_epi32(_mm_set1_epi32(in_val), in_vec);
+#elif defined(DEEP_USE_NEON)
+	return vmulq_s32(vdupq_n_s32(in_val), in_vec);
 #elif defined(DEEP_USE_WASM_SIMD128)
 	return wasm_i32x4_mul(wasm_i32x4_splat(in_val), in_vec);
 #else

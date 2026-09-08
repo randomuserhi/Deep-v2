@@ -40,6 +40,22 @@ Mat4x4 Mat4x4::transposed() const {
 		_mm_shuffle_ps(tmp3, tmp4, _MM_SHUFFLE(2, 0, 2, 0)), //
 		_mm_shuffle_ps(tmp3, tmp4, _MM_SHUFFLE(3, 1, 3, 1))  //
 	};
+#elif defined(DEEP_USE_NEON)
+	float32x4_t tmp1 = Float32x4{ vgetq_lane_f32(m_cols[0], 0), vgetq_lane_f32(m_cols[0], 1), vgetq_lane_f32(m_cols[1], 0),
+		                          vgetq_lane_f32(m_cols[1], 1) };
+	float32x4_t tmp3 = Float32x4{ vgetq_lane_f32(m_cols[0], 2), vgetq_lane_f32(m_cols[0], 3), vgetq_lane_f32(m_cols[1], 2),
+		                          vgetq_lane_f32(m_cols[1], 3) };
+	float32x4_t tmp2 = Float32x4{ vgetq_lane_f32(m_cols[2], 0), vgetq_lane_f32(m_cols[2], 1), vgetq_lane_f32(m_cols[3], 0),
+		                          vgetq_lane_f32(m_cols[3], 1) };
+	float32x4_t tmp4 = Float32x4{ vgetq_lane_f32(m_cols[2], 2), vgetq_lane_f32(m_cols[2], 3), vgetq_lane_f32(m_cols[3], 2),
+		                          vgetq_lane_f32(m_cols[3], 3) };
+
+	return Mat4x4{
+		Float32x4{ vgetq_lane_f32(tmp1, 0), vgetq_lane_f32(tmp1, 2), vgetq_lane_f32(tmp2, 0), vgetq_lane_f32(tmp2, 2) }, //
+		Float32x4{ vgetq_lane_f32(tmp1, 1), vgetq_lane_f32(tmp1, 3), vgetq_lane_f32(tmp2, 1), vgetq_lane_f32(tmp2, 3) }, //
+		Float32x4{ vgetq_lane_f32(tmp3, 0), vgetq_lane_f32(tmp3, 2), vgetq_lane_f32(tmp4, 0), vgetq_lane_f32(tmp4, 2) }, //
+		Float32x4{ vgetq_lane_f32(tmp3, 1), vgetq_lane_f32(tmp3, 3), vgetq_lane_f32(tmp4, 1), vgetq_lane_f32(tmp4, 3) }  //
+	};
 #else
 	return Mat4x4{
 		m00, m10, m20, m30, //
@@ -80,6 +96,33 @@ Mat4x4 Mat4x4::s_FromQuaternion(const Quat& in_quat) {
 		           _mm_blend_ps(_mm_blend_ps(minus, plus, 0b0001), diagonal,
 		                        0b0100), // (2 xz + 2 yw, 2 yz - 2 xw, 1 - 2 x^2 - 2 y^2, 0)
 		           _mm_set_ps(1, 0, 0, 0) };
+#elif defined(DEEP_USE_NEON)
+	float32x4_t xyzw = in_quat.m_float32x4;
+	float32x4_t two_xyzw = vaddq_f32(xyzw, xyzw);
+	float32x4_t yzxw =
+		Float32x4{ vgetq_lane_f32(xyzw, 1), vgetq_lane_f32(xyzw, 2), vgetq_lane_f32(xyzw, 0), vgetq_lane_f32(xyzw, 3) };
+	float32x4_t two_yzxw = vaddq_f32(yzxw, yzxw);
+	float32x4_t zxyw =
+		Float32x4{ vgetq_lane_f32(xyzw, 2), vgetq_lane_f32(xyzw, 0), vgetq_lane_f32(xyzw, 1), vgetq_lane_f32(xyzw, 3) };
+	float32x4_t two_zxyw = vaddq_f32(zxyw, zxyw);
+	float32x4_t wwww = vdupq_n_f32(vgetq_lane_f32(xyzw, 3));
+	float32x4_t diagonal =
+		vsubq_f32(vsubq_f32(vdupq_n_f32(1.0f), vmulq_f32(two_yzxw, yzxw)),
+	              vmulq_f32(two_zxyw, zxyw)); // (1 - 2 y^2 - 2 z^2, 1 - 2 x^2 - 2 z^2, 1 - 2 x^2 - 2 y^2, 1 - 4 w^2)
+	float32x4_t plus =
+		vaddq_f32(vmulq_f32(two_xyzw, zxyw), vmulq_f32(two_yzxw, wwww)); // 2 * (xz + yw, xy + zw, yz + xw, ww)
+	float32x4_t minus =
+		vsubq_f32(vmulq_f32(two_yzxw, xyzw), vmulq_f32(two_zxyw, wwww)); // 2 * (xy - zw, yz - xw, xz - yw, 0)
+
+	minus = vsetq_lane_f32(0.0f, minus, 3);
+
+	return Mat4x4{ Float32x4::s_Select(Float32x4::s_Select(plus, diagonal, Int32x4{ -1, 0, 0, 0 }), minus,
+		                               Int32x4{ 0, 0, -1, -1 }), // (1 - 2 y^2 - 2 z^2, 2 xy + 2 zw, 2 xz - 2 yw, 0)
+		           Float32x4::s_Select(Float32x4::s_Select(diagonal, minus, Int32x4{ -1, 0, 0, -1 }), plus,
+		                               Int32x4{ 0, 0, -1, 0 }), // (2 xy - 2 zw, 1 - 2 x^2 - 2 z^2, 2 yz + 2 xw, 0)
+		           Float32x4::s_Select(Float32x4::s_Select(minus, plus, Int32x4{ -1, 0, 0, 0 }), diagonal,
+		                               Int32x4{ 0, 0, -1, 0 }), // (2 xz + 2 yw, 2 yz - 2 xw, 1 - 2 x^2 - 2 y^2, 0)
+		           Float32x4{ 0, 0, 0, 1 } };
 #else
 	float32 x = in_quat.x;
 	float32 y = in_quat.y;
@@ -156,6 +199,47 @@ float32 Mat4x4::determinant() const {
 	det = _mm_add_ss(_mm_shuffle_ps(det, det, _MM_SHUFFLE(1, 0, 3, 2)), det);
 
 	return _mm_cvtss_f32(det);
+#elif defined(DEEP_USE_NEON)
+
+	float32x4_t tmp1 = Float32x4{ vgetq_lane_f32(m_cols[0], 0), vgetq_lane_f32(m_cols[0], 1), vgetq_lane_f32(m_cols[1], 0),
+		                          vgetq_lane_f32(m_cols[1], 1) };
+	float32x4_t row1 = Float32x4{ vgetq_lane_f32(m_cols[2], 0), vgetq_lane_f32(m_cols[2], 1), vgetq_lane_f32(m_cols[3], 0),
+		                          vgetq_lane_f32(m_cols[3], 1) };
+	float32x4_t row0 =
+		Float32x4{ vgetq_lane_f32(tmp1, 0), vgetq_lane_f32(tmp1, 2), vgetq_lane_f32(row1, 0), vgetq_lane_f32(row1, 2) };
+	row1 = Float32x4{ vgetq_lane_f32(row1, 1), vgetq_lane_f32(row1, 3), vgetq_lane_f32(tmp1, 1), vgetq_lane_f32(tmp1, 3) };
+	tmp1 = Float32x4{ vgetq_lane_f32(m_cols[0], 2), vgetq_lane_f32(m_cols[0], 3), vgetq_lane_f32(m_cols[1], 2),
+		              vgetq_lane_f32(m_cols[1], 3) };
+	float32x4_t row3 = Float32x4{ vgetq_lane_f32(m_cols[2], 2), vgetq_lane_f32(m_cols[2], 3), vgetq_lane_f32(m_cols[3], 2),
+		                          vgetq_lane_f32(m_cols[3], 3) };
+	float32x4_t row2 =
+		Float32x4{ vgetq_lane_f32(tmp1, 0), vgetq_lane_f32(tmp1, 2), vgetq_lane_f32(row3, 0), vgetq_lane_f32(row3, 2) };
+	row3 = Float32x4{ vgetq_lane_f32(row3, 1), vgetq_lane_f32(row3, 3), vgetq_lane_f32(tmp1, 1), vgetq_lane_f32(tmp1, 3) };
+
+	tmp1 = vmulq_f32(row2, row3);
+	tmp1 = vrev64q_f32(tmp1);
+	float32x4_t minor0 = vmulq_f32(row1, tmp1);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor0 = vsubq_f32(vmulq_f32(row1, tmp1), minor0);
+
+	tmp1 = vmulq_f32(row1, row2);
+	tmp1 = vrev64q_f32(tmp1);
+	minor0 = vaddq_f32(vmulq_f32(row3, tmp1), minor0);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor0 = vsubq_f32(minor0, vmulq_f32(row3, tmp1));
+
+	tmp1 = vmulq_f32(vextq_f32(row1, row1, 2), row3);
+	tmp1 = vrev64q_f32(tmp1);
+	row2 = vextq_f32(row2, row2, 2);
+	minor0 = vaddq_f32(vmulq_f32(row2, tmp1), minor0);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor0 = vsubq_f32(minor0, vmulq_f32(row2, tmp1));
+
+	float32x4_t det = vmulq_f32(row0, minor0);
+	det = vaddq_f32(vrev64q_f32(det), det);
+	det = vsetq_lane_f32(vgetq_lane_f32(vextq_f32(det, det, 2), 0) + vgetq_lane_f32(det, 0), vextq_f32(det, det, 2), 0);
+
+	return vgetq_lane_f32(det, 0);
 #else
 	float32 m00 = this->m00, m01 = this->m01, m02 = this->m02, m03 = this->m03;
 	float32 m10 = this->m10, m11 = this->m11, m12 = this->m12, m13 = this->m13;
@@ -269,6 +353,85 @@ Mat4x4 Mat4x4::inversed() const {
 		_mm_mul_ps(det, minor2), //
 		_mm_mul_ps(det, minor3)  //
 	};
+#elif defined(DEEP_USE_NEON)
+	float32x4_t tmp1 = Float32x4{ vgetq_lane_f32(m_cols[0], 0), vgetq_lane_f32(m_cols[0], 1), vgetq_lane_f32(m_cols[1], 0),
+		                          vgetq_lane_f32(m_cols[1], 1) };
+	float32x4_t row1 = Float32x4{ vgetq_lane_f32(m_cols[2], 0), vgetq_lane_f32(m_cols[2], 1), vgetq_lane_f32(m_cols[3], 0),
+		                          vgetq_lane_f32(m_cols[3], 1) };
+	float32x4_t row0 =
+		Float32x4{ vgetq_lane_f32(tmp1, 0), vgetq_lane_f32(tmp1, 2), vgetq_lane_f32(row1, 0), vgetq_lane_f32(row1, 2) };
+	row1 = Float32x4{ vgetq_lane_f32(row1, 1), vgetq_lane_f32(row1, 3), vgetq_lane_f32(tmp1, 1), vgetq_lane_f32(tmp1, 3) };
+	tmp1 = Float32x4{ vgetq_lane_f32(m_cols[0], 2), vgetq_lane_f32(m_cols[0], 3), vgetq_lane_f32(m_cols[1], 2),
+		              vgetq_lane_f32(m_cols[1], 3) };
+	float32x4_t row3 = Float32x4{ vgetq_lane_f32(m_cols[2], 2), vgetq_lane_f32(m_cols[2], 3), vgetq_lane_f32(m_cols[3], 2),
+		                          vgetq_lane_f32(m_cols[3], 3) };
+	float32x4_t row2 =
+		Float32x4{ vgetq_lane_f32(tmp1, 0), vgetq_lane_f32(tmp1, 2), vgetq_lane_f32(row3, 0), vgetq_lane_f32(row3, 2) };
+	row3 = Float32x4{ vgetq_lane_f32(row3, 1), vgetq_lane_f32(row3, 3), vgetq_lane_f32(tmp1, 1), vgetq_lane_f32(tmp1, 3) };
+
+	tmp1 = vmulq_f32(row2, row3);
+	tmp1 = vrev64q_f32(tmp1);
+	float32x4_t minor0 = vmulq_f32(row1, tmp1);
+	float32x4_t minor1 = vmulq_f32(row0, tmp1);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor0 = vsubq_f32(vmulq_f32(row1, tmp1), minor0);
+	minor1 = vsubq_f32(vmulq_f32(row0, tmp1), minor1);
+	minor1 = vextq_f32(minor1, minor1, 2);
+
+	tmp1 = vmulq_f32(row1, row2);
+	tmp1 = vrev64q_f32(tmp1);
+	minor0 = vaddq_f32(vmulq_f32(row3, tmp1), minor0);
+	float32x4_t minor3 = vmulq_f32(row0, tmp1);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor0 = vsubq_f32(minor0, vmulq_f32(row3, tmp1));
+	minor3 = vsubq_f32(vmulq_f32(row0, tmp1), minor3);
+	minor3 = vextq_f32(minor3, minor3, 2);
+
+	tmp1 = vmulq_f32(vextq_f32(row1, row1, 2), row3);
+	tmp1 = vrev64q_f32(tmp1);
+	row2 = vextq_f32(row2, row2, 2);
+	minor0 = vaddq_f32(vmulq_f32(row2, tmp1), minor0);
+	float32x4_t minor2 = vmulq_f32(row0, tmp1);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor0 = vsubq_f32(minor0, vmulq_f32(row2, tmp1));
+	minor2 = vsubq_f32(vmulq_f32(row0, tmp1), minor2);
+	minor2 = vextq_f32(minor2, minor2, 2);
+
+	tmp1 = vmulq_f32(row0, row1);
+	tmp1 = vrev64q_f32(tmp1);
+	minor2 = vaddq_f32(vmulq_f32(row3, tmp1), minor2);
+	minor3 = vsubq_f32(vmulq_f32(row2, tmp1), minor3);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor2 = vsubq_f32(vmulq_f32(row3, tmp1), minor2);
+	minor3 = vsubq_f32(minor3, vmulq_f32(row2, tmp1));
+
+	tmp1 = vmulq_f32(row0, row3);
+	tmp1 = vrev64q_f32(tmp1);
+	minor1 = vsubq_f32(minor1, vmulq_f32(row2, tmp1));
+	minor2 = vaddq_f32(vmulq_f32(row1, tmp1), minor2);
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor1 = vaddq_f32(vmulq_f32(row2, tmp1), minor1);
+	minor2 = vsubq_f32(minor2, vmulq_f32(row1, tmp1));
+
+	tmp1 = vmulq_f32(row0, row2);
+	tmp1 = vrev64q_f32(tmp1);
+	minor1 = vaddq_f32(vmulq_f32(row3, tmp1), minor1);
+	minor3 = vsubq_f32(minor3, vmulq_f32(row1, tmp1));
+	tmp1 = vextq_f32(tmp1, tmp1, 2);
+	minor1 = vsubq_f32(minor1, vmulq_f32(row3, tmp1));
+	minor3 = vaddq_f32(vmulq_f32(row1, tmp1), minor3);
+
+	float32x4_t det = vmulq_f32(row0, minor0);
+	det = vaddq_f32(vrev64q_f32(det), det);
+	det = vsetq_lane_f32(vgetq_lane_f32(vextq_f32(det, det, 2), 0) + vgetq_lane_f32(det, 0), vextq_f32(det, det, 2), 0);
+	det = vdupq_n_f32(1.0f / vgetq_lane_f32(det, 0));
+
+	return Mat4x4{
+		vmulq_f32(det, minor0), //
+		vmulq_f32(det, minor1), //
+		vmulq_f32(det, minor2), //
+		vmulq_f32(det, minor3)  //
+	};
 #else
 	float32 m00 = this->m00, m01 = this->m01, m02 = this->m02, m03 = this->m03;
 	float32 m10 = this->m10, m11 = this->m11, m12 = this->m12, m13 = this->m13;
@@ -316,7 +479,8 @@ Mat4x4 Mat4x4::inversed() const {
 	result.m_cols[2] /= det;
 	result.m_cols[3] /= det;
 
-	return result;
+	// The cofactors above form rows of the inverse; the constructor stores columns.
+	return result.transposed();
 #endif
 }
 
@@ -372,6 +536,26 @@ Mat4x4 operator*(Arg_Mat4x4 in_a, Arg_Mat4x4 in_b) {
 		c.m_cols[3], _mm_mul_ps(in_a.m_cols[2], _mm_shuffle_ps(in_b.m_cols[3], in_b.m_cols[3], _MM_SHUFFLE(2, 2, 2, 2))));
 	c.m_cols[3] = _mm_add_ps(
 		c.m_cols[3], _mm_mul_ps(in_a.m_cols[3], _mm_shuffle_ps(in_b.m_cols[3], in_b.m_cols[3], _MM_SHUFFLE(3, 3, 3, 3))));
+#elif defined(DEEP_USE_NEON)
+	c.m_cols[0] = vmulq_f32(in_a.m_cols[0], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[0], 0)));
+	c.m_cols[0] = vaddq_f32(c.m_cols[0], vmulq_f32(in_a.m_cols[1], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[0], 1))));
+	c.m_cols[0] = vaddq_f32(c.m_cols[0], vmulq_f32(in_a.m_cols[2], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[0], 2))));
+	c.m_cols[0] = vaddq_f32(c.m_cols[0], vmulq_f32(in_a.m_cols[3], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[0], 3))));
+
+	c.m_cols[1] = vmulq_f32(in_a.m_cols[0], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[1], 0)));
+	c.m_cols[1] = vaddq_f32(c.m_cols[1], vmulq_f32(in_a.m_cols[1], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[1], 1))));
+	c.m_cols[1] = vaddq_f32(c.m_cols[1], vmulq_f32(in_a.m_cols[2], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[1], 2))));
+	c.m_cols[1] = vaddq_f32(c.m_cols[1], vmulq_f32(in_a.m_cols[3], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[1], 3))));
+
+	c.m_cols[2] = vmulq_f32(in_a.m_cols[0], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[2], 0)));
+	c.m_cols[2] = vaddq_f32(c.m_cols[2], vmulq_f32(in_a.m_cols[1], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[2], 1))));
+	c.m_cols[2] = vaddq_f32(c.m_cols[2], vmulq_f32(in_a.m_cols[2], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[2], 2))));
+	c.m_cols[2] = vaddq_f32(c.m_cols[2], vmulq_f32(in_a.m_cols[3], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[2], 3))));
+
+	c.m_cols[3] = vmulq_f32(in_a.m_cols[0], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[3], 0)));
+	c.m_cols[3] = vaddq_f32(c.m_cols[3], vmulq_f32(in_a.m_cols[1], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[3], 1))));
+	c.m_cols[3] = vaddq_f32(c.m_cols[3], vmulq_f32(in_a.m_cols[2], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[3], 2))));
+	c.m_cols[3] = vaddq_f32(c.m_cols[3], vmulq_f32(in_a.m_cols[3], vdupq_n_f32(vgetq_lane_f32(in_b.m_cols[3], 3))));
 #else
 	c.m00 = in_a.m00 * in_b.m00 + in_a.m01 * in_b.m10 + in_a.m02 * in_b.m20 + in_a.m03 * in_b.m30;
 	c.m10 = in_a.m10 * in_b.m00 + in_a.m11 * in_b.m10 + in_a.m12 * in_b.m20 + in_a.m13 * in_b.m30;
@@ -411,6 +595,14 @@ Vec3 operator*(Arg_Mat4x4 in_mat, Arg_Vec3 in_vec) {
 	_v.m_float32x4 = _mm_add_ps(_v.m_float32x4, in_mat.m_cols[3]);
 	const __m128 w = _mm_shuffle_ps(_v.m_float32x4, _v.m_float32x4, _MM_SHUFFLE(3, 3, 3, 3));
 	_v.m_float32x4 = _mm_div_ps(_v.m_float32x4, w);
+#elif defined(DEEP_USE_NEON)
+	_v.m_float32x4 = vmulq_f32(in_mat.m_cols[0], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 0)));
+	_v.m_float32x4 =
+		vaddq_f32(_v.m_float32x4, vmulq_f32(in_mat.m_cols[1], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 1))));
+	_v.m_float32x4 =
+		vaddq_f32(_v.m_float32x4, vmulq_f32(in_mat.m_cols[2], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 2))));
+	_v.m_float32x4 = vaddq_f32(_v.m_float32x4, in_mat.m_cols[3]);
+	_v.m_float32x4 /= vgetq_lane_f32(_v.m_float32x4, 3);
 #else
 	float32 invW = 1.0f / (in_mat.m30 * in_vec.x + in_mat.m31 * in_vec.y + in_mat.m32 * in_vec.z + in_mat.m33);
 	_v.x = (in_mat.m00 * in_vec.x + in_mat.m01 * in_vec.y + in_mat.m02 * in_vec.z + in_mat.m03) * invW;
@@ -434,6 +626,14 @@ Vec4 operator*(Arg_Mat4x4 in_mat, Arg_Vec4 in_vec) {
 	_v.m_float32x4 = _mm_add_ps(
 		_v.m_float32x4,
 		_mm_mul_ps(in_mat.m_cols[3], _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(3, 3, 3, 3))));
+#elif defined(DEEP_USE_NEON)
+	_v.m_float32x4 = vmulq_f32(in_mat.m_cols[0], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 0)));
+	_v.m_float32x4 =
+		vaddq_f32(_v.m_float32x4, vmulq_f32(in_mat.m_cols[1], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 1))));
+	_v.m_float32x4 =
+		vaddq_f32(_v.m_float32x4, vmulq_f32(in_mat.m_cols[2], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 2))));
+	_v.m_float32x4 =
+		vaddq_f32(_v.m_float32x4, vmulq_f32(in_mat.m_cols[3], vdupq_n_f32(vgetq_lane_f32(in_vec.m_float32x4, 3))));
 #else
 	_v.x = in_mat.m00 * in_vec.x + in_mat.m01 * in_vec.y + in_mat.m02 * in_vec.z + in_mat.m03 * in_vec.w;
 	_v.y = in_mat.m10 * in_vec.x + in_mat.m11 * in_vec.y + in_mat.m12 * in_vec.z + in_mat.m13 * in_vec.w;

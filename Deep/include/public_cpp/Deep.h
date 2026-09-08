@@ -131,9 +131,7 @@
 #endif
 
 // TODO(randomuserhi):
-// - Support NEON SIMD
 // - Proper detection of SIMD (current is botched)
-// - Support for ARM / WASM compilation
 
 #if defined(DEEP_COMPILER_CLANG)
 	#define Deep_ForceInline inline __attribute__((always_inline))
@@ -272,7 +270,8 @@
 		#define DEEP_USE_FMA
 	#endif
 #elif defined(__aarch64__) || defined(_M_ARM64) || defined(__arm__) || defined(_M_ARM)
-	#if defined(__aarch64__) || defined(_M_ARM64)
+	#if (defined(__aarch64__) || defined(_M_ARM64) || defined(__ARM_NEON) || defined(__ARM_NEON__))                         \
+		&& !defined(DEEP_USE_NEON)
 		#define DEEP_USE_NEON
 	#endif
 #else

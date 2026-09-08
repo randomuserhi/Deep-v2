@@ -15,7 +15,10 @@ Vec4i::Vec4i(Int32x4 in_int32x4) :
 
 #ifdef DEEP_USE_SSE4_1
 Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
-	m_int32x4{ _mm_blend_epi32(in_xyz.m_int32x4, _mm_set1_epi32(in_w), 8) } {}
+	m_int32x4{ _mm_blend_epi16(in_xyz.m_int32x4, _mm_set1_epi32(in_w), 0xc0) } {}
+#elif defined(DEEP_USE_NEON)
+Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
+	m_int32x4{ vsetq_lane_s32(in_w, in_xyz.m_int32x4, 3) } {}
 #else
 Vec4i::Vec4i(Arg_Vec3i in_xyz, int32 in_w) :
 	x{ in_xyz.x }, y{ in_xyz.y }, z{ in_xyz.z }, w{ in_w } {}

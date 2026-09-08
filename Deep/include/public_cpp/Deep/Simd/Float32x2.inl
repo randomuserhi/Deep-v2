@@ -10,14 +10,24 @@
 
 DEEP_NAMESPACE_BEGIN
 
+#ifdef DEEP_USE_NEON
+Float32x2::Float32x2(float32 in_x, float32 in_y) :
+	m_internal{ in_x, in_y } {}
+#else
 Float32x2::Float32x2(float32 in_x, float32 in_y) :
 	x{ in_x }, y{ in_y } {}
+#endif
 
 Float32x2::Float32x2(Type in_internal) :
 	m_internal(in_internal) {}
 
+#ifdef DEEP_USE_NEON
+Float32x2::Float32x2(Float32x4 in_float32x4) :
+	m_internal{ vget_low_f32(in_float32x4) } {}
+#else
 Float32x2::Float32x2(Float32x4 in_float32x4) :
 	x{ in_float32x4.x }, y{ in_float32x4.y } {}
+#endif
 
 constexpr Float32x2 Float32x2::Constexpr(float32 in_x, float32 in_y) {
 	Float32x2 xmm;
@@ -31,40 +41,64 @@ constexpr Float32x2::operator Type() const {
 }
 
 Int32x2 Float32x2::ToInt() const {
+#if defined(DEEP_USE_NEON)
+	return vcvt_s32_f32(m_internal);
+#else
 	return Int32x2{ static_cast<int32>(x), static_cast<int32>(y) };
+#endif
 }
 constexpr Int32x2 Float32x2::Constexpr_ToInt() const {
 	return Int32x2::Constexpr(static_cast<int32>(x), static_cast<int32>(y));
 }
 
 Int32x2 Float32x2::ReinterpretAsInt() const {
+#if defined(DEEP_USE_NEON)
+	return vreinterpret_s32_f32(m_internal);
+#else
 	return BitCast<Int32x2>(*this);
+#endif
 }
 constexpr Int32x2 Float32x2::Constexpr_ReinterpretAsInt() const {
 	return BitCast<Int32x2>(*this);
 }
 
 Float32x2 Float32x2::s_Replicate(float32 in_value) {
+#if defined(DEEP_USE_NEON)
+	return vdup_n_f32(in_value);
+#else
 	return Float32x2{ in_value, in_value };
+#endif
 }
 
 Float32x2 Float32x2::s_Min(Arg_Float32x2 in_a, Arg_Float32x2 in_b) {
+#if defined(DEEP_USE_NEON)
+	return vbsl_f32(vclt_f32(in_a, in_b), in_a, in_b);
+#else
 	return Float32x2{
 		Deep::Min(in_a.x, in_b.x), //
 		Deep::Min(in_a.y, in_b.y)  //
 	};
+#endif
 }
 
 Float32x2 Float32x2::s_Max(Arg_Float32x2 in_a, Arg_Float32x2 in_b) {
+#if defined(DEEP_USE_NEON)
+	return vbsl_f32(vcgt_f32(in_a, in_b), in_a, in_b);
+#else
 	return Float32x2{
 		Deep::Max(in_a.x, in_b.x), //
 		Deep::Max(in_a.y, in_b.y)  //
 	};
+#endif
 }
 
 Int32x2 Float32x2::s_Equals(Arg_Float32x2 in_a, Arg_Float32x2 in_b) {
+#if defined(DEEP_USE_NEON)
+	return vreinterpret_s32_u32(vceq_f32(in_a, in_b));
+#else
 	return Int32x2{ in_a.x == in_b.x ? int32(0xffffffff) : 0, //
 		            in_a.y == in_b.y ? int32(0xffffffff) : 0 };
+#endif
 }
 
 constexpr float32& Float32x2::operator[](size_t in_index) {
@@ -82,7 +116,11 @@ bool operator==(Arg_Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator|=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vreinterpret_f32_u32(vorr_u32(vreinterpret_u32_f32(m_internal), vreinterpret_u32_f32(in_other)));
+#else
 	m_internal = (ReinterpretAsInt() | in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+#endif
 	return *this;
 }
 Float32x2 operator|(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -90,7 +128,11 @@ Float32x2 operator|(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator&=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vreinterpret_f32_u32(vand_u32(vreinterpret_u32_f32(m_internal), vreinterpret_u32_f32(in_other)));
+#else
 	m_internal = (ReinterpretAsInt() & in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+#endif
 	return *this;
 }
 Float32x2 operator&(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -98,7 +140,11 @@ Float32x2 operator&(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator^=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vreinterpret_f32_u32(veor_u32(vreinterpret_u32_f32(m_internal), vreinterpret_u32_f32(in_other)));
+#else
 	m_internal = (ReinterpretAsInt() ^ in_other.ReinterpretAsInt()).ReinterpretAsFloat();
+#endif
 	return *this;
 }
 Float32x2 operator^(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -106,8 +152,12 @@ Float32x2 operator^(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator+=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vadd_f32(m_internal, in_other);
+#else
 	x += in_other.x;
 	y += in_other.y;
+#endif
 	return *this;
 }
 
@@ -116,8 +166,12 @@ Float32x2 operator+(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator-=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vsub_f32(m_internal, in_other);
+#else
 	x -= in_other.x;
 	y -= in_other.y;
+#endif
 	return *this;
 }
 
@@ -126,13 +180,21 @@ Float32x2 operator-(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2 operator-(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	return vsub_f32(vdup_n_f32(0), in_other);
+#else
 	// NOTE(randomuserhi): 0.0f - x to stay consistent with vectorised version
 	return Float32x2{ 0.0f - in_other.x, 0.0f - in_other.y };
+#endif
 }
 
 Float32x2& Float32x2::operator*=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vmul_f32(m_internal, in_other);
+#else
 	x *= in_other.x;
 	y *= in_other.y;
+#endif
 	return *this;
 }
 Float32x2 operator*(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -140,8 +202,12 @@ Float32x2 operator*(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator*=(float32 in_other) {
+#if defined(DEEP_USE_NEON)
+	m_internal = vmul_f32(m_internal, vdup_n_f32(in_other));
+#else
 	x *= in_other;
 	y *= in_other;
+#endif
 	return *this;
 }
 
@@ -150,12 +216,20 @@ Float32x2 operator*(Float32x2 in_vec, float32 in_val) {
 }
 
 Float32x2 operator*(float32 in_val, Arg_Float32x2 in_vec) {
+#if defined(DEEP_USE_NEON)
+	return vmul_f32(vdup_n_f32(in_val), in_vec);
+#else
 	return Float32x2{ in_val * in_vec.x, in_val * in_vec.y };
+#endif
 }
 
 Float32x2& Float32x2::operator/=(Arg_Float32x2 in_other) {
+#if defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	m_internal = vdiv_f32(m_internal, in_other);
+#else
 	x /= in_other.x;
 	y /= in_other.y;
+#endif
 	return *this;
 }
 Float32x2 operator/(Float32x2 in_a, Arg_Float32x2 in_b) {
@@ -163,8 +237,12 @@ Float32x2 operator/(Float32x2 in_a, Arg_Float32x2 in_b) {
 }
 
 Float32x2& Float32x2::operator/=(float32 in_other) {
+#if defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	m_internal = vdiv_f32(m_internal, vdup_n_f32(in_other));
+#else
 	x /= in_other;
 	y /= in_other;
+#endif
 	return *this;
 }
 
@@ -173,15 +251,27 @@ Float32x2 operator/(Float32x2 in_vec, float32 in_val) {
 }
 
 Float32x2 operator/(float32 in_val, Arg_Float32x2 in_vec) {
+#if defined(DEEP_USE_NEON) && defined(DEEP_ARCH_ARM64)
+	return vdiv_f32(vdup_n_f32(in_val), in_vec);
+#else
 	return Float32x2{ in_val / in_vec.x, in_val / in_vec.y };
+#endif
 }
 
 Int32x2 Float32x2::s_IsNegative(Arg_Float32x2 in_value) {
+#if defined(DEEP_USE_NEON)
+	return vreinterpret_s32_u32(vclt_f32(in_value, vdup_n_f32(0.0f)));
+#else
 	return Int32x2{ in_value.x < 0 ? int32(0xffffffff) : 0, in_value.y < 0 ? int32(0xffffffff) : 0 };
+#endif
 }
 
 Float32x2 Float32x2::s_Select(Arg_Float32x2 in_a, Arg_Float32x2 in_b, Arg_Int32x2 in_control) {
+#if defined(DEEP_USE_NEON)
+	return vbsl_f32(vreinterpret_u32_s32(vshr_n_s32(in_control, 31)), in_b, in_a);
+#else
 	return Float32x2{ in_control.x < 0 ? in_b.x : in_a.x, in_control.y < 0 ? in_b.y : in_a.y };
+#endif
 }
 
 void Float32x2::SinCos(Float32x2& out_sin, Float32x2& out_cos) {

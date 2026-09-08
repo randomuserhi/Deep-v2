@@ -126,6 +126,16 @@ target_include_directories(Tests PUBLIC "${TEST_ROOT}/src")
 # Add includes and link Deep
 target_link_libraries(Tests PRIVATE Deep)
 
+enable_testing()
+if (TEST_TARGET_WASM)
+	find_program(TEST_NODE_EXECUTABLE NAMES node)
+	if (TEST_NODE_EXECUTABLE)
+		add_test(NAME Deep.Tests COMMAND "${TEST_NODE_EXECUTABLE}" "$<TARGET_FILE_DIR:Tests>/test.js")
+	endif()
+elseif (NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+	add_test(NAME Deep.Tests COMMAND Tests)
+endif()
+
 # Applies to clang-cl and MSVC
 if (MSVC)
 	# Disable safe versions of functions

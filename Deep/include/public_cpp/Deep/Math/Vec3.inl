@@ -62,6 +62,9 @@ float32 Vec3::s_Dot(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 	t = _mm_add_ss(t, y);
 	t = _mm_add_ss(t, z);
 	return _mm_cvtss_f32(t);
+#elif defined(DEEP_USE_NEON)
+	float32x4_t product = vmulq_f32(in_a.m_float32x4, in_b.m_float32x4);
+	return vgetq_lane_f32(product, 0) + vgetq_lane_f32(product, 1) + vgetq_lane_f32(product, 2);
 #else
 	return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z;
 #endif
@@ -77,6 +80,11 @@ Vec3 Vec3::s_Cross(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 	t2 = _mm_mul_ps(t2, in_b.m_float32x4);
 	Float32x4 t3 = _mm_sub_ps(t1, t2);
 	return Vec3{ _mm_shuffle_ps(t3, t3, _MM_SHUFFLE(0, 0, 2, 1)) }; // Assure Z and W are the same
+#elif defined(DEEP_USE_NEON)
+	Float32x4 ayzx{ in_a.y, in_a.z, in_a.x, in_a.x };
+	Float32x4 byzx{ in_b.y, in_b.z, in_b.x, in_b.x };
+	Float32x4 product = in_a.m_float32x4 * byzx - ayzx * in_b.m_float32x4;
+	return Vec3{ product.y, product.z, product.x };
 #else
 	return Vec3{ in_a.m_values[1] * in_b.m_values[2] - in_a.m_values[2] * in_b.m_values[1],
 		         in_a.m_values[2] * in_b.m_values[0] - in_a.m_values[0] * in_b.m_values[2],
@@ -102,6 +110,8 @@ Vec3 Vec3::s_FixW(Arg_Vec3 in_vec) {
 #ifdef DEEP_USE_FLOATING_POINT_EXCEPTIONS
 	#ifdef DEEP_USE_SSE2
 	return Vec3{ _mm_shuffle_ps(in_vec.m_float32x4, in_vec.m_float32x4, _MM_SHUFFLE(2, 2, 1, 0)) };
+	#elif defined(DEEP_USE_NEON)
+	return Vec3{ vsetq_lane_f32(vgetq_lane_f32(in_vec.m_float32x4, 2), in_vec.m_float32x4, 3) };
 	#else
 	return Vec3{ in_vec.x, in_vec.y, in_vec.z };
 	#endif
@@ -115,7 +125,7 @@ Vec3::operator Float32x4() const {
 }
 
 Vec3::operator Vec3i() const {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3i{ m_float32x4.ToInt() };
 #else
 	return Vec3i{ static_cast<int32>(x), static_cast<int32>(y), static_cast<int32>(z) };
@@ -132,6 +142,8 @@ constexpr const float32& Vec3::operator[](size_t in_index) const {
 void Vec3::XYZ(Arg_Vec3 in_vec) {
 #ifdef DEEP_USE_SSE4_1
 	m_float32x4 = _mm_blend_ps(in_vec.m_float32x4, m_float32x4, 0x08);
+#elif defined(DEEP_USE_NEON)
+	m_float32x4 = vsetq_lane_f32(vgetq_lane_f32(m_float32x4, 3), in_vec.m_float32x4, 3);
 #else
 	x = in_vec.x;
 	y = in_vec.y;
@@ -140,7 +152,7 @@ void Vec3::XYZ(Arg_Vec3 in_vec) {
 }
 
 bool operator!=(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE4_1
+#if defined(DEEP_USE_SSE4_1) || defined(DEEP_USE_NEON)
 	return (Float32x4::s_Equals(in_a.m_float32x4, in_b.m_float32x4).ToBooleanBitMask() & 0b111) != 0b111;
 #else
 	return in_a.x != in_b.x || in_a.y != in_b.y || in_a.z != in_b.z;
@@ -151,7 +163,7 @@ bool operator==(Arg_Vec3 a, Arg_Vec3 b) {
 }
 
 Vec3& Vec3::operator+=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	m_float32x4 += in_other.m_float32x4;
 #else
 	x += in_other.x;
@@ -162,7 +174,7 @@ Vec3& Vec3::operator+=(Arg_Vec3 in_other) {
 }
 
 Vec3 operator+(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ in_a.m_float32x4 + in_b.m_float32x4 };
 #else
 	return Vec3{ in_a.x + in_b.x, in_a.y + in_b.y, in_a.z + in_b.z };
@@ -170,7 +182,7 @@ Vec3 operator+(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 }
 
 Vec3& Vec3::operator-=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	m_float32x4 -= in_other.m_float32x4;
 #else
 	x -= in_other.x;
@@ -181,7 +193,7 @@ Vec3& Vec3::operator-=(Arg_Vec3 in_other) {
 }
 
 Vec3 operator-(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ in_a.m_float32x4 - in_b.m_float32x4 };
 #else
 	return Vec3{ in_a.x - in_b.x, in_a.y - in_b.y, in_a.z - in_b.z };
@@ -189,7 +201,7 @@ Vec3 operator-(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 }
 
 Vec3 operator-(Arg_Vec3 in_a) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ -in_a.m_float32x4 };
 #else
 	// 0-x to mimic SIMD version
@@ -198,7 +210,7 @@ Vec3 operator-(Arg_Vec3 in_a) {
 }
 
 Vec3& Vec3::operator*=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	m_float32x4 *= in_other.m_float32x4;
 #else
 	x *= in_other.x;
@@ -208,7 +220,7 @@ Vec3& Vec3::operator*=(Arg_Vec3 in_other) {
 	return *this;
 }
 Vec3 operator*(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ in_a.m_float32x4 * in_b.m_float32x4 };
 #else
 	return Vec3{ in_a.x * in_b.x, in_a.y * in_b.y, in_a.z * in_b.z };
@@ -216,7 +228,7 @@ Vec3 operator*(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 }
 
 Vec3& Vec3::operator*=(float32 in_other) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	m_float32x4 *= in_other;
 #else
 	x *= in_other;
@@ -227,7 +239,7 @@ Vec3& Vec3::operator*=(float32 in_other) {
 }
 
 Vec3 operator*(Arg_Vec3 in_vec, float32 in_val) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ in_vec.m_float32x4 * in_val };
 #else
 	return Vec3{ in_vec.x * in_val, in_vec.y * in_val, in_vec.z * in_val };
@@ -235,7 +247,7 @@ Vec3 operator*(Arg_Vec3 in_vec, float32 in_val) {
 }
 
 Vec3 operator*(float32 in_val, Arg_Vec3 in_vec) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ in_val * in_vec.m_float32x4 };
 #else
 	return Vec3{ in_val * in_vec.x, in_val * in_vec.y, in_val * in_vec.z };
@@ -243,7 +255,7 @@ Vec3 operator*(float32 in_val, Arg_Vec3 in_vec) {
 }
 
 Vec3& Vec3::operator/=(Arg_Vec3 in_other) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	Vec3::s_CheckW(in_other);
 	m_float32x4 /= in_other.m_float32x4;
 #else
@@ -254,7 +266,7 @@ Vec3& Vec3::operator/=(Arg_Vec3 in_other) {
 	return *this;
 }
 Vec3 operator/(Arg_Vec3 in_a, Arg_Vec3 in_b) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	Vec3::s_CheckW(in_b);
 	return Vec3{ in_a.m_float32x4 / in_b.m_float32x4 };
 #else
@@ -263,7 +275,7 @@ Vec3 operator/(Arg_Vec3 in_a, Arg_Vec3 in_b) {
 }
 
 Vec3& Vec3::operator/=(float32 in_other) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	m_float32x4 /= in_other;
 #else
 	x /= in_other;
@@ -274,7 +286,7 @@ Vec3& Vec3::operator/=(float32 in_other) {
 }
 
 Vec3 operator/(Arg_Vec3 in_vec, float32 in_val) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	return Vec3{ in_vec.m_float32x4 / in_val };
 #else
 	return Vec3{ in_vec.x / in_val, in_vec.y / in_val, in_vec.z / in_val };
@@ -282,7 +294,7 @@ Vec3 operator/(Arg_Vec3 in_vec, float32 in_val) {
 }
 
 Vec3 operator/(float32 in_val, Arg_Vec3 in_vec) {
-#ifdef DEEP_USE_SSE2
+#if defined(DEEP_USE_SSE2) || defined(DEEP_USE_NEON)
 	Vec3::s_CheckW(in_vec);
 	return Vec3{ in_val / in_vec.m_float32x4 };
 #else

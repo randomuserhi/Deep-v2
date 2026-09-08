@@ -1,29 +1,15 @@
 #include "Tests.h"
 
-#include "Deep/Simd/Int32x2.h"
+#include "Deep/Simd/UInt32x2.h"
 #include <limits>
 
-TEST(Int32x2, Equality) {
-	Deep::Int32x2 a{ 1, 4 };
-	Deep::Int32x2 b{ 1, 4 };
-	EXPECT_EQ(a, b);
-}
-
-TEST(Int32x2, Add) {
-	Deep::Int32x2 a{ 2, 4 };
-	Deep::Int32x2 b{ 1, 5 };
-	Deep::Int32x2 c = a + b;
-	EXPECT_EQ(c.x, 3);
-	EXPECT_EQ(c.y, 9);
-}
-
-TEST(Int32x2, LanesMasksAndShifts) {
-	using Scalar = Deep::int32;
+TEST(UInt32x2, LanesMasksAndShifts) {
+	using Scalar = Deep::uint32;
 	using Unsigned = Deep::uint32;
 	const Scalar values[] = { 0, 1, std::numeric_limits<Scalar>::max(), std::numeric_limits<Scalar>::min() };
 	for (Scalar value : values) {
-		auto a = Deep::Int32x2::s_Replicate(value);
-		EXPECT_EQ(Deep::Int32x2::s_Equals(a, a).ToBooleanBitMask(), 3u);
+		auto a = Deep::UInt32x2::s_Replicate(value);
+		EXPECT_EQ(Deep::UInt32x2::s_Equals(a, a).ToBooleanBitMask(), 3u);
 		for (Deep::int32 shift = 0; shift < 32; ++shift) {
 			auto left = a << shift;
 			auto right = a >> shift;
@@ -32,12 +18,12 @@ TEST(Int32x2, LanesMasksAndShifts) {
 				EXPECT_EQ(right[i], value >> shift);
 			}
 		}
-		EXPECT_EQ((a ^ a), Deep::Int32x2::s_Replicate(0));
-		EXPECT_EQ((a & ~a), Deep::Int32x2::s_Replicate(0));
-		EXPECT_EQ((a | ~a), Deep::Int32x2::s_Replicate(static_cast<Scalar>(~Unsigned{ 0 })));
+		EXPECT_EQ((a ^ a), Deep::UInt32x2::s_Replicate(0));
+		EXPECT_EQ((a & ~a), Deep::UInt32x2::s_Replicate(0));
+		EXPECT_EQ((a | ~a), Deep::UInt32x2::s_Replicate(static_cast<Scalar>(~Unsigned{ 0 })));
 	}
 	for (Deep::uint32 mask = 0; mask < 4; ++mask) {
-		Deep::Int32x2 a;
+		Deep::UInt32x2 a;
 		for (size_t i = 0; i < 2; ++i)
 			a[i] = static_cast<Scalar>((mask & (1u << i)) ? (Unsigned{ 1 } << 31) : 1);
 		EXPECT_EQ(a.ToBooleanBitMask(), mask);
@@ -48,9 +34,9 @@ TEST(Int32x2, LanesMasksAndShifts) {
 	}
 }
 
-TEST(Int32x2, ArithmeticAndSelect) {
-	Deep::Int32x2 a{ 12, 24 };
-	Deep::Int32x2 b{ 3, 4 };
+TEST(UInt32x2, ArithmeticAndSelect) {
+	Deep::UInt32x2 a{ 12, 24 };
+	Deep::UInt32x2 b{ 3, 4 };
 	auto sum = a + b;
 	auto difference = a - b;
 	auto product = a * b;
@@ -60,18 +46,18 @@ TEST(Int32x2, ArithmeticAndSelect) {
 		EXPECT_EQ(difference[i], a[i] - b[i]);
 		EXPECT_EQ(product[i], a[i] * b[i]);
 		EXPECT_EQ(quotient[i], a[i] / b[i]);
-		EXPECT_EQ(static_cast<Deep::int32>((a * Deep::int32{ 2 })[i]), a[i] * 2);
-		EXPECT_EQ(static_cast<Deep::int32>((Deep::int32{ 2 } * a)[i]), 2 * a[i]);
-		EXPECT_EQ(static_cast<Deep::int32>((a / Deep::int32{ 2 })[i]), a[i] / 2);
-		EXPECT_EQ(static_cast<Deep::int32>(a.ToFloat()[i]), static_cast<Deep::float32>(a[i]));
+		EXPECT_EQ(static_cast<Deep::uint32>((a * Deep::uint32{ 2 })[i]), a[i] * 2);
+		EXPECT_EQ(static_cast<Deep::uint32>((Deep::uint32{ 2 } * a)[i]), 2 * a[i]);
+		EXPECT_EQ(static_cast<Deep::uint32>((a / Deep::uint32{ 2 })[i]), a[i] / 2);
+		EXPECT_EQ(static_cast<Deep::uint32>(a.ToFloat()[i]), static_cast<Deep::float32>(a[i]));
 	}
-	EXPECT_EQ(Deep::Int32x2::s_Min(a, b), b);
-	EXPECT_EQ(Deep::Int32x2::s_Max(a, b), a);
+	EXPECT_EQ(Deep::UInt32x2::s_Min(a, b), b);
+	EXPECT_EQ(Deep::UInt32x2::s_Max(a, b), a);
 	for (Deep::uint32 mask = 0; mask < 4; ++mask) {
 		Deep::Int32x2 control;
 		for (size_t i = 0; i < 2; ++i)
 			control[i] = (mask & (1u << i)) ? Deep::int32(0x80000000) : 1;
-		auto selected = Deep::Int32x2::s_Select(a, b, control);
+		auto selected = Deep::UInt32x2::s_Select(a, b, control);
 		for (size_t i = 0; i < 2; ++i)
 			EXPECT_EQ(selected[i], (mask & (1u << i)) ? b[i] : a[i]);
 	}

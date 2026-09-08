@@ -12,7 +12,7 @@ struct DEEP_EXPORT Sphere {
 	float32 m_radius;
 
 	// Returns `m_center` and `m_radius` as a packed Vec3.
-	// NOTE(randomuserhi): Writing to this may effect `m_penetrationDistance` which is stored in the `._w` component, use
+	// NOTE(randomuserhi): Writing to this may effect `m_radius` which is stored in the `._w` component, use
 	//                     with caution.
 	inline Vec3& m_Center4();
 	inline const Vec3& m_Center4() const;
@@ -33,13 +33,11 @@ bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere);
 extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere);
 extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere);
 
-// TODO(randomuserhi)
 template<RaycastType3D in_queryType = RaycastType3D::e_default>
 bool Raycast(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hit);
 extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
 extern template DEEP_EXPORT bool Raycast<RaycastType3D::e_startsOutside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);
 
-// TODO(randomuserhi)
 template<RaycastType3D in_queryType = RaycastType3D::e_default>
 int32 RaycastAll(Arg_Ray3D in_ray, Arg_Sphere in_sphere, RayHit3D* out_hits);
 extern template DEEP_EXPORT int32 RaycastAll<RaycastType3D::e_startsInside>(Arg_Ray3D, Arg_Sphere, RayHit3D*);

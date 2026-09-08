@@ -201,6 +201,42 @@ Quat& Quat::operator*=(Arg_Quat in_other) {
 
 	// [dw-ax-by-cz,dz+ay-bx+cw,dy-az+bw+cx,dx+aw+bz-cy]
 	m_float32x4 = _mm_shuffle_ps(e, e, _MM_SHUFFLE(2, 3, 1, 0));
+#elif defined(DEEP_USE_NEON)
+	float32x4_t abcd = m_float32x4;
+	float32x4_t xyzw = in_other.m_float32x4;
+
+	float32x4_t t0 = vdupq_n_f32(vgetq_lane_f32(abcd, 3));
+	float32x4_t t1 = vrev64q_f32(xyzw);
+
+	float32x4_t t3 = vdupq_n_f32(vgetq_lane_f32(abcd, 0));
+	float32x4_t t4 = vextq_f32(xyzw, xyzw, 2);
+
+	float32x4_t t5 = vdupq_n_f32(vgetq_lane_f32(abcd, 1));
+	float32x4_t t6 =
+		Float32x4{ vgetq_lane_f32(xyzw, 1), vgetq_lane_f32(xyzw, 3), vgetq_lane_f32(xyzw, 0), vgetq_lane_f32(xyzw, 2) };
+
+	float32x4_t m0 = vmulq_f32(t0, t1);
+
+	float32x4_t m1 = vmulq_f32(t3, t4);
+
+	float32x4_t m2 = vmulq_f32(t5, t6);
+
+	float32x4_t t7 = vdupq_n_f32(vgetq_lane_f32(abcd, 2));
+	float32x4_t t8 =
+		Float32x4{ vgetq_lane_f32(xyzw, 1), vgetq_lane_f32(xyzw, 0), vgetq_lane_f32(xyzw, 2), vgetq_lane_f32(xyzw, 3) };
+	float32x4_t m3 = vmulq_f32(t7, t8);
+
+	float32x4_t e = Float32x4::s_Select(vsubq_f32(m0, m1), vaddq_f32(m0, m1), Int32x4{ 0, -1, 0, -1 });
+
+	e = Float32x4{ vgetq_lane_f32(e, 2), vgetq_lane_f32(e, 0), vgetq_lane_f32(e, 3), vgetq_lane_f32(e, 1) };
+
+	e = Float32x4::s_Select(vsubq_f32(e, m2), vaddq_f32(e, m2), Int32x4{ 0, -1, 0, -1 });
+
+	e = Float32x4{ vgetq_lane_f32(e, 3), vgetq_lane_f32(e, 1), vgetq_lane_f32(e, 0), vgetq_lane_f32(e, 2) };
+
+	e = Float32x4::s_Select(vsubq_f32(e, m3), vaddq_f32(e, m3), Int32x4{ 0, -1, 0, -1 });
+
+	m_float32x4 = Float32x4{ vgetq_lane_f32(e, 0), vgetq_lane_f32(e, 1), vgetq_lane_f32(e, 3), vgetq_lane_f32(e, 2) };
 #else
 	float lx = x;
 	float ly = y;

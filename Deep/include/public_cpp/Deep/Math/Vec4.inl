@@ -17,6 +17,9 @@ Vec4::Vec4(Float32x4 in_float32x4) :
 #ifdef DEEP_USE_SSE4_1
 Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
 	m_float32x4{ _mm_blend_ps(in_xyz.m_float32x4, _mm_set1_ps(in_w), 8) } {}
+#elif defined(DEEP_USE_NEON)
+Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
+	m_float32x4{ vsetq_lane_f32(in_w, in_xyz.m_float32x4, 3) } {}
 #else
 Vec4::Vec4(Arg_Vec3 in_xyz, float32 in_w) :
 	x{ in_xyz.x }, y{ in_xyz.y }, z{ in_xyz.z }, w{ in_w } {}
@@ -55,6 +58,9 @@ float32 Vec4::m_Magnitude() const {
 float32 Vec4::s_Dot(Arg_Vec4 in_a, Arg_Vec4 in_b) {
 #ifdef DEEP_USE_SSE4_1
 	return _mm_cvtss_f32(_mm_dp_ps(in_a.m_float32x4, in_b.m_float32x4, 0xff));
+#elif defined(DEEP_USE_NEON)
+	float32x4_t product = vmulq_f32(in_a.m_float32x4, in_b.m_float32x4);
+	return vgetq_lane_f32(product, 0) + vgetq_lane_f32(product, 1) + vgetq_lane_f32(product, 2) + vgetq_lane_f32(product, 3);
 #else
 	return in_a.x * in_b.x + in_a.y * in_b.y + in_a.z * in_b.z + in_a.w * in_b.w;
 #endif
