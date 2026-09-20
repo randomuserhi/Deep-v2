@@ -135,6 +135,12 @@ size_t SlotVec<T>::GetId(size_t in_slot) const {
 }
 
 template<typename T>
+size_t SlotVec<T>::GetSlot(size_t in_id) const {
+	Deep_Assert(IsActive(in_id), "Inactive SlotVec ID.");
+	return m_idToSlot[in_id];
+}
+
+template<typename T>
 typename std::vector<T>::iterator SlotVec<T>::begin() {
 	return m_slots.begin();
 }

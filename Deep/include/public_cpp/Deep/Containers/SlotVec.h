@@ -33,6 +33,7 @@ public:
 	//
 
 	inline size_t GetId(size_t in_slot) const;
+	inline size_t GetSlot(size_t in_id) const;
 	inline bool IsActive(size_t in_id) const;
 
 	inline size_t Size() const;

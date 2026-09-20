@@ -136,12 +136,14 @@ TEST(SlotVec, StableIdsAndIteration) {
 	const size_t a = items.PushBack(10);
 	const size_t b = items.PushBack(20);
 	const size_t c = items.PushBack(30);
+	EXPECT_EQ(items.GetSlot(c), 2);
 	items.Remove(b);
 	EXPECT_EQ(items.Size(), 2);
 	EXPECT_FALSE(items.IsActive(b));
 	EXPECT_EQ(items[a], 10);
 	EXPECT_EQ(items[c], 30);
 	EXPECT_EQ(items.GetId(1), c);
+	EXPECT_EQ(items.GetSlot(c), 1);
 	EXPECT_FALSE(items.IsActive(size_t(-1)));
 
 	for (int& item : items)
@@ -152,6 +154,7 @@ TEST(SlotVec, StableIdsAndIteration) {
 		sum += item;
 	EXPECT_EQ(sum, 42);
 	EXPECT_EQ(view[c], 31);
+	EXPECT_EQ(view.GetSlot(a), 0);
 	EXPECT_EQ(view.end() - view.begin(), 2);
 
 	EXPECT_EQ(items.PushBack(40), b);
@@ -233,6 +236,7 @@ TEST(SlotVec, RepeatedRemovalAndReuse) {
 		for (size_t i = 0; i < 64; ++i) {
 			EXPECT_EQ(items[i], expected[i]);
 			EXPECT_EQ(items[items.GetId(i)], *(items.begin() + i));
+			EXPECT_EQ(items.GetSlot(items.GetId(i)), i);
 		}
 	}
 }
