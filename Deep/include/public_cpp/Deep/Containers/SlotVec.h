@@ -68,7 +68,7 @@ public:
 
 	//
 
-	constexpr static uint64 k_maxCapacity = Deep::Min(std::numeric_limits<size_t>().max(), uint64{ 1 } << 48);
+	constexpr static uint64 k_maxCapacity = uint64{ 1 } << 48;
 
 private:
 	DEEP_PRIVATE_TESTABLE
