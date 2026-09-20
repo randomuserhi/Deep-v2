@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Deep.h"
-#include "Deep/Bit/IntegerBitMask.h"
+#include "Deep/Bit/c_BitMask.h"
 #include "Deep/Templates/ConstructWith.h"
 #include "Deep/Templates/SoALayout.h"
 
