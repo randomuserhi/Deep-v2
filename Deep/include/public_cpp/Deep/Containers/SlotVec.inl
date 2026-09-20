@@ -41,103 +41,118 @@ size_t SlotVec<T>::Size() const {
 }
 
 template<typename T>
-bool SlotVec<T>::IsActive(size_t in_id) const {
-	return in_id < m_idToSlot.size() && m_idToSlot[in_id] < Size();
+bool SlotVec<T>::IsActive(Handle in_handle) const {
+	const Handle index = in_handle >> k_versionBits;
+	if (index >= m_handleToSlot.size()) return false;
+	const size_t slot = m_handleToSlot[index];
+	return slot < Size() && m_slotToHandle[slot] == in_handle;
 }
 
 template<typename T>
-T& SlotVec<T>::operator[](size_t in_id) {
-	Deep_Assert(IsActive(in_id), "Inactive SlotVec ID.");
-	return m_slots[m_idToSlot[in_id]];
+T& SlotVec<T>::operator[](Handle in_handle) {
+	Deep_Assert(IsActive(in_handle), "Inactive SlotVec handle.");
+	return m_slots[m_handleToSlot[in_handle >> k_versionBits]];
 }
 
 template<typename T>
-const T& SlotVec<T>::operator[](size_t in_id) const {
-	Deep_Assert(IsActive(in_id), "Inactive SlotVec ID.");
-	return m_slots[m_idToSlot[in_id]];
+const T& SlotVec<T>::operator[](Handle in_handle) const {
+	Deep_Assert(IsActive(in_handle), "Inactive SlotVec handle.");
+	return m_slots[m_handleToSlot[in_handle >> k_versionBits]];
 }
 
 template<typename T>
 template<typename... Args>
-size_t SlotVec<T>::Emplace(Args&&... in_args) {
+typename SlotVec<T>::Handle SlotVec<T>::Emplace(Args&&... in_args) {
 	const size_t slot = Size();
-	if (slot == m_slotToId.size()) {
+	if (slot >= k_maxCapacity) {
+		Deep_Assert(false, "SlotVec capacity exceeds the 48-bit index limit.");
+		std::abort();
+	}
+	if (slot == m_slotToHandle.size()) {
 		// Grow the maps first so arguments referring to existing items remain valid.
 #if DEEP_CPP_EXCEPTIONS_ENABLED
 		try {
 #endif
-			m_idToSlot.push_back(slot);
-			m_slotToId.push_back(slot);
+			m_handleToSlot.push_back(slot);
+			m_slotToHandle.push_back(static_cast<Handle>(slot) << k_versionBits);
 			m_slots.emplace_back(std::forward<Args>(in_args)...);
 #if DEEP_CPP_EXCEPTIONS_ENABLED
 		} catch (...) {
 			// Restore both maps if allocation or item construction fails.
-			m_idToSlot.resize(slot);
-			m_slotToId.resize(slot);
+			m_handleToSlot.resize(slot);
+			m_slotToHandle.resize(slot);
 			throw;
 		}
 #endif
 	} else {
 		m_slots.emplace_back(std::forward<Args>(in_args)...);
 	}
-	return m_slotToId[slot];
+	return m_slotToHandle[slot];
 }
 
 template<typename T>
-size_t SlotVec<T>::PushBack(const T& in_item) {
+typename SlotVec<T>::Handle SlotVec<T>::PushBack(const T& in_item) {
 	return Emplace(in_item);
 }
 
 template<typename T>
-size_t SlotVec<T>::PushBack(T&& in_item) {
+typename SlotVec<T>::Handle SlotVec<T>::PushBack(T&& in_item) {
 	return Emplace(std::move(in_item));
 }
 
 template<typename T>
-void SlotVec<T>::Remove(size_t in_id) {
-	Deep_Assert(IsActive(in_id), "Inactive SlotVec ID.");
-	const size_t slot = m_idToSlot[in_id];
+void SlotVec<T>::Remove(Handle in_handle) {
+	Deep_Assert(IsActive(in_handle), "Inactive SlotVec handle.");
+	const size_t slot = m_handleToSlot[in_handle >> k_versionBits];
 	const size_t last = Size() - 1;
 	if (slot != last) {
 		std::swap(m_slots[slot], m_slots[last]);
-		std::swap(m_slotToId[slot], m_slotToId[last]);
-		m_idToSlot[m_slotToId[slot]] = slot;
-		m_idToSlot[in_id] = last;
+		std::swap(m_slotToHandle[slot], m_slotToHandle[last]);
+		m_handleToSlot[m_slotToHandle[slot] >> k_versionBits] = slot;
+		m_handleToSlot[in_handle >> k_versionBits] = last;
 	}
+	// Increment only the version, without carrying into the index on wraparound.
+	m_slotToHandle[last] = (in_handle & ~k_versionMask) | ((in_handle + 1) & k_versionMask);
 	m_slots.pop_back();
 }
 
 template<typename T>
 void SlotVec<T>::Clear() {
+	for (size_t slot = 0; slot < Size(); ++slot) {
+		const Handle handle = m_slotToHandle[slot];
+		m_slotToHandle[slot] = (handle & ~k_versionMask) | ((handle + 1) & k_versionMask);
+	}
 	m_slots.clear();
-	m_idToSlot.clear();
-	m_slotToId.clear();
 }
 
 template<typename T>
 void SlotVec<T>::Reserve(size_t in_capacity) {
-	m_idToSlot.reserve(in_capacity);
-	m_slotToId.reserve(in_capacity);
+	if (in_capacity > k_maxCapacity) {
+		Deep_Assert(false, "SlotVec capacity exceeds the 48-bit index limit.");
+		std::abort();
+	}
+	m_handleToSlot.reserve(in_capacity);
+	m_slotToHandle.reserve(in_capacity);
 	m_slots.reserve(in_capacity);
 }
 
 template<typename T>
 void SlotVec<T>::Swap(SlotVec& in_other) noexcept {
 	m_slots.swap(in_other.m_slots);
-	m_idToSlot.swap(in_other.m_idToSlot);
-	m_slotToId.swap(in_other.m_slotToId);
+	m_handleToSlot.swap(in_other.m_handleToSlot);
+	m_slotToHandle.swap(in_other.m_slotToHandle);
 }
 
 template<typename T>
-size_t SlotVec<T>::GetId(size_t in_slot) const {
+typename SlotVec<T>::Handle SlotVec<T>::GetId(size_t in_slot) const {
 	Deep_Assert(in_slot < Size(), "Out of range.");
-	return m_slotToId[in_slot];
+	return m_slotToHandle[in_slot];
 }
 
 template<typename T>
-size_t SlotVec<T>::GetSlot(size_t in_id) const {
-	Deep_Assert(IsActive(in_id), "Inactive SlotVec ID.");
-	return m_idToSlot[in_id];
+size_t SlotVec<T>::GetSlot(Handle in_handle) const {
+	Deep_Assert(IsActive(in_handle), "Inactive SlotVec handle.");
+	return m_handleToSlot[in_handle >> k_versionBits];
 }
 
 template<typename T>
