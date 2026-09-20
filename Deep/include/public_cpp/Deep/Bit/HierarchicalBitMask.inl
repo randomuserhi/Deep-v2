@@ -122,6 +122,16 @@ const STORAGE::ChunkType* STORAGE::m_Ptr() const {
 #define ARG_BITMASK Arg_HierarchicalBitMask<in_N, in_Policy>
 
 BITMASK_TEMPLATE
+constexpr BITMASK::HierarchicalBitMask(std::nullptr_t) :
+	HierarchicalBitMask{} {}
+
+BITMASK_TEMPLATE
+constexpr BITMASK& BITMASK::operator=(std::nullptr_t) {
+	Clear();
+	return *this;
+}
+
+BITMASK_TEMPLATE
 constexpr void BITMASK::RebuildHierarchy() {
 	for (size_t level = 1; level < k_numLevels; ++level) {
 		const size_t childOffset = k_levelOffsets[level - 1];

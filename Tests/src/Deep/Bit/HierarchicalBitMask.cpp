@@ -5,6 +5,43 @@
 #include "Deep/Types.h"
 #include "Deep/Bit/HierarchicalBitMask.h"
 
+namespace {
+
+template<typename T>
+concept AcceptsNonzeroHierarchicalBitMask = requires(T a) { T{ 1 }; };
+
+template<typename T>
+concept AssignsNonzeroHierarchicalBitMask = requires(T a) { a = 1; };
+
+} // namespace
+
+TEST(HierarchicalBitMask, LiteralZero) {
+	auto check = [this]<Deep::StoragePolicy in_policy>() {
+		using Mask = Deep::HierarchicalBitMask<4097, in_policy>;
+		static_assert(Deep::c_BitMask<Mask>);
+		static_assert(!AcceptsNonzeroHierarchicalBitMask<Mask>);
+		static_assert(!AssignsNonzeroHierarchicalBitMask<Mask>);
+		static_assert(!std::is_constructible_v<Mask, int>);
+		static_assert(!std::is_assignable_v<Mask&, int>);
+		Mask mask{ 0 };
+		Mask converted = 0;
+		EXPECT_FALSE(mask.Any());
+		EXPECT_FALSE(converted.Any());
+		mask.Inverse();
+		EXPECT_EQ(mask.NumSetBits(), Mask::k_maxNumBits);
+		EXPECT_EQ(&(mask = 0), &mask);
+		EXPECT_FALSE(mask.Any());
+		EXPECT_EQ(mask.NumSetBits(), 0);
+		for (size_t i = 0; i < Mask::k_maxNumBits; ++i)
+			EXPECT_FALSE(mask.Test(i));
+		mask.template Set<true>(4096);
+		EXPECT_EQ(mask.PopLowestSetBit(), 4096);
+		EXPECT_FALSE(mask.Any());
+	};
+	check.template operator()<Deep::StoragePolicy::e_stack>();
+	check.template operator()<Deep::StoragePolicy::e_heap>();
+}
+
 TEST(HierarchicalBitMask, DefaultConstructionAndClear) {
 	Deep::HierarchicalBitMask<32> mask{};
 

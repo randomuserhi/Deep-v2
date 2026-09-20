@@ -122,6 +122,16 @@ const STORAGE::ChunkType* STORAGE::m_Ptr() const {
 #define ARG_BITMASK Arg_BitMask<in_N, in_Policy>
 
 BITMASK_TEMPLATE
+constexpr BITMASK::BitMask(std::nullptr_t) :
+	BitMask{} {}
+
+BITMASK_TEMPLATE
+constexpr BITMASK& BITMASK::operator=(std::nullptr_t) {
+	Clear();
+	return *this;
+}
+
+BITMASK_TEMPLATE
 constexpr bool BITMASK::Test(size_t in_index) const {
 	Deep_Assert(in_index < k_maxNumBits, "Index out of range.");
 

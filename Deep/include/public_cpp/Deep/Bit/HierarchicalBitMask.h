@@ -189,6 +189,10 @@ public:
 public:
 	HierarchicalBitMask() = default;
 
+	// Accept literal 0 (or nullptr), but not arbitrary integers.
+	constexpr inline HierarchicalBitMask(std::nullptr_t);
+	constexpr inline HierarchicalBitMask& operator=(std::nullptr_t);
+
 	[[nodiscard]] constexpr Deep_ForceInline bool Any() const;
 
 	[[nodiscard]] constexpr Deep_ForceInline bool Test(size_t in_index) const;
